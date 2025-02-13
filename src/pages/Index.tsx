@@ -46,11 +46,11 @@ const Index = () => {
   );
 
   return (
-    <div className="min-h-screen p-6 animate-enter">
+    <div className="min-h-screen p-6 animate-enter bg-[#FAFBFF]">
       <header className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-semibold">Pawnshop Inventory</h1>
-          <Button className="hover-transform">
+          <h1 className="text-3xl font-semibold text-[#111111]">Pawnshop Inventory</h1>
+          <Button className="hover-transform bg-[#646ECB] hover:bg-[#3F4BBD] text-white">
             <Plus className="mr-2 h-4 w-4" />
             Add Item
           </Button>
@@ -59,40 +59,40 @@ const Index = () => {
         <div className="grid gap-4 md:grid-cols-4">
           <Card className="p-4 glass-card hover-transform">
             <div className="flex items-center space-x-2">
-              <Package className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Total Items</span>
+              <Package className="h-4 w-4 text-[#646ECB]" />
+              <span className="text-sm font-medium text-[#2A2A2A]">Total Items</span>
             </div>
-            <p className="text-2xl font-bold mt-2">247</p>
+            <p className="text-2xl font-bold mt-2 text-[#111111]">247</p>
           </Card>
           <Card className="p-4 glass-card hover-transform">
             <div className="flex items-center space-x-2">
-              <DollarSign className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Total Value</span>
+              <DollarSign className="h-4 w-4 text-[#646ECB]" />
+              <span className="text-sm font-medium text-[#2A2A2A]">Total Value</span>
             </div>
-            <p className="text-2xl font-bold mt-2">$45,299</p>
+            <p className="text-2xl font-bold mt-2 text-[#111111]">$45,299</p>
           </Card>
           <Card className="p-4 glass-card hover-transform">
             <div className="flex items-center space-x-2">
-              <Users className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Active Loans</span>
+              <Users className="h-4 w-4 text-[#646ECB]" />
+              <span className="text-sm font-medium text-[#2A2A2A]">Active Loans</span>
             </div>
-            <p className="text-2xl font-bold mt-2">38</p>
+            <p className="text-2xl font-bold mt-2 text-[#111111]">38</p>
           </Card>
           <Card className="p-4 glass-card hover-transform">
             <div className="flex items-center space-x-2">
-              <AlertCircle className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium">Due Today</span>
+              <AlertCircle className="h-4 w-4 text-[#646ECB]" />
+              <span className="text-sm font-medium text-[#2A2A2A]">Due Today</span>
             </div>
-            <p className="text-2xl font-bold mt-2">5</p>
+            <p className="text-2xl font-bold mt-2 text-[#111111]">5</p>
           </Card>
         </div>
       </header>
 
       <div className="mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#646ECB] h-4 w-4" />
           <Input
-            className="pl-10"
+            className="pl-10 border-[#646ECB]/20 focus:border-[#646ECB] focus:ring-[#646ECB]"
             placeholder="Search inventory..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
