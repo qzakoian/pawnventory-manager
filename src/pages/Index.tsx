@@ -1,10 +1,11 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Plus, Users, Package, LineChart, ArrowRight, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -49,12 +50,58 @@ const transactions = [
   // ... more transactions
 ];
 
+interface Customer {
+  id: number;
+  first_name: string | null;
+  last_name: string | null;
+}
+
 const Index = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Customer[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate("/auth");
+  };
+
+  const handleCustomerSearch = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const { data, error } = await supabase
+        .from('Customers')
+        .select('id, first_name, last_name')
+        .or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
+        .limit(5);
+
+      if (error) throw error;
+
+      setSearchResults(data || []);
+
+      if (data && data.length === 0) {
+        toast({
+          description: "No customers found",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error('Error searching customers:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to search for customers",
+      });
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   return (
@@ -94,11 +141,46 @@ const Index = () => {
             <Card className="p-4 glass-card">
               <h3 className="text-lg font-medium text-[#111111] mb-4">Find a Customer</h3>
               <div className="flex space-x-2">
-                <Input placeholder="John Doe" className="flex-1" />
-                <Button variant="outline" className="text-[#646ECB]">
-                  Find <ArrowRight className="ml-2 h-4 w-4" />
+                <Input 
+                  placeholder="Search by name..." 
+                  className="flex-1"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCustomerSearch()}
+                />
+                <Button 
+                  variant="outline" 
+                  className="text-[#646ECB]"
+                  onClick={handleCustomerSearch}
+                  disabled={isSearching}
+                >
+                  {isSearching ? "Searching..." : (
+                    <>
+                      Find <ArrowRight className="ml-2 h-4 w-4" />
+                    </>
+                  )}
                 </Button>
               </div>
+              {searchResults.length > 0 && (
+                <div className="mt-2 space-y-1">
+                  {searchResults.map((customer) => (
+                    <div
+                      key={customer.id}
+                      className="p-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center justify-between"
+                      onClick={() => {
+                        toast({
+                          description: `Selected customer: ${customer.first_name} ${customer.last_name}`,
+                        });
+                        setSearchResults([]);
+                        setSearchQuery('');
+                      }}
+                    >
+                      <span>{customer.first_name} {customer.last_name}</span>
+                      <ArrowRight className="h-4 w-4 text-[#646ECB]" />
+                    </div>
+                  ))}
+                </div>
+              )}
               <Button variant="link" className="text-[#646ECB] pl-0 mt-2">
                 <Plus className="h-4 w-4 mr-1" /> Create Customer
               </Button>
