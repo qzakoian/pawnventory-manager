@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Plus, Users, Package, LineChart, ArrowRight, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   LineChart as RechartsLineChart,
@@ -68,8 +68,8 @@ const Index = () => {
     navigate("/auth");
   };
 
-  const handleCustomerSearch = async () => {
-    if (!searchQuery.trim()) {
+  const handleCustomerSearch = async (query: string) => {
+    if (!query.trim()) {
       setSearchResults([]);
       return;
     }
@@ -79,14 +79,14 @@ const Index = () => {
       const { data, error } = await supabase
         .from('Customers')
         .select('id, first_name, last_name')
-        .or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
+        .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
         .limit(5);
 
       if (error) throw error;
 
       setSearchResults(data || []);
 
-      if (data && data.length === 0) {
+      if (data && data.length === 0 && query.trim() !== '') {
         toast({
           description: "No customers found",
           duration: 3000,
@@ -103,6 +103,14 @@ const Index = () => {
       setIsSearching(false);
     }
   };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      handleCustomerSearch(searchQuery);
+    }, 300); // Wait 300ms after user stops typing
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   return (
     <div className="min-h-screen bg-[#F8F9FF]">
@@ -146,12 +154,11 @@ const Index = () => {
                   className="flex-1"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleCustomerSearch()}
                 />
                 <Button 
                   variant="outline" 
                   className="text-[#646ECB]"
-                  onClick={handleCustomerSearch}
+                  onClick={() => handleCustomerSearch(searchQuery)}
                   disabled={isSearching}
                 >
                   {isSearching ? "Searching..." : (
