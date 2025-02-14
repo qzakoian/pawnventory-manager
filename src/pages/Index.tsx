@@ -175,11 +175,7 @@ const Index = () => {
                       key={customer.id}
                       className="p-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center justify-between"
                       onClick={() => {
-                        toast({
-                          description: `Selected customer: ${customer.first_name} ${customer.last_name}`,
-                        });
-                        setSearchResults([]);
-                        setSearchQuery('');
+                        navigate(`/customer/${customer.id}`);
                       }}
                     >
                       <span>{customer.first_name} {customer.last_name}</span>
