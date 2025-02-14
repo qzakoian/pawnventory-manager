@@ -4,13 +4,19 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Store, User } from "lucide-react";
+import { ChevronDown, Store, User, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
 
 interface Shop {
   id: number;
@@ -21,7 +27,10 @@ export const ShopsDropdown = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserShops = async () => {
@@ -30,16 +39,19 @@ export const ShopsDropdown = () => {
         
         if (!user) return;
 
+        setUserEmail(user.email);
+
         // First get the user's ID and profile picture from the Users table
         const { data: userData, error: userError } = await supabase
           .from('Users')
-          .select('id, profil_picture')
+          .select('id, profil_picture, first_name, last_name')
           .eq('email', user.email)
           .single();
 
         if (userError) throw userError;
 
         setProfilePicture(userData.profil_picture);
+        setUserName(`${userData.first_name} ${userData.last_name}`);
 
         // Then use that ID to get the linked shops
         const { data: shopLinks, error: shopError } = await supabase
@@ -76,6 +88,11 @@ export const ShopsDropdown = () => {
     fetchUserShops();
   }, []);
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -90,17 +107,41 @@ export const ShopsDropdown = () => {
           <ChevronDown className="h-4 w-4 ml-2" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[200px] bg-white">
-        {shops.map((shop) => (
-          <DropdownMenuItem
-            key={shop.id}
-            className="cursor-pointer"
-            onClick={() => setSelectedShop(shop)}
-          >
+      <DropdownMenuContent align="end" className="w-[280px] bg-white">
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{userName}</p>
+            <p className="text-xs leading-none text-muted-foreground">{userEmail}</p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem>
+          Account and settings
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className="cursor-pointer">
             <Store className="h-4 w-4 mr-2" />
-            {shop.name}
-          </DropdownMenuItem>
-        ))}
+            <span>{selectedShop?.name || "Select Shop"}</span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="w-[200px]">
+            {shops.map((shop) => (
+              <DropdownMenuItem
+                key={shop.id}
+                className="cursor-pointer"
+                onClick={() => setSelectedShop(shop)}
+              >
+                <Store className="h-4 w-4 mr-2" />
+                {shop.name}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={handleLogout}>
+          <LogOut className="h-4 w-4 mr-2" />
+          Log out
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
