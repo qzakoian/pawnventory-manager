@@ -28,7 +28,17 @@ export const ShopsDropdown = () => {
         
         if (!user) return;
 
-        const { data, error } = await supabase
+        // First get the user's ID from the Users table
+        const { data: userData, error: userError } = await supabase
+          .from('Users')
+          .select('id')
+          .eq('email', user.email)
+          .single();
+
+        if (userError) throw userError;
+
+        // Then use that ID to get the linked shops
+        const { data: shopLinks, error: shopError } = await supabase
           .from('User-Shop links')
           .select(`
             shop_id,
@@ -37,11 +47,11 @@ export const ShopsDropdown = () => {
               name
             )
           `)
-          .eq('user_id', user.id);
+          .eq('user_id', userData.id);
 
-        if (error) throw error;
+        if (shopError) throw shopError;
 
-        const userShops = data
+        const userShops = shopLinks
           .map(link => link.Shops)
           .filter((shop): shop is Shop => shop !== null);
 
