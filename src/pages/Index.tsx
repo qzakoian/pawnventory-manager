@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { ShopsDropdown } from "@/components/ShopsDropdown";
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -121,10 +122,7 @@ const Index = () => {
             <span className="font-medium">Pawn Systems</span>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-              <Users className="h-5 w-5" />
-              <span className="font-medium">Parmy Pawn Shop</span>
-            </div>
+            <ShopsDropdown />
             <Button
               variant="ghost"
               size="sm"
