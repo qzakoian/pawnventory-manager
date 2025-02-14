@@ -36,11 +36,21 @@ const CustomerProfile = () => {
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
+        const customerId = parseInt(id || '');
+        if (isNaN(customerId)) {
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "Invalid customer ID",
+          });
+          return;
+        }
+
         // Fetch customer details
         const { data: customerData, error: customerError } = await supabase
           .from('Customers')
           .select('*')
-          .eq('id', id)
+          .eq('id', customerId)
           .single();
 
         if (customerError) throw customerError;
@@ -50,7 +60,7 @@ const CustomerProfile = () => {
         const { data: productsData, error: productsError } = await supabase
           .from('Products')
           .select('*')
-          .eq('customer_id', id)
+          .eq('customer_id', customerId)
           .order('purchase_date', { ascending: false });
 
         if (productsError) throw productsError;
