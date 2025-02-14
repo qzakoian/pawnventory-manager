@@ -7,9 +7,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Store } from "lucide-react";
+import { ChevronDown, Store, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface Shop {
   id: number;
@@ -19,6 +20,7 @@ interface Shop {
 export const ShopsDropdown = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -28,14 +30,16 @@ export const ShopsDropdown = () => {
         
         if (!user) return;
 
-        // First get the user's ID from the Users table
+        // First get the user's ID and profile picture from the Users table
         const { data: userData, error: userError } = await supabase
           .from('Users')
-          .select('id')
+          .select('id, profil_picture')
           .eq('email', user.email)
           .single();
 
         if (userError) throw userError;
+
+        setProfilePicture(userData.profil_picture);
 
         // Then use that ID to get the linked shops
         const { data: shopLinks, error: shopError } = await supabase
@@ -76,7 +80,12 @@ export const ShopsDropdown = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 text-white hover:text-white hover:bg-white/20">
-          <Store className="h-4 w-4 mr-2" />
+          <Avatar className="h-6 w-6 mr-2">
+            <AvatarImage src={profilePicture || undefined} />
+            <AvatarFallback>
+              <User className="h-4 w-4" />
+            </AvatarFallback>
+          </Avatar>
           {selectedShop?.name || "Select Shop"}
           <ChevronDown className="h-4 w-4 ml-2" />
         </Button>
