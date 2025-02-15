@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Package, Plus, ArrowLeft } from "lucide-react";
+import { Package, Plus, ArrowLeft, LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -28,6 +28,7 @@ import { Customer, Product, NewProduct, EditCustomer } from "@/types/customer";
 import { CustomerInfoCard } from "@/components/customer/CustomerInfoCard";
 import { CustomerProducts } from "@/components/customer/CustomerProducts";
 import { EditCustomerDialog } from "@/components/customer/EditCustomerDialog";
+import { ShopsDropdown } from "@/components/ShopsDropdown";
 import { formatUKPhoneNumber, formatPostcode, isValidUKPhoneNumber, isValidUKPostcode } from "@/utils/validation";
 
 const CustomerProfile = () => {
@@ -234,6 +235,11 @@ const CustomerProfile = () => {
     }
   };
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8F9FF] p-6">
@@ -256,7 +262,27 @@ const CustomerProfile = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F9FF]">
-      <header className="bg-white border-b px-6 py-4">
+      <header className="bg-[#646ECB] text-white px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Package className="h-5 w-5" />
+            <span className="font-medium">Pawn Systems</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <ShopsDropdown />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-white hover:text-white hover:bg-white/20"
+              onClick={handleLogout}
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <div className="bg-white border-b px-6 py-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
@@ -277,7 +303,7 @@ const CustomerProfile = () => {
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
       <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
