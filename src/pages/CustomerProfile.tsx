@@ -270,6 +270,13 @@ const CustomerProfile = () => {
             <span className="font-medium">Pawn Systems</span>
           </div>
           <div className="flex items-center space-x-4">
+            <Button 
+              onClick={() => setIsNewProductDialogOpen(true)} 
+              className="bg-white text-[#646ECB] hover:bg-white/90"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add New Product
+            </Button>
             <ShopsDropdown />
           </div>
         </div>
@@ -286,12 +293,6 @@ const CustomerProfile = () => {
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
-              </Button>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button onClick={() => setIsNewProductDialogOpen(true)} className="bg-[#646ECB] hover:bg-[#4E56A6]">
-                <Plus className="h-4 w-4 mr-2" />
-                Add New Product
               </Button>
             </div>
           </div>
