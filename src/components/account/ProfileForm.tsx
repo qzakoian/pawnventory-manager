@@ -42,11 +42,33 @@ interface ProfileFormProps {
 }
 
 export function ProfileForm({ form, onSubmit }: ProfileFormProps) {
+  const handleProfileUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const values = form.getValues();
+    await onSubmit({
+      ...values,
+      current_password: undefined,
+      new_password: undefined,
+      confirm_password: undefined,
+    });
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (form.getValues('new_password')) {
+      await onSubmit({
+        ...form.getValues(),
+        first_name: form.getValues('first_name'),
+        last_name: form.getValues('last_name'),
+      });
+    }
+  };
+
   return (
     <Form {...form}>
       <div className="space-y-6">
         {/* Profile Information Form */}
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleProfileUpdate} className="space-y-4">
           <FormField
             control={form.control}
             name="first_name"
@@ -83,7 +105,7 @@ export function ProfileForm({ form, onSubmit }: ProfileFormProps) {
         {/* Password Change Form */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Change Password</h3>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handlePasswordChange} className="space-y-4">
             <FormField
               control={form.control}
               name="current_password"
