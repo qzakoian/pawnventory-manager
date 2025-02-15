@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User, Store } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
   CardContent,
@@ -216,131 +217,146 @@ export default function AccountSettings() {
             Manage your account settings and preferences
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Profile Picture Section */}
-          <div className="flex flex-col items-center space-y-4">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={profileUrl || undefined} />
-              <AvatarFallback>
-                <User className="h-12 w-12" />
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <Input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-                id="profile-picture"
-              />
-              <Button
-                variant="outline"
-                onClick={() => document.getElementById('profile-picture')?.click()}
-              >
-                Change Picture
-              </Button>
-            </div>
-          </div>
+        <CardContent>
+          <Tabs defaultValue="profile" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="shops">Your Shops</TabsTrigger>
+            </TabsList>
 
-          {/* Profile Form */}
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="first_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>First Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="last_name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Last Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="pt-4">
-                <h3 className="text-lg font-medium">Change Password</h3>
-                <div className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="current_password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Current Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
+            <TabsContent value="profile" className="space-y-6">
+              {/* Profile Picture Section */}
+              <div className="flex flex-col items-center space-y-4">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={profileUrl || undefined} />
+                  <AvatarFallback>
+                    <User className="h-12 w-12" />
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="profile-picture"
                   />
-
-                  <FormField
-                    control={form.control}
-                    name="new_password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>New Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="confirm_password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Confirm New Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => document.getElementById('profile-picture')?.click()}
+                  >
+                    Change Picture
+                  </Button>
                 </div>
               </div>
 
-              <Button type="submit" className="w-full">
-                Save Changes
-              </Button>
-            </form>
-          </Form>
+              {/* Profile Form */}
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="first_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-          {/* Shops Section */}
-          <div className="pt-6">
-            <h3 className="text-lg font-medium mb-4">Your Shops</h3>
-            <div className="space-y-2">
-              {shops.map((shop) => (
-                <div
-                  key={shop.id}
-                  className="flex items-center p-3 border rounded-lg"
-                >
-                  <Store className="h-4 w-4 mr-2" />
-                  <span>{shop.name}</span>
+                  <FormField
+                    control={form.control}
+                    name="last_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="pt-4">
+                    <h3 className="text-lg font-medium">Change Password</h3>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="current_password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Current Password</FormLabel>
+                            <FormControl>
+                              <Input type="password" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="new_password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>New Password</FormLabel>
+                            <FormControl>
+                              <Input type="password" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="confirm_password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Confirm New Password</FormLabel>
+                            <FormControl>
+                              <Input type="password" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+
+                  <Button type="submit" className="w-full">
+                    Save Changes
+                  </Button>
+                </form>
+              </Form>
+            </TabsContent>
+
+            <TabsContent value="shops" className="space-y-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  {shops.map((shop) => (
+                    <div
+                      key={shop.id}
+                      className="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <Store className="h-5 w-5 mr-3 text-gray-500" />
+                      <span className="font-medium">{shop.name}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
+                {shops.length === 0 && (
+                  <div className="text-center py-8 text-gray-500">
+                    <Store className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p>No shops found</p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
