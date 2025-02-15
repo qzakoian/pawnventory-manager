@@ -210,13 +210,28 @@ const CustomerProfile = () => {
   const handleUpdateCustomer = async () => {
     if (!customer) return;
 
+    // Validate phone number if provided
+    if (editCustomer.phone_number && !isValidUKPhoneNumber(editCustomer.phone_number)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid phone number",
+        description: "Please enter a valid UK mobile number",
+      });
+      return;
+    }
+
+    // Format phone number before saving
+    const formattedPhoneNumber = editCustomer.phone_number 
+      ? formatUKPhoneNumber(editCustomer.phone_number)
+      : '';
+
     try {
       const { error } = await supabase
         .from('Customers')
         .update({
           first_name: editCustomer.first_name,
           last_name: editCustomer.last_name,
-          phone_number: editCustomer.phone_number,
+          phone_number: formattedPhoneNumber,
           email: editCustomer.email,
           address: editCustomer.address,
         })
@@ -228,7 +243,7 @@ const CustomerProfile = () => {
         ...customer,
         first_name: editCustomer.first_name,
         last_name: editCustomer.last_name,
-        phone_number: editCustomer.phone_number,
+        phone_number: formattedPhoneNumber,
         email: editCustomer.email,
         address: editCustomer.address,
       });
@@ -246,6 +261,41 @@ const CustomerProfile = () => {
         description: "Failed to update customer profile",
       });
     }
+  };
+
+  const formatUKPhoneNumber = (phoneNumber: string): string => {
+    // Remove all non-digit characters
+    const digitsOnly = phoneNumber.replace(/\D/g, '');
+    
+    // Check if it's a UK number starting with '44' or '0'
+    let formatted = digitsOnly;
+    if (digitsOnly.startsWith('44')) {
+      // Format as international UK number
+      formatted = digitsOnly.replace(/^44/, '');
+      return `+44 ${formatted.slice(0, 4)} ${formatted.slice(4)}`;
+    } else if (digitsOnly.startsWith('0')) {
+      // Convert UK local format to international
+      formatted = digitsOnly.slice(1);
+      return `+44 ${formatted.slice(0, 4)} ${formatted.slice(4)}`;
+    }
+    return `+44 ${formatted.slice(0, 4)} ${formatted.slice(4)}`;
+  };
+
+  const isValidUKPhoneNumber = (phoneNumber: string): boolean => {
+    // Remove all non-digit characters
+    const digitsOnly = phoneNumber.replace(/\D/g, '');
+    
+    // Check if empty (since phone is optional)
+    if (digitsOnly === '') return true;
+    
+    // UK mobile numbers are typically 11 digits (including leading 0)
+    // or 12 digits (including 44)
+    const validLength = digitsOnly.length === 11 || (digitsOnly.length === 12 && digitsOnly.startsWith('44'));
+    
+    // Basic UK mobile number pattern
+    const ukMobilePattern = /^(0|44)?7\d{9}$/;
+    
+    return validLength && ukMobilePattern.test(digitsOnly);
   };
 
   if (loading) {
@@ -499,9 +549,22 @@ const CustomerProfile = () => {
               <Input
                 id="phone_number"
                 value={editCustomer.phone_number}
-                onChange={(e) => setEditCustomer({ ...editCustomer, phone_number: e.target.value })}
-                placeholder="Enter phone number"
+                onChange={(e) => {
+                  const input = e.target.value;
+                  // Only allow digits, spaces, plus, and hyphens
+                  const sanitized = input.replace(/[^\d\s+-]/g, '');
+                  setEditCustomer({ ...editCustomer, phone_number: sanitized });
+                }}
+                placeholder="Enter UK mobile number (e.g., 07123456789)"
+                className={!isValidUKPhoneNumber(editCustomer.phone_number) && editCustomer.phone_number 
+                  ? "border-red-500" 
+                  : ""}
               />
+              {!isValidUKPhoneNumber(editCustomer.phone_number) && editCustomer.phone_number && (
+                <p className="text-sm text-red-500 mt-1">
+                  Please enter a valid UK mobile number
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email (optional)</Label>
