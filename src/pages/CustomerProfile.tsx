@@ -181,7 +181,7 @@ const CustomerProfile = () => {
 
     try {
       console.log('Updating customer with ID:', customer.id);
-      console.log('Update payload:', {
+      const updatePayload = {
         first_name: editedCustomer.first_name,
         last_name: editedCustomer.last_name,
         phone_number: formattedPhoneNumber,
@@ -191,21 +191,12 @@ const CustomerProfile = () => {
         city: editedCustomer.city,
         postal_code: formattedPostcode,
         county: editedCustomer.county,
-      });
+      };
+      console.log('Update payload:', updatePayload);
 
       const { data, error } = await supabase
         .from('Customers')
-        .update({
-          first_name: editedCustomer.first_name,
-          last_name: editedCustomer.last_name,
-          phone_number: formattedPhoneNumber,
-          email: editedCustomer.email,
-          address_line1: editedCustomer.address_line1,
-          address_line2: editedCustomer.address_line2,
-          city: editedCustomer.city,
-          postal_code: formattedPostcode,
-          county: editedCustomer.county,
-        })
+        .update(updatePayload)
         .eq('id', customer.id)
         .select();
 
@@ -214,20 +205,15 @@ const CustomerProfile = () => {
         throw error;
       }
 
-      console.log('Update response:', data);
+      console.log('Update response data:', JSON.stringify(data, null, 2));
 
       if (data && data.length > 0) {
+        const updatedCustomer = data[0];
+        console.log('Successfully updated customer:', updatedCustomer);
+        
         setCustomer({
           ...customer,
-          first_name: editedCustomer.first_name,
-          last_name: editedCustomer.last_name,
-          phone_number: formattedPhoneNumber,
-          email: editedCustomer.email,
-          address_line1: editedCustomer.address_line1,
-          address_line2: editedCustomer.address_line2,
-          city: editedCustomer.city,
-          postal_code: formattedPostcode,
-          county: editedCustomer.county,
+          ...updatedCustomer
         });
         
         setIsEditCustomerDialogOpen(false);
