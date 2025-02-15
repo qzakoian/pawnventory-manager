@@ -276,7 +276,7 @@ const CustomerProfile = () => {
       </header>
 
       <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
-        <div className="flex items-center space-x-4">
+        <div className="space-y-4">
           <Button
             variant="ghost"
             onClick={() => navigate(-1)}
@@ -285,11 +285,15 @@ const CustomerProfile = () => {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
-          {customer && (
-            <h1 className="text-xl font-semibold text-[#2A2A2A]">
-              {customer.first_name} {customer.last_name}
-            </h1>
-          )}
+          
+          <div className="space-y-2">
+            <p className="text-gray-500 text-sm">Customer Profile</p>
+            {customer && (
+              <h1 className="text-3xl font-semibold text-[#2A2A2A]">
+                {customer.first_name} {customer.last_name}
+              </h1>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
