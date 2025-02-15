@@ -1,9 +1,8 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, User, ArrowLeft, Plus } from "lucide-react";
+import { Package, User, ArrowLeft, Plus, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -54,6 +53,11 @@ interface NewProduct {
   purchase_date: string;
 }
 
+interface EditCustomer {
+  first_name: string;
+  last_name: string;
+}
+
 const CustomerProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -71,6 +75,11 @@ const CustomerProfile = () => {
     purchase_date: new Date().toISOString().split('T')[0],
   });
   const [categories, setCategories] = useState<string[]>([]);
+  const [isEditCustomerDialogOpen, setIsEditCustomerDialogOpen] = useState(false);
+  const [editCustomer, setEditCustomer] = useState<EditCustomer>({
+    first_name: "",
+    last_name: "",
+  });
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -134,6 +143,15 @@ const CustomerProfile = () => {
     fetchCustomerData();
   }, [id, toast]);
 
+  useEffect(() => {
+    if (customer) {
+      setEditCustomer({
+        first_name: customer.first_name || "",
+        last_name: customer.last_name || "",
+      });
+    }
+  }, [customer]);
+
   const handleCreateProduct = async () => {
     if (!selectedShop || !customer) return;
 
@@ -172,6 +190,41 @@ const CustomerProfile = () => {
         variant: "destructive",
         title: "Error",
         description: "Failed to create product",
+      });
+    }
+  };
+
+  const handleUpdateCustomer = async () => {
+    if (!customer) return;
+
+    try {
+      const { error } = await supabase
+        .from('Customers')
+        .update({
+          first_name: editCustomer.first_name,
+          last_name: editCustomer.last_name,
+        })
+        .eq('id', customer.id);
+
+      if (error) throw error;
+
+      setCustomer({
+        ...customer,
+        first_name: editCustomer.first_name,
+        last_name: editCustomer.last_name,
+      });
+      
+      setIsEditCustomerDialogOpen(false);
+      toast({
+        title: "Success",
+        description: "Customer profile updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update customer profile",
       });
     }
   };
@@ -227,16 +280,26 @@ const CustomerProfile = () => {
         </div>
 
         <Card className="p-6 bg-white shadow-sm border-0">
-          <div className="flex items-center space-x-4">
-            <div className="bg-[#646ECB] p-3 rounded-full text-white">
-              <User className="h-6 w-6" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="bg-[#646ECB] p-3 rounded-full text-white">
+                <User className="h-6 w-6" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold">
+                  {customer.first_name} {customer.last_name}
+                </h2>
+                <p className="text-[#2A2A2A]/70">Customer ID: {customer.id}</p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold">
-                {customer.first_name} {customer.last_name}
-              </h2>
-              <p className="text-[#2A2A2A]/70">Customer ID: {customer.id}</p>
-            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setIsEditCustomerDialogOpen(true)}
+              className="ml-4"
+            >
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit Profile
+            </Button>
           </div>
         </Card>
 
@@ -370,6 +433,43 @@ const CustomerProfile = () => {
             </Button>
             <Button onClick={handleCreateProduct}>
               Create Product
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isEditCustomerDialogOpen} onOpenChange={setIsEditCustomerDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Customer Profile</DialogTitle>
+            <DialogDescription>
+              Update the customer's information
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="first_name">First Name</Label>
+              <Input
+                id="first_name"
+                value={editCustomer.first_name}
+                onChange={(e) => setEditCustomer({ ...editCustomer, first_name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="last_name">Last Name</Label>
+              <Input
+                id="last_name"
+                value={editCustomer.last_name}
+                onChange={(e) => setEditCustomer({ ...editCustomer, last_name: e.target.value })}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditCustomerDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleUpdateCustomer}>
+              Update Profile
             </Button>
           </DialogFooter>
         </DialogContent>
