@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -184,19 +183,34 @@ const CustomerProfile = () => {
       const { error } = await supabase
         .from('Customers')
         .update({
-          ...editedCustomer,
+          first_name: editedCustomer.first_name,
+          last_name: editedCustomer.last_name,
           phone_number: formattedPhoneNumber,
+          email: editedCustomer.email,
+          address_line1: editedCustomer.address_line1,
+          address_line2: editedCustomer.address_line2,
+          city: editedCustomer.city,
           postal_code: formattedPostcode,
+          county: editedCustomer.county,
         })
         .eq('id', customer.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
 
       setCustomer({
         ...customer,
-        ...editedCustomer,
+        first_name: editedCustomer.first_name,
+        last_name: editedCustomer.last_name,
         phone_number: formattedPhoneNumber,
+        email: editedCustomer.email,
+        address_line1: editedCustomer.address_line1,
+        address_line2: editedCustomer.address_line2,
+        city: editedCustomer.city,
         postal_code: formattedPostcode,
+        county: editedCustomer.county,
       });
       
       setIsEditCustomerDialogOpen(false);
