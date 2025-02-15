@@ -44,38 +44,46 @@ interface ProfileFormProps {
 export function ProfileForm({ form, onSubmit }: ProfileFormProps) {
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
-          name="first_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>First Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+      <div className="space-y-6">
+        {/* Profile Information Form */}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="first_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>First Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="last_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Last Name</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="last_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="pt-4">
+          <Button type="submit" className="w-full">
+            Update Profile
+          </Button>
+        </form>
+
+        {/* Password Change Form */}
+        <div className="space-y-4">
           <h3 className="text-lg font-medium">Change Password</h3>
-          <div className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="current_password"
@@ -117,13 +125,13 @@ export function ProfileForm({ form, onSubmit }: ProfileFormProps) {
                 </FormItem>
               )}
             />
-          </div>
-        </div>
 
-        <Button type="submit" className="w-full">
-          Save Changes
-        </Button>
-      </form>
+            <Button type="submit" className="w-full">
+              Change Password
+            </Button>
+          </form>
+        </div>
+      </div>
     </Form>
   );
 }
