@@ -115,7 +115,7 @@ export const ShopsDropdown = () => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/account-settings")}>
           Account and settings
         </DropdownMenuItem>
         <DropdownMenuSeparator />

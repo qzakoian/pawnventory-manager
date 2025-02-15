@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import CustomerProfile from "./pages/CustomerProfile";
+import AccountSettings from "./pages/AccountSettings";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <CustomerProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/account-settings"
+              element={
+                <ProtectedRoute>
+                  <AccountSettings />
                 </ProtectedRoute>
               }
             />
