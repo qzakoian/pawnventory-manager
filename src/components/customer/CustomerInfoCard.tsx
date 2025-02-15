@@ -13,8 +13,8 @@ interface CustomerInfoCardProps {
 export const CustomerInfoCard = ({ customer, onEditClick }: CustomerInfoCardProps) => {
   return (
     <Card className="p-6 bg-white shadow-sm border-0">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
+      <div className="flex items-start justify-between">
+        <div className="flex items-start space-x-4">
           <div className="bg-[#646ECB] p-3 rounded-full text-white">
             <User className="h-6 w-6" />
           </div>
