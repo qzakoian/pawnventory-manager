@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useNavigate } from "react-router-dom";
+import { useShop } from "@/contexts/ShopContext";
 
 interface Shop {
   id: number;
@@ -25,12 +26,12 @@ interface Shop {
 
 export const ShopsDropdown = () => {
   const [shops, setShops] = useState<Shop[]>([]);
-  const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { selectedShop, setSelectedShop } = useShop();
 
   useEffect(() => {
     const fetchUserShops = async () => {
@@ -41,7 +42,6 @@ export const ShopsDropdown = () => {
 
         setUserEmail(user.email);
 
-        // First get the user's ID and profile picture from the Users table
         const { data: userData, error: userError } = await supabase
           .from('Users')
           .select('id, profil_picture, first_name, last_name')
@@ -53,7 +53,6 @@ export const ShopsDropdown = () => {
         setProfilePicture(userData.profil_picture);
         setUserName(`${userData.first_name} ${userData.last_name}`);
 
-        // Then use that ID to get the linked shops
         const { data: shopLinks, error: shopError } = await supabase
           .from('User-Shop links')
           .select(`
@@ -72,9 +71,6 @@ export const ShopsDropdown = () => {
           .filter((shop): shop is Shop => shop !== null);
 
         setShops(userShops);
-        if (userShops.length > 0 && !selectedShop) {
-          setSelectedShop(userShops[0]);
-        }
       } catch (error) {
         console.error('Error fetching shops:', error);
         toast({

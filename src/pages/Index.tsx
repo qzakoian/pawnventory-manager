@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { ShopsDropdown } from "@/components/ShopsDropdown";
+import { useShop } from "@/contexts/ShopContext";
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -64,6 +66,7 @@ const Index = () => {
   const [searchResults, setSearchResults] = useState<Customer[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [firstName, setFirstName] = useState<string>("");
+  const { selectedShop } = useShop();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -97,7 +100,7 @@ const Index = () => {
   };
 
   const handleCustomerSearch = async (query: string) => {
-    if (!query.trim()) {
+    if (!query.trim() || !selectedShop) {
       setSearchResults([]);
       return;
     }
@@ -107,6 +110,7 @@ const Index = () => {
       const { data, error } = await supabase
         .from('Customers')
         .select('id, first_name, last_name')
+        .eq('shop_id', selectedShop.id)
         .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
         .limit(5);
 
@@ -135,10 +139,10 @@ const Index = () => {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       handleCustomerSearch(searchQuery);
-    }, 300); // Wait 300ms after user stops typing
+    }, 300);
 
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
+  }, [searchQuery, selectedShop]);
 
   return (
     <div className="min-h-screen bg-[#F8F9FF]">
