@@ -180,7 +180,20 @@ const CustomerProfile = () => {
       : '';
 
     try {
-      const { error } = await supabase
+      console.log('Updating customer with ID:', customer.id);
+      console.log('Update payload:', {
+        first_name: editedCustomer.first_name,
+        last_name: editedCustomer.last_name,
+        phone_number: formattedPhoneNumber,
+        email: editedCustomer.email,
+        address_line1: editedCustomer.address_line1,
+        address_line2: editedCustomer.address_line2,
+        city: editedCustomer.city,
+        postal_code: formattedPostcode,
+        county: editedCustomer.county,
+      });
+
+      const { data, error } = await supabase
         .from('Customers')
         .update({
           first_name: editedCustomer.first_name,
@@ -193,31 +206,38 @@ const CustomerProfile = () => {
           postal_code: formattedPostcode,
           county: editedCustomer.county,
         })
-        .eq('id', customer.id);
+        .eq('id', customer.id)
+        .select();
 
       if (error) {
         console.error('Supabase error:', error);
         throw error;
       }
 
-      setCustomer({
-        ...customer,
-        first_name: editedCustomer.first_name,
-        last_name: editedCustomer.last_name,
-        phone_number: formattedPhoneNumber,
-        email: editedCustomer.email,
-        address_line1: editedCustomer.address_line1,
-        address_line2: editedCustomer.address_line2,
-        city: editedCustomer.city,
-        postal_code: formattedPostcode,
-        county: editedCustomer.county,
-      });
-      
-      setIsEditCustomerDialogOpen(false);
-      toast({
-        title: "Success",
-        description: "Customer profile updated successfully",
-      });
+      console.log('Update response:', data);
+
+      if (data && data.length > 0) {
+        setCustomer({
+          ...customer,
+          first_name: editedCustomer.first_name,
+          last_name: editedCustomer.last_name,
+          phone_number: formattedPhoneNumber,
+          email: editedCustomer.email,
+          address_line1: editedCustomer.address_line1,
+          address_line2: editedCustomer.address_line2,
+          city: editedCustomer.city,
+          postal_code: formattedPostcode,
+          county: editedCustomer.county,
+        });
+        
+        setIsEditCustomerDialogOpen(false);
+        toast({
+          title: "Success",
+          description: "Customer profile updated successfully",
+        });
+      } else {
+        throw new Error('No data returned from update operation');
+      }
     } catch (error) {
       console.error('Error updating customer:', error);
       toast({
