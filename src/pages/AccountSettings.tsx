@@ -15,6 +15,9 @@ import { useForm } from "react-hook-form";
 import { ProfilePicture } from "@/components/account/ProfilePicture";
 import { ProfileForm, formSchema } from "@/components/account/ProfileForm";
 import { ShopsList } from "@/components/account/ShopsList";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import type { z } from "zod";
 
 interface Shop {
@@ -23,6 +26,7 @@ interface Shop {
 }
 
 export default function AccountSettings() {
+  const navigate = useNavigate();
   const [profileUrl, setProfileUrl] = useState<string | null>(null);
   const [shops, setShops] = useState<Shop[]>([]);
   const { toast } = useToast();
@@ -171,6 +175,14 @@ export default function AccountSettings() {
 
   return (
     <div className="container mx-auto py-8 max-w-2xl">
+      <Button
+        variant="ghost"
+        className="mb-4"
+        onClick={() => navigate('/')}
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back to Dashboard
+      </Button>
       <Card>
         <CardHeader>
           <CardTitle>Account Settings</CardTitle>
