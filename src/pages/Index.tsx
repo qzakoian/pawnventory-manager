@@ -1,8 +1,7 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, Users, Package, LineChart, ArrowRight, LogOut } from "lucide-react";
+import { Search, Plus, Users, Package, LineChart, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -94,11 +93,6 @@ const Index = () => {
     fetchUserData();
   }, []);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
-
   const handleCustomerSearch = async (query: string) => {
     if (!query.trim() || !selectedShop) {
       setSearchResults([]);
@@ -152,17 +146,7 @@ const Index = () => {
             <Package className="h-5 w-5" />
             <span className="font-medium">Pawn Systems</span>
           </div>
-          <div className="flex items-center space-x-4">
-            <ShopsDropdown />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:text-white hover:bg-white/20"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
-          </div>
+          <ShopsDropdown />
         </div>
       </header>
 
