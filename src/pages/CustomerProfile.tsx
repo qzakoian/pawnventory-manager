@@ -1,8 +1,8 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, User, ArrowLeft, Plus, Pencil } from "lucide-react";
+import { Package, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -24,54 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { format } from "date-fns";
 import { useShop } from "@/contexts/ShopContext";
-
-interface Customer {
-  id: number;
-  first_name: string | null;
-  last_name: string | null;
-  created_at: string;
-  phone_number: string | null;
-  email: string | null;
-  address_line1: string | null;
-  address_line2: string | null;
-  city: string | null;
-  postal_code: string | null;
-  county: string | null;
-}
-
-interface Product {
-  id: number;
-  model: string | null;
-  product_category: string | null;
-  scheme: string | null;
-  purchase_date: string | null;
-  sale_date: string | null;
-  purchase_price_including_VAT: number | null;
-  sale_price_including_VAT: number | null;
-  in_stock: boolean | null;
-}
-
-interface NewProduct {
-  model: string;
-  product_category: string;
-  scheme: string;
-  purchase_price_including_VAT: number;
-  purchase_date: string;
-}
-
-interface EditCustomer {
-  first_name: string;
-  last_name: string;
-  phone_number: string;
-  email: string;
-  address_line1: string;
-  address_line2: string;
-  city: string;
-  postal_code: string;
-  county: string;
-}
+import { Customer, Product, NewProduct, EditCustomer } from "@/types/customer";
+import { CustomerInfoCard } from "@/components/customer/CustomerInfoCard";
+import { CustomerProducts } from "@/components/customer/CustomerProducts";
+import { EditCustomerDialog } from "@/components/customer/EditCustomerDialog";
+import { formatUKPhoneNumber, formatPostcode, isValidUKPhoneNumber, isValidUKPostcode } from "@/utils/validation";
 
 const CustomerProfile = () => {
   const { id } = useParams();
@@ -82,25 +40,14 @@ const CustomerProfile = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
+  const [isEditCustomerDialogOpen, setIsEditCustomerDialogOpen] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
   const [newProduct, setNewProduct] = useState<NewProduct>({
     model: "",
     product_category: "",
     scheme: "buy-back",
     purchase_price_including_VAT: 0,
     purchase_date: new Date().toISOString().split('T')[0],
-  });
-  const [categories, setCategories] = useState<string[]>([]);
-  const [isEditCustomerDialogOpen, setIsEditCustomerDialogOpen] = useState(false);
-  const [editCustomer, setEditCustomer] = useState<EditCustomer>({
-    first_name: "",
-    last_name: "",
-    phone_number: "",
-    email: "",
-    address_line1: "",
-    address_line2: "",
-    city: "",
-    postal_code: "",
-    county: "",
   });
 
   useEffect(() => {
@@ -131,7 +78,6 @@ const CustomerProfile = () => {
           return;
         }
 
-        // Fetch customer details
         const { data: customerData, error: customerError } = await supabase
           .from('Customers')
           .select('*')
@@ -141,7 +87,6 @@ const CustomerProfile = () => {
         if (customerError) throw customerError;
         setCustomer(customerData);
 
-        // Fetch customer's products
         const { data: productsData, error: productsError } = await supabase
           .from('Products')
           .select('*')
@@ -164,22 +109,6 @@ const CustomerProfile = () => {
 
     fetchCustomerData();
   }, [id, toast]);
-
-  useEffect(() => {
-    if (customer) {
-      setEditCustomer({
-        first_name: customer.first_name || "",
-        last_name: customer.last_name || "",
-        phone_number: customer.phone_number || "",
-        email: customer.email || "",
-        address_line1: customer.address_line1 || "",
-        address_line2: customer.address_line2 || "",
-        city: customer.city || "",
-        postal_code: customer.postal_code || "",
-        county: customer.county || "",
-      });
-    }
-  }, [customer]);
 
   const handleCreateProduct = async () => {
     if (!selectedShop || !customer) return;
@@ -223,11 +152,10 @@ const CustomerProfile = () => {
     }
   };
 
-  const handleUpdateCustomer = async () => {
+  const handleUpdateCustomer = async (editedCustomer: EditCustomer) => {
     if (!customer) return;
 
-    // Validate phone number if provided
-    if (editCustomer.phone_number && !isValidUKPhoneNumber(editCustomer.phone_number)) {
+    if (editedCustomer.phone_number && !isValidUKPhoneNumber(editedCustomer.phone_number)) {
       toast({
         variant: "destructive",
         title: "Invalid phone number",
@@ -236,8 +164,7 @@ const CustomerProfile = () => {
       return;
     }
 
-    // Validate postcode if provided
-    if (editCustomer.postal_code && !isValidUKPostcode(editCustomer.postal_code)) {
+    if (editedCustomer.postal_code && !isValidUKPostcode(editedCustomer.postal_code)) {
       toast({
         variant: "destructive",
         title: "Invalid postcode",
@@ -246,27 +173,20 @@ const CustomerProfile = () => {
       return;
     }
 
-    // Format phone number and postcode before saving
-    const formattedPhoneNumber = editCustomer.phone_number 
-      ? formatUKPhoneNumber(editCustomer.phone_number)
+    const formattedPhoneNumber = editedCustomer.phone_number 
+      ? formatUKPhoneNumber(editedCustomer.phone_number)
       : '';
-    const formattedPostcode = editCustomer.postal_code 
-      ? formatPostcode(editCustomer.postal_code)
+    const formattedPostcode = editedCustomer.postal_code 
+      ? formatPostcode(editedCustomer.postal_code)
       : '';
 
     try {
       const { error } = await supabase
         .from('Customers')
         .update({
-          first_name: editCustomer.first_name,
-          last_name: editCustomer.last_name,
+          ...editedCustomer,
           phone_number: formattedPhoneNumber,
-          email: editCustomer.email,
-          address_line1: editCustomer.address_line1,
-          address_line2: editCustomer.address_line2,
-          city: editCustomer.city,
           postal_code: formattedPostcode,
-          county: editCustomer.county,
         })
         .eq('id', customer.id);
 
@@ -274,15 +194,9 @@ const CustomerProfile = () => {
 
       setCustomer({
         ...customer,
-        first_name: editCustomer.first_name,
-        last_name: editCustomer.last_name,
+        ...editedCustomer,
         phone_number: formattedPhoneNumber,
-        email: editCustomer.email,
-        address_line1: editCustomer.address_line1,
-        address_line2: editCustomer.address_line2,
-        city: editCustomer.city,
         postal_code: formattedPostcode,
-        county: editCustomer.county,
       });
       
       setIsEditCustomerDialogOpen(false);
@@ -298,54 +212,6 @@ const CustomerProfile = () => {
         description: "Failed to update customer profile",
       });
     }
-  };
-
-  const formatUKPhoneNumber = (phoneNumber: string): string => {
-    // Remove all non-digit characters
-    const digitsOnly = phoneNumber.replace(/\D/g, '');
-    
-    // Check if it's a UK number starting with '44' or '0'
-    let formatted = digitsOnly;
-    if (digitsOnly.startsWith('44')) {
-      // Format as international UK number
-      formatted = digitsOnly.replace(/^44/, '');
-      return `+44 ${formatted.slice(0, 4)} ${formatted.slice(4)}`;
-    } else if (digitsOnly.startsWith('0')) {
-      // Convert UK local format to international
-      formatted = digitsOnly.slice(1);
-      return `+44 ${formatted.slice(0, 4)} ${formatted.slice(4)}`;
-    }
-    return `+44 ${formatted.slice(0, 4)} ${formatted.slice(4)}`;
-  };
-
-  const isValidUKPhoneNumber = (phoneNumber: string): boolean => {
-    // Remove all non-digit characters
-    const digitsOnly = phoneNumber.replace(/\D/g, '');
-    
-    // Check if empty (since phone is optional)
-    if (digitsOnly === '') return true;
-    
-    // UK mobile numbers are typically 11 digits (including leading 0)
-    // or 12 digits (including 44)
-    const validLength = digitsOnly.length === 11 || (digitsOnly.length === 12 && digitsOnly.startsWith('44'));
-    
-    // Basic UK mobile number pattern
-    const ukMobilePattern = /^(0|44)?7\d{9}$/;
-    
-    return validLength && ukMobilePattern.test(digitsOnly);
-  };
-
-  const isValidUKPostcode = (postcode: string): boolean => {
-    if (!postcode) return true; // Optional field
-    const postcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
-    return postcodeRegex.test(postcode.trim());
-  };
-
-  const formatPostcode = (postcode: string): string => {
-    if (!postcode) return "";
-    const cleaned = postcode.trim().toUpperCase();
-    // Add space before the last 3 characters if not present
-    return cleaned.replace(/^(.+?)([0-9][A-Z]{2})$/, "$1 $2");
   };
 
   if (loading) {
@@ -387,7 +253,6 @@ const CustomerProfile = () => {
               onClick={() => navigate(-1)}
               className="text-[#646ECB]"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
             <h1 className="text-2xl font-bold text-[#111111]">Customer Profile</h1>
@@ -398,315 +263,109 @@ const CustomerProfile = () => {
           </Button>
         </div>
 
-        <Card className="p-6 bg-white shadow-sm border-0">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="bg-[#646ECB] p-3 rounded-full text-white">
-                <User className="h-6 w-6" />
-              </div>
-              <div className="space-y-1">
-                <h2 className="text-xl font-semibold">
-                  {customer.first_name} {customer.last_name}
-                </h2>
-                <p className="text-[#2A2A2A]/70">Customer ID: {customer.id}</p>
-                <p className="text-sm text-[#2A2A2A]/70">
-                  Created: {format(new Date(customer.created_at), 'MMM d, yyyy')}
-                </p>
-                {customer.email && (
-                  <p className="text-sm text-[#2A2A2A]/70">Email: {customer.email}</p>
-                )}
-                {customer.phone_number && (
-                  <p className="text-sm text-[#2A2A2A]/70">Phone: {customer.phone_number}</p>
-                )}
-                {(customer.address_line1 || customer.address_line2 || customer.city || customer.postal_code || customer.county) && (
-                  <div className="text-sm text-[#2A2A2A]/70">
-                    <p className="font-medium">Address:</p>
-                    {customer.address_line1 && <p>{customer.address_line1}</p>}
-                    {customer.address_line2 && <p>{customer.address_line2}</p>}
-                    <p>
-                      {[
-                        customer.city,
-                        customer.county,
-                        customer.postal_code
-                      ].filter(Boolean).join(', ')}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-            <Button 
-              variant="outline" 
-              onClick={() => setIsEditCustomerDialogOpen(true)}
-              className="ml-4"
-            >
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Profile
-            </Button>
-          </div>
-        </Card>
+        <CustomerInfoCard 
+          customer={customer} 
+          onEditClick={() => setIsEditCustomerDialogOpen(true)} 
+        />
 
         <div>
           <h2 className="text-xl font-bold text-[#111111] mb-4">Customer Products</h2>
-          {products.length === 0 ? (
-            <Card className="p-6 bg-white shadow-sm border-0 text-center">
-              <p className="text-[#2A2A2A]/70">No products found for this customer</p>
-            </Card>
-          ) : (
-            <div className="grid gap-4 md:grid-cols-2">
-              {products.map((product) => (
-                <Card key={product.id} className="p-4 bg-white shadow-sm border-0 hover:shadow-md transition-shadow">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-2">
-                      <h3 className="font-semibold text-[#111111]">{product.model}</h3>
-                      <div className="space-y-1">
-                        <p className="text-sm text-[#2A2A2A]/70">Category: {product.product_category}</p>
-                        <p className="text-sm text-[#2A2A2A]/70">Scheme: {product.scheme}</p>
-                      </div>
-                      <div className="space-y-1 mt-3">
-                        <p className="text-sm">
-                          Purchase: £{product.purchase_price_including_VAT?.toFixed(2)} 
-                          <span className="text-[#2A2A2A]/50 ml-2">
-                            ({product.purchase_date ? format(new Date(product.purchase_date), 'MMM d, yyyy') : 'N/A'})
-                          </span>
-                        </p>
-                        {product.sale_date && (
-                          <p className="text-sm">
-                            Sale: £{product.sale_price_including_VAT?.toFixed(2)}
-                            <span className="text-[#2A2A2A]/50 ml-2">
-                              ({format(new Date(product.sale_date), 'MMM d, yyyy')})
-                            </span>
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <span className={`px-3 py-1 rounded-full text-xs ${
-                      product.in_stock 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {product.in_stock ? 'In Stock' : 'Sold'}
-                    </span>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          )}
+          <CustomerProducts products={products} />
         </div>
-      </main>
 
-      <Dialog open={isNewProductDialogOpen} onOpenChange={setIsNewProductDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add New Product</DialogTitle>
-            <DialogDescription>
-              Create a new product for {customer.first_name} {customer.last_name}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="model">Model</Label>
-              <Input
-                id="model"
-                value={newProduct.model}
-                onChange={(e) => setNewProduct({ ...newProduct, model: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="category">Category</Label>
-              <Select
-                value={newProduct.product_category}
-                onValueChange={(value) => setNewProduct({ ...newProduct, product_category: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Categories</SelectLabel>
-                    {categories.map((category) => (
-                      <SelectItem key={category} value={category}>
-                        {category}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="scheme">Scheme</Label>
-              <Select
-                value={newProduct.scheme}
-                onValueChange={(value) => setNewProduct({ ...newProduct, scheme: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select scheme" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Schemes</SelectLabel>
-                    <SelectItem value="buy-back">Buy Back</SelectItem>
-                    <SelectItem value="pawn">Pawn</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="purchase_price">Purchase Price (inc. VAT)</Label>
-              <Input
-                id="purchase_price"
-                type="number"
-                value={newProduct.purchase_price_including_VAT}
-                onChange={(e) => setNewProduct({ ...newProduct, purchase_price_including_VAT: parseFloat(e.target.value) })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="purchase_date">Purchase Date</Label>
-              <Input
-                id="purchase_date"
-                type="date"
-                value={newProduct.purchase_date}
-                onChange={(e) => setNewProduct({ ...newProduct, purchase_date: e.target.value })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsNewProductDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreateProduct}>
-              Create Product
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isEditCustomerDialogOpen} onOpenChange={setIsEditCustomerDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Customer Profile</DialogTitle>
-            <DialogDescription>
-              Update the customer's information
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="first_name">First Name</Label>
-              <Input
-                id="first_name"
-                value={editCustomer.first_name}
-                onChange={(e) => setEditCustomer({ ...editCustomer, first_name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="last_name">Last Name</Label>
-              <Input
-                id="last_name"
-                value={editCustomer.last_name}
-                onChange={(e) => setEditCustomer({ ...editCustomer, last_name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone_number">Phone Number (optional)</Label>
-              <Input
-                id="phone_number"
-                value={editCustomer.phone_number}
-                onChange={(e) => {
-                  const input = e.target.value;
-                  // Only allow digits, spaces, plus, and hyphens
-                  const sanitized = input.replace(/[^\d\s+-]/g, '');
-                  setEditCustomer({ ...editCustomer, phone_number: sanitized });
-                }}
-                placeholder="Enter UK mobile number (e.g., 07123456789)"
-                className={!isValidUKPhoneNumber(editCustomer.phone_number) && editCustomer.phone_number 
-                  ? "border-red-500" 
-                  : ""}
-              />
-              {!isValidUKPhoneNumber(editCustomer.phone_number) && editCustomer.phone_number && (
-                <p className="text-sm text-red-500 mt-1">
-                  Please enter a valid UK mobile number
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email (optional)</Label>
-              <Input
-                id="email"
-                type="email"
-                value={editCustomer.email}
-                onChange={(e) => setEditCustomer({ ...editCustomer, email: e.target.value })}
-                placeholder="Enter email address"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="address">Address (optional)</Label>
-              <div className="space-y-4">
-                <h3 className="text-sm font-medium">Address (optional)</h3>
-                <div className="space-y-2">
-                  <Label htmlFor="address_line1">Address Line 1</Label>
-                  <Input
-                    id="address_line1"
-                    value={editCustomer.address_line1}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, address_line1: e.target.value })}
-                    placeholder="House number and street name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="address_line2">Address Line 2</Label>
-                  <Input
-                    id="address_line2"
-                    value={editCustomer.address_line2}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, address_line2: e.target.value })}
-                    placeholder="Apartment, suite, unit, etc. (optional)"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="city">Town/City</Label>
-                  <Input
-                    id="city"
-                    value={editCustomer.city}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, city: e.target.value })}
-                    placeholder="Town or city"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="county">County</Label>
-                  <Input
-                    id="county"
-                    value={editCustomer.county}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, county: e.target.value })}
-                    placeholder="County"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="postal_code">Postcode</Label>
-                  <Input
-                    id="postal_code"
-                    value={editCustomer.postal_code}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, postal_code: e.target.value })}
-                    placeholder="Postcode"
-                    className={!isValidUKPostcode(editCustomer.postal_code) && editCustomer.postal_code 
-                      ? "border-red-500" 
-                      : ""}
-                  />
-                  {!isValidUKPostcode(editCustomer.postal_code) && editCustomer.postal_code && (
-                    <p className="text-sm text-red-500 mt-1">
-                      Please enter a valid UK postcode
-                    </p>
-                  )}
-                </div>
+        <Dialog open={isNewProductDialogOpen} onOpenChange={setIsNewProductDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Product</DialogTitle>
+              <DialogDescription>
+                Create a new product for {customer.first_name} {customer.last_name}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="model">Model</Label>
+                <Input
+                  id="model"
+                  value={newProduct.model}
+                  onChange={(e) => setNewProduct({ ...newProduct, model: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select
+                  value={newProduct.product_category}
+                  onValueChange={(value) => setNewProduct({ ...newProduct, product_category: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Categories</SelectLabel>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="scheme">Scheme</Label>
+                <Select
+                  value={newProduct.scheme}
+                  onValueChange={(value) => setNewProduct({ ...newProduct, scheme: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select scheme" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectLabel>Schemes</SelectLabel>
+                      <SelectItem value="buy-back">Buy Back</SelectItem>
+                      <SelectItem value="pawn">Pawn</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="purchase_price">Purchase Price (inc. VAT)</Label>
+                <Input
+                  id="purchase_price"
+                  type="number"
+                  value={newProduct.purchase_price_including_VAT}
+                  onChange={(e) => setNewProduct({ ...newProduct, purchase_price_including_VAT: parseFloat(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="purchase_date">Purchase Date</Label>
+                <Input
+                  id="purchase_date"
+                  type="date"
+                  value={newProduct.purchase_date}
+                  onChange={(e) => setNewProduct({ ...newProduct, purchase_date: e.target.value })}
+                />
               </div>
             </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditCustomerDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleUpdateCustomer}>
-              Update Profile
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsNewProductDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleCreateProduct}>
+                Create Product
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <EditCustomerDialog
+          open={isEditCustomerDialogOpen}
+          onOpenChange={setIsEditCustomerDialogOpen}
+          customer={customer}
+          onSave={handleUpdateCustomer}
+        />
+      </main>
     </div>
   );
 };
