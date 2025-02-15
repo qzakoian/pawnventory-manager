@@ -7,7 +7,7 @@ import AccountSettings from "@/pages/AccountSettings";
 import CustomerProfile from "@/pages/CustomerProfile";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ShopProvider } from "@/contexts/ShopContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 function App() {
   return (
