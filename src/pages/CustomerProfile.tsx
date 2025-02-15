@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Package, Plus, ArrowLeft, LogOut } from "lucide-react";
+import { Package, Plus, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -270,14 +270,6 @@ const CustomerProfile = () => {
           </div>
           <div className="flex items-center space-x-4">
             <ShopsDropdown />
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-white hover:text-white hover:bg-white/20"
-              onClick={handleLogout}
-            >
-              <LogOut className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </header>
