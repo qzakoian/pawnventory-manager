@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -281,10 +282,10 @@ const CustomerProfile = () => {
               <Button
                 variant="ghost"
                 onClick={() => navigate(-1)}
-                className="text-[#646ECB] hover:text-[#646ECB]/80"
+                className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to customers
+                Back to Dashboard
               </Button>
             </div>
             <div className="flex items-center space-x-4">
