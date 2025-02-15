@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Package, Plus } from "lucide-react";
+import { Package, Plus, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import {
@@ -256,41 +256,75 @@ const CustomerProfile = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F9FF]">
-      <header className="bg-[#646ECB] text-white px-6 py-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center space-x-2">
-            <Package className="h-5 w-5" />
-            <span className="font-medium">Pawn Systems</span>
+      <header className="bg-white border-b px-6 py-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                onClick={() => navigate(-1)}
+                className="text-[#646ECB] hover:text-[#646ECB]/80"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to customers
+              </Button>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button onClick={() => setIsNewProductDialogOpen(true)} className="bg-[#646ECB] hover:bg-[#4E56A6]">
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Product
+              </Button>
+            </div>
           </div>
         </div>
       </header>
 
-      <main className="p-6 max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate(-1)}
-              className="text-[#646ECB]"
-            >
-              Back
-            </Button>
-            <h1 className="text-2xl font-bold text-[#111111]">Customer Profile</h1>
+      <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-sm text-gray-500 mb-2">Total Products</h3>
+            <p className="text-3xl font-semibold text-[#2A2A2A]">{products.length}</p>
+            <p className="text-sm text-gray-400 mt-1">All time</p>
           </div>
-          <Button onClick={() => setIsNewProductDialogOpen(true)} className="bg-[#646ECB] hover:bg-[#4E56A6]">
-            <Plus className="h-4 w-4 mr-2" />
-            Add New Product
-          </Button>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-sm text-gray-500 mb-2">In Stock</h3>
+            <p className="text-3xl font-semibold text-[#2A2A2A]">
+              {products.filter(p => p.in_stock).length}
+            </p>
+            <p className="text-sm text-gray-400 mt-1">Current inventory</p>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-sm text-gray-500 mb-2">Sold</h3>
+            <p className="text-3xl font-semibold text-[#2A2A2A]">
+              {products.filter(p => !p.in_stock).length}
+            </p>
+            <p className="text-sm text-gray-400 mt-1">All time</p>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="text-sm text-gray-500 mb-2">Total Value</h3>
+            <p className="text-3xl font-semibold text-[#2A2A2A]">
+              £{products.reduce((sum, p) => sum + (p.purchase_price_including_VAT || 0), 0).toFixed(2)}
+            </p>
+            <p className="text-sm text-gray-400 mt-1">Purchase price</p>
+          </div>
         </div>
 
-        <CustomerInfoCard 
-          customer={customer} 
-          onEditClick={() => setIsEditCustomerDialogOpen(true)} 
-        />
-
-        <div>
-          <h2 className="text-xl font-bold text-[#111111] mb-4">Customer Products</h2>
-          <CustomerProducts products={products} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1">
+            <CustomerInfoCard 
+              customer={customer} 
+              onEditClick={() => setIsEditCustomerDialogOpen(true)} 
+            />
+          </div>
+          
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-[#2A2A2A]">Products</h2>
+              </div>
+              <CustomerProducts products={products} />
+            </div>
+          </div>
         </div>
 
         <Dialog open={isNewProductDialogOpen} onOpenChange={setIsNewProductDialogOpen}>
