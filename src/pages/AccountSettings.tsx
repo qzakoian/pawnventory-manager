@@ -2,10 +2,6 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { User, Store } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Card,
@@ -14,41 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-
-const formSchema = z.object({
-  first_name: z.string().min(1, "First name is required"),
-  last_name: z.string().min(1, "Last name is required"),
-  current_password: z.string().optional(),
-  new_password: z.string().min(6, "Password must be at least 6 characters").optional(),
-  confirm_password: z.string().optional(),
-}).refine((data) => {
-  if (data.new_password && !data.current_password) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Current password is required to change password",
-  path: ["current_password"],
-}).refine((data) => {
-  if (data.new_password !== data.confirm_password) {
-    return false;
-  }
-  return true;
-}, {
-  message: "Passwords do not match",
-  path: ["confirm_password"],
-});
+import { ProfilePicture } from "@/components/account/ProfilePicture";
+import { ProfileForm, formSchema } from "@/components/account/ProfileForm";
+import { ShopsList } from "@/components/account/ShopsList";
+import type { z } from "zod";
 
 interface Shop {
   id: number;
@@ -91,7 +58,6 @@ export default function AccountSettings() {
         });
         setProfileUrl(userData.profil_picture);
 
-        // Fetch shops
         const { data: shopLinks, error: shopError } = await supabase
           .from('User-Shop links')
           .select(`
@@ -128,7 +94,6 @@ export default function AccountSettings() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Update name in Users table
       const { error: updateError } = await supabase
         .from('Users')
         .update({
@@ -139,7 +104,6 @@ export default function AccountSettings() {
 
       if (updateError) throw updateError;
 
-      // Update password if provided
       if (values.new_password && values.current_password) {
         const { error: passwordError } = await supabase.auth.updateUser({
           password: values.new_password
@@ -170,7 +134,6 @@ export default function AccountSettings() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Upload the file
       const fileExt = file.name.split('.').pop();
       const filePath = `${user.id}-${Date.now()}.${fileExt}`;
 
@@ -180,12 +143,10 @@ export default function AccountSettings() {
 
       if (uploadError) throw uploadError;
 
-      // Get the public URL
       const { data: { publicUrl } } = supabase.storage
         .from('profile-pictures')
         .getPublicUrl(filePath);
 
-      // Update the profile picture URL in the database
       const { error: updateError } = await supabase
         .from('Users')
         .update({ profil_picture: publicUrl })
@@ -225,136 +186,18 @@ export default function AccountSettings() {
             </TabsList>
 
             <TabsContent value="profile" className="space-y-6">
-              {/* Profile Picture Section */}
-              <div className="flex flex-col items-center space-y-4">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage src={profileUrl || undefined} />
-                  <AvatarFallback>
-                    <User className="h-12 w-12" />
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="profile-picture"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() => document.getElementById('profile-picture')?.click()}
-                  >
-                    Change Picture
-                  </Button>
-                </div>
-              </div>
-
-              {/* Profile Form */}
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="first_name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="last_name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="pt-4">
-                    <h3 className="text-lg font-medium">Change Password</h3>
-                    <div className="space-y-4">
-                      <FormField
-                        control={form.control}
-                        name="current_password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Current Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="new_password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>New Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="confirm_password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Confirm New Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-
-                  <Button type="submit" className="w-full">
-                    Save Changes
-                  </Button>
-                </form>
-              </Form>
+              <ProfilePicture 
+                profileUrl={profileUrl} 
+                onImageUpload={handleImageUpload} 
+              />
+              <ProfileForm 
+                form={form} 
+                onSubmit={onSubmit} 
+              />
             </TabsContent>
 
             <TabsContent value="shops" className="space-y-4">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  {shops.map((shop) => (
-                    <div
-                      key={shop.id}
-                      className="flex items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <Store className="h-5 w-5 mr-3 text-gray-500" />
-                      <span className="font-medium">{shop.name}</span>
-                    </div>
-                  ))}
-                </div>
-                {shops.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <Store className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                    <p>No shops found</p>
-                  </div>
-                )}
-              </div>
+              <ShopsList shops={shops} />
             </TabsContent>
           </Tabs>
         </CardContent>
