@@ -31,6 +31,10 @@ interface Customer {
   id: number;
   first_name: string | null;
   last_name: string | null;
+  created_at: string;
+  phone_number: string | null;
+  email: string | null;
+  address: string | null;
 }
 
 interface Product {
@@ -56,6 +60,9 @@ interface NewProduct {
 interface EditCustomer {
   first_name: string;
   last_name: string;
+  phone_number: string;
+  email: string;
+  address: string;
 }
 
 const CustomerProfile = () => {
@@ -79,6 +86,9 @@ const CustomerProfile = () => {
   const [editCustomer, setEditCustomer] = useState<EditCustomer>({
     first_name: "",
     last_name: "",
+    phone_number: "",
+    email: "",
+    address: "",
   });
 
   useEffect(() => {
@@ -148,6 +158,9 @@ const CustomerProfile = () => {
       setEditCustomer({
         first_name: customer.first_name || "",
         last_name: customer.last_name || "",
+        phone_number: customer.phone_number || "",
+        email: customer.email || "",
+        address: customer.address || "",
       });
     }
   }, [customer]);
@@ -203,6 +216,9 @@ const CustomerProfile = () => {
         .update({
           first_name: editCustomer.first_name,
           last_name: editCustomer.last_name,
+          phone_number: editCustomer.phone_number,
+          email: editCustomer.email,
+          address: editCustomer.address,
         })
         .eq('id', customer.id);
 
@@ -212,6 +228,9 @@ const CustomerProfile = () => {
         ...customer,
         first_name: editCustomer.first_name,
         last_name: editCustomer.last_name,
+        phone_number: editCustomer.phone_number,
+        email: editCustomer.email,
+        address: editCustomer.address,
       });
       
       setIsEditCustomerDialogOpen(false);
@@ -285,11 +304,23 @@ const CustomerProfile = () => {
               <div className="bg-[#646ECB] p-3 rounded-full text-white">
                 <User className="h-6 w-6" />
               </div>
-              <div>
+              <div className="space-y-1">
                 <h2 className="text-xl font-semibold">
                   {customer.first_name} {customer.last_name}
                 </h2>
                 <p className="text-[#2A2A2A]/70">Customer ID: {customer.id}</p>
+                <p className="text-sm text-[#2A2A2A]/70">
+                  Created: {format(new Date(customer.created_at), 'MMM d, yyyy')}
+                </p>
+                {customer.email && (
+                  <p className="text-sm text-[#2A2A2A]/70">Email: {customer.email}</p>
+                )}
+                {customer.phone_number && (
+                  <p className="text-sm text-[#2A2A2A]/70">Phone: {customer.phone_number}</p>
+                )}
+                {customer.address && (
+                  <p className="text-sm text-[#2A2A2A]/70">Address: {customer.address}</p>
+                )}
               </div>
             </div>
             <Button 
@@ -461,6 +492,34 @@ const CustomerProfile = () => {
                 id="last_name"
                 value={editCustomer.last_name}
                 onChange={(e) => setEditCustomer({ ...editCustomer, last_name: e.target.value })}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone_number">Phone Number (optional)</Label>
+              <Input
+                id="phone_number"
+                value={editCustomer.phone_number}
+                onChange={(e) => setEditCustomer({ ...editCustomer, phone_number: e.target.value })}
+                placeholder="Enter phone number"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email (optional)</Label>
+              <Input
+                id="email"
+                type="email"
+                value={editCustomer.email}
+                onChange={(e) => setEditCustomer({ ...editCustomer, email: e.target.value })}
+                placeholder="Enter email address"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="address">Address (optional)</Label>
+              <Input
+                id="address"
+                value={editCustomer.address}
+                onChange={(e) => setEditCustomer({ ...editCustomer, address: e.target.value })}
+                placeholder="Enter postal address"
               />
             </div>
           </div>

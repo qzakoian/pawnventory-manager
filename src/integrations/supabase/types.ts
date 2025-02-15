@@ -43,24 +43,33 @@ export type Database = {
       }
       Customers: {
         Row: {
+          address: string | null
           created_at: string
+          email: string | null
           first_name: string | null
           id: number
           last_name: string | null
+          phone_number: string | null
           shop_id: number | null
         }
         Insert: {
+          address?: string | null
           created_at?: string
+          email?: string | null
           first_name?: string | null
           id?: number
           last_name?: string | null
+          phone_number?: string | null
           shop_id?: number | null
         }
         Update: {
+          address?: string | null
           created_at?: string
+          email?: string | null
           first_name?: string | null
           id?: number
           last_name?: string | null
+          phone_number?: string | null
           shop_id?: number | null
         }
         Relationships: [
