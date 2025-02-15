@@ -34,7 +34,11 @@ interface Customer {
   created_at: string;
   phone_number: string | null;
   email: string | null;
-  address: string | null;
+  address_line1: string | null;
+  address_line2: string | null;
+  city: string | null;
+  postal_code: string | null;
+  county: string | null;
 }
 
 interface Product {
@@ -62,7 +66,11 @@ interface EditCustomer {
   last_name: string;
   phone_number: string;
   email: string;
-  address: string;
+  address_line1: string;
+  address_line2: string;
+  city: string;
+  postal_code: string;
+  county: string;
 }
 
 const CustomerProfile = () => {
@@ -88,7 +96,11 @@ const CustomerProfile = () => {
     last_name: "",
     phone_number: "",
     email: "",
-    address: "",
+    address_line1: "",
+    address_line2: "",
+    city: "",
+    postal_code: "",
+    county: "",
   });
 
   useEffect(() => {
@@ -160,7 +172,11 @@ const CustomerProfile = () => {
         last_name: customer.last_name || "",
         phone_number: customer.phone_number || "",
         email: customer.email || "",
-        address: customer.address || "",
+        address_line1: customer.address_line1 || "",
+        address_line2: customer.address_line2 || "",
+        city: customer.city || "",
+        postal_code: customer.postal_code || "",
+        county: customer.county || "",
       });
     }
   }, [customer]);
@@ -220,9 +236,22 @@ const CustomerProfile = () => {
       return;
     }
 
-    // Format phone number before saving
+    // Validate postcode if provided
+    if (editCustomer.postal_code && !isValidUKPostcode(editCustomer.postal_code)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid postcode",
+        description: "Please enter a valid UK postcode",
+      });
+      return;
+    }
+
+    // Format phone number and postcode before saving
     const formattedPhoneNumber = editCustomer.phone_number 
       ? formatUKPhoneNumber(editCustomer.phone_number)
+      : '';
+    const formattedPostcode = editCustomer.postal_code 
+      ? formatPostcode(editCustomer.postal_code)
       : '';
 
     try {
@@ -233,7 +262,11 @@ const CustomerProfile = () => {
           last_name: editCustomer.last_name,
           phone_number: formattedPhoneNumber,
           email: editCustomer.email,
-          address: editCustomer.address,
+          address_line1: editCustomer.address_line1,
+          address_line2: editCustomer.address_line2,
+          city: editCustomer.city,
+          postal_code: formattedPostcode,
+          county: editCustomer.county,
         })
         .eq('id', customer.id);
 
@@ -245,7 +278,11 @@ const CustomerProfile = () => {
         last_name: editCustomer.last_name,
         phone_number: formattedPhoneNumber,
         email: editCustomer.email,
-        address: editCustomer.address,
+        address_line1: editCustomer.address_line1,
+        address_line2: editCustomer.address_line2,
+        city: editCustomer.city,
+        postal_code: formattedPostcode,
+        county: editCustomer.county,
       });
       
       setIsEditCustomerDialogOpen(false);
@@ -296,6 +333,19 @@ const CustomerProfile = () => {
     const ukMobilePattern = /^(0|44)?7\d{9}$/;
     
     return validLength && ukMobilePattern.test(digitsOnly);
+  };
+
+  const isValidUKPostcode = (postcode: string): boolean => {
+    if (!postcode) return true; // Optional field
+    const postcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
+    return postcodeRegex.test(postcode.trim());
+  };
+
+  const formatPostcode = (postcode: string): string => {
+    if (!postcode) return "";
+    const cleaned = postcode.trim().toUpperCase();
+    // Add space before the last 3 characters if not present
+    return cleaned.replace(/^(.+?)([0-9][A-Z]{2})$/, "$1 $2");
   };
 
   if (loading) {
@@ -368,8 +418,19 @@ const CustomerProfile = () => {
                 {customer.phone_number && (
                   <p className="text-sm text-[#2A2A2A]/70">Phone: {customer.phone_number}</p>
                 )}
-                {customer.address && (
-                  <p className="text-sm text-[#2A2A2A]/70">Address: {customer.address}</p>
+                {(customer.address_line1 || customer.address_line2 || customer.city || customer.postal_code || customer.county) && (
+                  <div className="text-sm text-[#2A2A2A]/70">
+                    <p className="font-medium">Address:</p>
+                    {customer.address_line1 && <p>{customer.address_line1}</p>}
+                    {customer.address_line2 && <p>{customer.address_line2}</p>}
+                    <p>
+                      {[
+                        customer.city,
+                        customer.county,
+                        customer.postal_code
+                      ].filter(Boolean).join(', ')}
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
@@ -578,12 +639,62 @@ const CustomerProfile = () => {
             </div>
             <div className="space-y-2">
               <Label htmlFor="address">Address (optional)</Label>
-              <Input
-                id="address"
-                value={editCustomer.address}
-                onChange={(e) => setEditCustomer({ ...editCustomer, address: e.target.value })}
-                placeholder="Enter postal address"
-              />
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium">Address (optional)</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="address_line1">Address Line 1</Label>
+                  <Input
+                    id="address_line1"
+                    value={editCustomer.address_line1}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, address_line1: e.target.value })}
+                    placeholder="House number and street name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="address_line2">Address Line 2</Label>
+                  <Input
+                    id="address_line2"
+                    value={editCustomer.address_line2}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, address_line2: e.target.value })}
+                    placeholder="Apartment, suite, unit, etc. (optional)"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="city">Town/City</Label>
+                  <Input
+                    id="city"
+                    value={editCustomer.city}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, city: e.target.value })}
+                    placeholder="Town or city"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="county">County</Label>
+                  <Input
+                    id="county"
+                    value={editCustomer.county}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, county: e.target.value })}
+                    placeholder="County"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="postal_code">Postcode</Label>
+                  <Input
+                    id="postal_code"
+                    value={editCustomer.postal_code}
+                    onChange={(e) => setEditCustomer({ ...editCustomer, postal_code: e.target.value })}
+                    placeholder="Postcode"
+                    className={!isValidUKPostcode(editCustomer.postal_code) && editCustomer.postal_code 
+                      ? "border-red-500" 
+                      : ""}
+                  />
+                  {!isValidUKPostcode(editCustomer.postal_code) && editCustomer.postal_code && (
+                    <p className="text-sm text-red-500 mt-1">
+                      Please enter a valid UK postcode
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
           <DialogFooter>

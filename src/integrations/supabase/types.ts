@@ -43,33 +43,45 @@ export type Database = {
       }
       Customers: {
         Row: {
-          address: string | null
+          address_line1: string | null
+          address_line2: string | null
+          city: string | null
+          county: string | null
           created_at: string
           email: string | null
           first_name: string | null
           id: number
           last_name: string | null
           phone_number: string | null
+          postal_code: string | null
           shop_id: number | null
         }
         Insert: {
-          address?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          county?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
           id?: number
           last_name?: string | null
           phone_number?: string | null
+          postal_code?: string | null
           shop_id?: number | null
         }
         Update: {
-          address?: string | null
+          address_line1?: string | null
+          address_line2?: string | null
+          city?: string | null
+          county?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
           id?: number
           last_name?: string | null
           phone_number?: string | null
+          postal_code?: string | null
           shop_id?: number | null
         }
         Relationships: [
