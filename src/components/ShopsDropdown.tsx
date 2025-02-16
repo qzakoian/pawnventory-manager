@@ -119,7 +119,7 @@ export const ShopsDropdown = () => {
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
-          className="cursor-pointer hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
+          className="cursor-pointer hover:bg-[#646ECB] hover:text-white"
           onClick={() => navigate("/account-settings")}
         >
           <Settings className="h-4 w-4 mr-2" />
@@ -137,7 +137,7 @@ export const ShopsDropdown = () => {
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="w-[200px]">
               <DropdownMenuItem
-                className="cursor-pointer hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
+                className="cursor-pointer hover:bg-[#646ECB] hover:text-white"
                 onClick={() => navigate("/account-settings?tab=shops")}
               >
                 All my shops
@@ -146,7 +146,7 @@ export const ShopsDropdown = () => {
               {shops.map((shop) => (
                 <DropdownMenuItem
                   key={shop.id}
-                  className="cursor-pointer hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
+                  className="cursor-pointer hover:bg-[#646ECB] hover:text-white"
                   onClick={() => setSelectedShop(shop)}
                 >
                   <Store className="h-4 w-4 mr-2" />
