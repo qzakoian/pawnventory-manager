@@ -1,15 +1,19 @@
 
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, ArrowLeft } from "lucide-react";
+import { Package, ArrowLeft, Edit } from "lucide-react";
 import { ShopsDropdown } from "@/components/ShopsDropdown";
+import { EditProductForm } from "@/components/product/EditProductForm";
+import { useState } from "react";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
@@ -74,11 +78,21 @@ const ProductDetails = () => {
             Back to Dashboard
           </Button>
           
-          <div className="space-y-2">
-            <p className="text-gray-500 text-sm">Product Details</p>
-            <h1 className="text-3xl font-semibold text-[#2A2A2A]">
-              {product.model}
-            </h1>
+          <div className="flex items-start justify-between">
+            <div className="space-y-2">
+              <p className="text-gray-500 text-sm">Product Details</p>
+              <h1 className="text-3xl font-semibold text-[#2A2A2A]">
+                {product.model}
+              </h1>
+            </div>
+            <Button
+              onClick={() => setIsEditDialogOpen(true)}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Edit className="h-4 w-4" />
+              Edit Product
+            </Button>
           </div>
         </div>
 
@@ -125,6 +139,13 @@ const ProductDetails = () => {
             </div>
           </div>
         </Card>
+
+        <EditProductForm 
+          product={product}
+          isOpen={isEditDialogOpen}
+          onClose={() => setIsEditDialogOpen(false)}
+          onSuccess={() => queryClient.invalidateQueries({ queryKey: ['product', id] })}
+        />
       </main>
     </div>
   );
