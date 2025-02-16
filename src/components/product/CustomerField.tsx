@@ -94,8 +94,10 @@ export const CustomerField = ({ form, customers }: EditProductFormProps) => {
                     size="icon"
                     className="absolute right-8 top-0 h-full hover:bg-transparent"
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
-                      form.setValue("customer_id", undefined);
+                      form.setValue("customer_id", "");
+                      setOpen(false);
                     }}
                   >
                     <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
