@@ -121,6 +121,7 @@ export type Database = {
           creation_date: string | null
           customer_id: number | null
           id: number
+          imei: string | null
           in_stock: boolean | null
           model: string | null
           photo_url: string | null
@@ -133,6 +134,7 @@ export type Database = {
           sale_price_including_VAT: number | null
           scheme: string | null
           shop_id: number | null
+          sku: string | null
         }
         Insert: {
           "12-week-buy-back_price"?: number | null
@@ -142,6 +144,7 @@ export type Database = {
           creation_date?: string | null
           customer_id?: number | null
           id?: number
+          imei?: string | null
           in_stock?: boolean | null
           model?: string | null
           photo_url?: string | null
@@ -154,6 +157,7 @@ export type Database = {
           sale_price_including_VAT?: number | null
           scheme?: string | null
           shop_id?: number | null
+          sku?: string | null
         }
         Update: {
           "12-week-buy-back_price"?: number | null
@@ -163,6 +167,7 @@ export type Database = {
           creation_date?: string | null
           customer_id?: number | null
           id?: number
+          imei?: string | null
           in_stock?: boolean | null
           model?: string | null
           photo_url?: string | null
@@ -175,6 +180,7 @@ export type Database = {
           sale_price_including_VAT?: number | null
           scheme?: string | null
           shop_id?: number | null
+          sku?: string | null
         }
         Relationships: [
           {

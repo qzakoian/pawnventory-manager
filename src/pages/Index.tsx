@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { ShopsDropdown } from "@/components/ShopsDropdown";
 import { useShop } from "@/contexts/ShopContext";
 import { CustomerSearch } from "@/components/customer/CustomerSearch";
+import { ProductSearch } from "@/components/product/ProductSearch";
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -100,20 +101,12 @@ const Index = () => {
         <section>
           <h2 className="text-xl font-bold text-[#111111] mb-4">Quick access</h2>
           <div className="grid md:grid-cols-2 gap-4">
-            {selectedShop && <CustomerSearch shopId={selectedShop.id} />}
-            <Card className="p-4 glass-card">
-              <h3 className="text-lg font-medium text-[#111111] mb-4">Find a Product</h3>
-              <div className="flex space-x-2">
-                <Input placeholder="IMEI/SKU/ID" className="flex-1" />
-                <Button variant="outline" className="text-[#646ECB]">
-                  Find <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </div>
-              <Button variant="link" className="text-[#646ECB] pl-0 mt-2 gap-1.5">
-                <Plus className="h-4 w-4" />
-                Create Product
-              </Button>
-            </Card>
+            {selectedShop && (
+              <>
+                <CustomerSearch shopId={selectedShop.id} />
+                <ProductSearch shopId={selectedShop.id} />
+              </>
+            )}
           </div>
         </section>
 
