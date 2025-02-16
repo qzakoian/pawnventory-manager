@@ -18,11 +18,49 @@ export const CustomerField = ({ form, customers }: EditProductFormProps) => {
       .join(" ") || "Unnamed Customer";
   };
 
-  const filteredCustomers = (customers || []).filter((customer) => {
+  const filteredCustomers = customers?.filter((customer) => {
     const searchTerm = customerSearch.toLowerCase();
     const customerName = getCustomerDisplayName(customer).toLowerCase();
     return customerName.includes(searchTerm);
-  });
+  }) ?? [];
+
+  const renderCommandContent = () => {
+    if (!customers) {
+      return <div className="p-4 text-sm text-muted-foreground">Loading customers...</div>;
+    }
+
+    return (
+      <Command value={field.value || ""} shouldFilter={false}>
+        <CommandInput 
+          placeholder="Search customer..." 
+          value={customerSearch}
+          onValueChange={setCustomerSearch}
+        />
+        <CommandEmpty>No customer found.</CommandEmpty>
+        <CommandGroup>
+          {filteredCustomers.map((customer) => (
+            <CommandItem
+              key={`customer-${customer.id}`}
+              value={String(customer.id)}
+              onSelect={() => {
+                form.setValue("customer_id", String(customer.id));
+                setCustomerSearch("");
+                setOpen(false);
+              }}
+            >
+              <Check
+                className={cn(
+                  "mr-2 h-4 w-4",
+                  field.value === String(customer.id) ? "opacity-100" : "opacity-0"
+                )}
+              />
+              {getCustomerDisplayName(customer)}
+            </CommandItem>
+          ))}
+        </CommandGroup>
+      </Command>
+    );
+  };
 
   return (
     <FormField
@@ -56,35 +94,7 @@ export const CustomerField = ({ form, customers }: EditProductFormProps) => {
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[300px] p-0">
-                    <Command value="" shouldFilter={false}>
-                      <CommandInput 
-                        placeholder="Search customer..." 
-                        value={customerSearch}
-                        onValueChange={setCustomerSearch}
-                      />
-                      <CommandEmpty>No customer found.</CommandEmpty>
-                      <CommandGroup>
-                        {(filteredCustomers || []).map((customer) => (
-                          <CommandItem
-                            key={`customer-${customer.id}`}
-                            value={String(customer.id)}
-                            onSelect={() => {
-                              form.setValue("customer_id", String(customer.id));
-                              setCustomerSearch("");
-                              setOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                field.value === String(customer.id) ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {getCustomerDisplayName(customer)}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
+                    {renderCommandContent()}
                   </PopoverContent>
                 </Popover>
                 {foundCustomer && (
