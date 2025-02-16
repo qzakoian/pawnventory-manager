@@ -62,11 +62,11 @@ const ProductDetails = () => {
     return customerName.includes(searchTerm);
   }) ?? [];
 
-  const updateCustomer = async (customerId: string | null) => {
+  const updateCustomer = async (customerId: number | null) => {
     try {
       const { error } = await supabase
         .from('Products')
-        .update({ customer_id: customerId ? parseInt(customerId) : null })
+        .update({ customer_id: customerId })
         .eq('id', id);
 
       if (error) throw error;
@@ -201,7 +201,7 @@ const ProductDetails = () => {
                                 key={customer.id}
                                 value={String(customer.id)}
                                 onSelect={(value) => {
-                                  updateCustomer(value);
+                                  updateCustomer(parseInt(value));
                                   setCustomerSearch("");
                                   setOpen(false);
                                 }}
