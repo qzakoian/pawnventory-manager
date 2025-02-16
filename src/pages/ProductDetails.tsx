@@ -4,18 +4,22 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, ArrowLeft, Edit } from "lucide-react";
+import { Package, ArrowLeft, Edit, Check, ChevronsUpDown, X } from "lucide-react";
 import { ShopsDropdown } from "@/components/ShopsDropdown";
-import { EditProductForm } from "@/components/product/EditProductForm";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { toast } from "@/components/ui/use-toast";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [customerSearch, setCustomerSearch] = useState("");
 
-  const { data: product, isLoading } = useQuery({
+  const { data: product, isLoading: isLoadingProduct } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
       if (!id) throw new Error('Product ID is required');
@@ -24,7 +28,7 @@ const ProductDetails = () => {
 
       const { data, error } = await supabase
         .from('Products')
-        .select('*')
+        .select('*, customer:Customers(*)')
         .eq('id', productId)
         .single();
 
@@ -33,7 +37,56 @@ const ProductDetails = () => {
     },
   });
 
-  if (isLoading) {
+  const { data: customers, isLoading: isLoadingCustomers } = useQuery({
+    queryKey: ['customers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('Customers')
+        .select('id, first_name, last_name')
+        .order('first_name');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const getCustomerDisplayName = (customer: { first_name: string | null; last_name: string | null }) => {
+    return [customer.first_name, customer.last_name]
+      .filter(name => name !== null)
+      .join(" ") || "Unnamed Customer";
+  };
+
+  const filteredCustomers = customers?.filter((customer) => {
+    const searchTerm = customerSearch.toLowerCase();
+    const customerName = getCustomerDisplayName(customer).toLowerCase();
+    return customerName.includes(searchTerm);
+  }) ?? [];
+
+  const updateCustomer = async (customerId: string | null) => {
+    try {
+      const { error } = await supabase
+        .from('Products')
+        .update({ customer_id: customerId ? parseInt(customerId) : null })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      queryClient.invalidateQueries({ queryKey: ['product', id] });
+      toast({
+        title: "Success",
+        description: "Customer updated successfully",
+      });
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update customer",
+      });
+    }
+  };
+
+  if (isLoadingProduct) {
     return (
       <div className="min-h-screen bg-[#F8F9FF] p-6">
         <div className="max-w-7xl mx-auto">
@@ -86,14 +139,6 @@ const ProductDetails = () => {
                 {product.model}
               </h1>
             </div>
-            <Button
-              onClick={() => setIsEditDialogOpen(true)}
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Edit className="h-4 w-4" />
-              Edit Product
-            </Button>
           </div>
         </div>
 
@@ -118,6 +163,77 @@ const ProductDetails = () => {
                   <p className="font-medium">{product.sku}</p>
                 </div>
               )}
+
+              <div>
+                <h3 className="text-sm text-gray-500 mb-2">Customer</h3>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className={cn(
+                        "w-full justify-between",
+                        !product.customer && "text-muted-foreground"
+                      )}
+                    >
+                      {product.customer 
+                        ? getCustomerDisplayName(product.customer)
+                        : "Select customer"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[300px] p-0">
+                    {isLoadingCustomers ? (
+                      <div className="p-4 text-sm text-muted-foreground">Loading customers...</div>
+                    ) : (
+                      <Command className="w-full">
+                        <CommandInput 
+                          placeholder="Search customer..." 
+                          value={customerSearch}
+                          onValueChange={setCustomerSearch}
+                        />
+                        <CommandEmpty>No customer found.</CommandEmpty>
+                        {filteredCustomers.length > 0 && (
+                          <CommandGroup>
+                            {filteredCustomers.map((customer) => (
+                              <CommandItem
+                                key={customer.id}
+                                value={String(customer.id)}
+                                onSelect={(value) => {
+                                  updateCustomer(value);
+                                  setCustomerSearch("");
+                                  setOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    product.customer_id === customer.id ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {getCustomerDisplayName(customer)}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        )}
+                      </Command>
+                    )}
+                  </PopoverContent>
+                </Popover>
+                {product.customer && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => updateCustomer(null)}
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Remove customer
+                  </Button>
+                )}
+              </div>
             </div>
 
             <div className="space-y-4">
@@ -140,13 +256,6 @@ const ProductDetails = () => {
             </div>
           </div>
         </Card>
-
-        <EditProductForm 
-          product={product}
-          isOpen={isEditDialogOpen}
-          onClose={() => setIsEditDialogOpen(false)}
-          onSuccess={() => queryClient.invalidateQueries({ queryKey: ['product', id] })}
-        />
       </main>
     </div>
   );
