@@ -155,15 +155,16 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[300px] p-0">
-                    <Command>
+                    <Command value={field.value || ""}>
                       <CommandInput 
                         placeholder="Search customer..." 
                         value={customerSearch}
                         onValueChange={setCustomerSearch}
                       />
                       <CommandEmpty>No customer found.</CommandEmpty>
-                      <CommandGroup>
+                      <CommandGroup heading="Customers">
                         <CommandItem
+                          key="none"
                           value="none"
                           onSelect={() => {
                             form.setValue("customer_id", "none");
@@ -181,7 +182,7 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                         </CommandItem>
                         {filteredCustomers.map((customer) => (
                           <CommandItem
-                            key={customer.id}
+                            key={`customer-${customer.id}`}
                             value={String(customer.id)}
                             onSelect={() => {
                               form.setValue("customer_id", String(customer.id));
