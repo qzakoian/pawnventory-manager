@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { UseFormReturn } from "react-hook-form";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import * as z from "zod";
@@ -137,72 +137,71 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
             <FormItem>
               <FormLabel>Customer (optional)</FormLabel>
               <FormControl>
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
+                <div className="relative">
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={open}
+                        className={cn(
+                          "w-full justify-between",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {foundCustomer 
+                          ? getCustomerDisplayName(foundCustomer)
+                          : "Select customer"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[300px] p-0">
+                      <Command value={field.value || ""}>
+                        <CommandInput 
+                          placeholder="Search customer..." 
+                          value={customerSearch}
+                          onValueChange={setCustomerSearch}
+                        />
+                        <CommandEmpty>No customer found.</CommandEmpty>
+                        <CommandGroup heading="Customers">
+                          {filteredCustomers.map((customer) => (
+                            <CommandItem
+                              key={`customer-${customer.id}`}
+                              value={String(customer.id)}
+                              onSelect={() => {
+                                form.setValue("customer_id", String(customer.id));
+                                setCustomerSearch("");
+                                setOpen(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  field.value === String(customer.id) ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {getCustomerDisplayName(customer)}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                  {foundCustomer && (
                     <Button
-                      variant="outline"
-                      role="combobox"
-                      aria-expanded={open}
-                      className={cn(
-                        "w-full justify-between",
-                        !field.value && "text-muted-foreground"
-                      )}
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-8 top-0 h-full hover:bg-transparent"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        form.setValue("customer_id", undefined);
+                      }}
                     >
-                      {foundCustomer 
-                        ? getCustomerDisplayName(foundCustomer)
-                        : "Select customer"}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      <X className="h-4 w-4 text-muted-foreground hover:text-foreground" />
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[300px] p-0">
-                    <Command value={field.value || ""}>
-                      <CommandInput 
-                        placeholder="Search customer..." 
-                        value={customerSearch}
-                        onValueChange={setCustomerSearch}
-                      />
-                      <CommandEmpty>No customer found.</CommandEmpty>
-                      <CommandGroup heading="Customers">
-                        <CommandItem
-                          key="none"
-                          value="none"
-                          onSelect={() => {
-                            form.setValue("customer_id", "none");
-                            setCustomerSearch("");
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              field.value === "none" ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          None
-                        </CommandItem>
-                        {filteredCustomers.map((customer) => (
-                          <CommandItem
-                            key={`customer-${customer.id}`}
-                            value={String(customer.id)}
-                            onSelect={() => {
-                              form.setValue("customer_id", String(customer.id));
-                              setCustomerSearch("");
-                              setOpen(false);
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                "mr-2 h-4 w-4",
-                                field.value === String(customer.id) ? "opacity-100" : "opacity-0"
-                              )}
-                            />
-                            {getCustomerDisplayName(customer)}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                  )}
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
