@@ -137,17 +137,16 @@ export const ShopsDropdown = () => {
             </DropdownMenuSubTrigger>
             <DropdownMenuSubContent className="w-[200px]">
               <DropdownMenuItem
-                className="cursor-pointer"
+                className="cursor-pointer hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
                 onClick={() => navigate("/account-settings?tab=shops")}
               >
-                <Store className="h-4 w-4 mr-2" />
                 All my shops
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {shops.map((shop) => (
                 <DropdownMenuItem
                   key={shop.id}
-                  className="cursor-pointer"
+                  className="cursor-pointer hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
                   onClick={() => setSelectedShop(shop)}
                 >
                   <Store className="h-4 w-4 mr-2" />
