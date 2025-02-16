@@ -38,6 +38,12 @@ const editProductSchema = z.object({
 export { editProductSchema };
 
 export const EditProductFormFields = ({ form, categories, customers }: EditProductFormFieldsProps) => {
+  const getCustomerDisplayName = (customer: Customer) => {
+    return [customer.first_name, customer.last_name]
+      .filter(name => name !== null)
+      .join(" ") || "Unnamed Customer";
+  };
+
   return (
     <>
       <FormField
@@ -128,9 +134,9 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                   >
                     {field.value && field.value !== "none"
                       ? customers?.find((customer) => String(customer.id) === field.value)
-                        ? `${customers.find((customer) => String(customer.id) === field.value)?.first_name} ${
-                            customers.find((customer) => String(customer.id) === field.value)?.last_name
-                          }`
+                        ? getCustomerDisplayName(
+                            customers.find((customer) => String(customer.id) === field.value)!
+                          )
                         : "Select customer"
                       : "Select customer"}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -158,7 +164,7 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                       {customers?.map((customer) => (
                         <CommandItem
                           key={customer.id}
-                          value={`${customer.first_name} ${customer.last_name}`.toLowerCase()}
+                          value={getCustomerDisplayName(customer).toLowerCase()}
                           onSelect={() => {
                             form.setValue("customer_id", String(customer.id));
                           }}
@@ -169,7 +175,7 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                               field.value === String(customer.id) ? "opacity-100" : "opacity-0"
                             )}
                           />
-                          {customer.first_name} {customer.last_name}
+                          {getCustomerDisplayName(customer)}
                         </CommandItem>
                       ))}
                     </CommandGroup>
