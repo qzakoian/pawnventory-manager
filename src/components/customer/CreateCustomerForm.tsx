@@ -90,8 +90,9 @@ export const CreateCustomerForm = ({ shopId }: CreateCustomerFormProps) => {
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <DialogTrigger asChild>
-        <Button variant="link" className="text-[#646ECB] pl-0 mt-2">
-          <Plus className="h-4 w-4 mr-1" /> Create Customer
+        <Button variant="link" className="text-[#646ECB] pl-0 mt-2 gap-1.5">
+          <Plus className="h-4 w-4" />
+          Create Customer
         </Button>
       </DialogTrigger>
       <DialogContent>

@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -51,6 +50,7 @@ const transactions = [
 
 const Index = () => {
   const [firstName, setFirstName] = useState<string>("");
+
   const { selectedShop } = useShop();
 
   useEffect(() => {
@@ -109,8 +109,9 @@ const Index = () => {
                   Find <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </div>
-              <Button variant="link" className="text-[#646ECB] pl-0 mt-2">
-                <Plus className="h-4 w-4 mr-1" /> Create Product
+              <Button variant="link" className="text-[#646ECB] pl-0 mt-2 gap-1.5">
+                <Plus className="h-4 w-4" />
+                Create Product
               </Button>
             </Card>
           </div>
