@@ -19,13 +19,13 @@ const ProductDetails = () => {
   const [open, setOpen] = useState(false);
   const [customerSearch, setCustomerSearch] = useState("");
 
-  const { data: product, isLoading: isLoadingProduct } = useQuery({
-    queryKey: ['product', id],
-    queryFn: async () => {
-      if (!id) throw new Error('Product ID is required');
-      const productId = parseInt(id);
-      if (isNaN(productId)) throw new Error('Invalid product ID');
+  const productId = id ? parseInt(id) : null;
 
+  const { data: product, isLoading: isLoadingProduct } = useQuery({
+    queryKey: ['product', productId],
+    queryFn: async () => {
+      if (!productId) throw new Error('Product ID is required');
+      
       const { data, error } = await supabase
         .from('Products')
         .select('*, customer:Customers(*)')
@@ -35,6 +35,7 @@ const ProductDetails = () => {
       if (error) throw error;
       return data;
     },
+    enabled: !!productId,
   });
 
   const { data: customers, isLoading: isLoadingCustomers } = useQuery({
@@ -63,15 +64,17 @@ const ProductDetails = () => {
   }) ?? [];
 
   const updateCustomer = async (customerId: number | null) => {
+    if (!productId) return;
+
     try {
       const { error } = await supabase
         .from('Products')
         .update({ customer_id: customerId })
-        .eq('id', id);
+        .eq('id', productId);
 
       if (error) throw error;
 
-      queryClient.invalidateQueries({ queryKey: ['product', id] });
+      queryClient.invalidateQueries({ queryKey: ['product', productId] });
       toast({
         title: "Success",
         description: "Customer updated successfully",
