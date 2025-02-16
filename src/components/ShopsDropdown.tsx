@@ -128,10 +128,10 @@ export const ShopsDropdown = () => {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="cursor-pointer">
+            <DropdownMenuSubTrigger className="cursor-pointer hover:bg-[#646ECB] hover:text-white data-[state=open]:bg-[#646ECB] data-[state=open]:text-white">
               <Store className="h-4 w-4 mr-2" />
               <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground">Shop</span>
+                <span className="text-xs text-muted-foreground group-hover:text-white">Shop</span>
                 <span>{selectedShop?.name || "Select Shop"}</span>
               </div>
             </DropdownMenuSubTrigger>
