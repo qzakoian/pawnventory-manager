@@ -119,7 +119,7 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                   <SelectValue placeholder="Select a customer" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
                   {customers?.map((customer) => (
                     <SelectItem 
                       key={customer.id} 
