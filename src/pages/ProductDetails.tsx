@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -190,7 +189,7 @@ const ProductDetails = () => {
                     {isLoadingCustomers ? (
                       <div className="p-4 text-sm text-muted-foreground">Loading customers...</div>
                     ) : (
-                      <Command className="w-full">
+                      <Command>
                         <CommandInput 
                           placeholder="Search customer..." 
                           value={customerSearch}
@@ -202,9 +201,8 @@ const ProductDetails = () => {
                             {filteredCustomers.map((customer) => (
                               <CommandItem
                                 key={customer.id}
-                                value={String(customer.id)}
-                                onSelect={(value) => {
-                                  updateCustomer(parseInt(value));
+                                onSelect={() => {
+                                  updateCustomer(customer.id);
                                   setCustomerSearch("");
                                   setOpen(false);
                                 }}
