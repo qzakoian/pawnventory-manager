@@ -80,12 +80,32 @@ export const EditProductForm = ({ product, isOpen, onClose, onSuccess }: EditPro
 
   const onSubmit = async (values: z.infer<typeof editProductSchema>) => {
     try {
-      const { error } = await supabase
-        .from('Products')
-        .update(values)
-        .eq('id', product.id);
+      console.log('Submitting values:', values); // Debug log
 
-      if (error) throw error;
+      // Clean up the values before sending to Supabase
+      const updateData = {
+        ...values,
+        purchase_price_including_VAT: Number(values.purchase_price_including_VAT),
+        // Handle optional fields
+        imei: values.imei || null,
+        sku: values.sku || null,
+      };
+
+      console.log('Sending to Supabase:', updateData); // Debug log
+      
+      const { data, error } = await supabase
+        .from('Products')
+        .update(updateData)
+        .eq('id', product.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Supabase error:', error); // Debug log
+        throw error;
+      }
+
+      console.log('Update successful:', data); // Debug log
 
       toast({
         title: "Success",
