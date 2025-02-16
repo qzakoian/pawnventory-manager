@@ -44,10 +44,6 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
       .join(" ") || "Unnamed Customer";
   };
 
-  const foundCustomer = field.value && field.value !== "none" 
-    ? customers?.find((customer) => String(customer.id) === field.value)
-    : null;
-
   return (
     <>
       <FormField
@@ -122,66 +118,72 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
       <FormField
         control={form.control}
         name="customer_id"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Customer (optional)</FormLabel>
-            <FormControl>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className={cn(
-                      "w-full justify-between",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {foundCustomer 
-                      ? getCustomerDisplayName(foundCustomer)
-                      : "Select customer"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-[300px] p-0">
-                  <Command>
-                    <CommandInput placeholder="Search customer..." />
-                    <CommandEmpty>No customer found.</CommandEmpty>
-                    <CommandGroup>
-                      <CommandItem
-                        value="none"
-                        onSelect={() => form.setValue("customer_id", "none")}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            field.value === "none" ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        None
-                      </CommandItem>
-                      {(customers || []).map((customer) => (
+        render={({ field }) => {
+          const foundCustomer = field.value && field.value !== "none" 
+            ? customers?.find((customer) => String(customer.id) === field.value)
+            : null;
+
+          return (
+            <FormItem>
+              <FormLabel>Customer (optional)</FormLabel>
+              <FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      className={cn(
+                        "w-full justify-between",
+                        !field.value && "text-muted-foreground"
+                      )}
+                    >
+                      {foundCustomer 
+                        ? getCustomerDisplayName(foundCustomer)
+                        : "Select customer"}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[300px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Search customer..." />
+                      <CommandEmpty>No customer found.</CommandEmpty>
+                      <CommandGroup>
                         <CommandItem
-                          key={customer.id}
-                          value={String(customer.id)}
-                          onSelect={() => form.setValue("customer_id", String(customer.id))}
+                          value="none"
+                          onSelect={() => form.setValue("customer_id", "none")}
                         >
                           <Check
                             className={cn(
                               "mr-2 h-4 w-4",
-                              field.value === String(customer.id) ? "opacity-100" : "opacity-0"
+                              field.value === "none" ? "opacity-100" : "opacity-0"
                             )}
                           />
-                          {getCustomerDisplayName(customer)}
+                          None
                         </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
+                        {(customers || []).map((customer) => (
+                          <CommandItem
+                            key={customer.id}
+                            value={String(customer.id)}
+                            onSelect={() => form.setValue("customer_id", String(customer.id))}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                field.value === String(customer.id) ? "opacity-100" : "opacity-0"
+                              )}
+                            />
+                            {getCustomerDisplayName(customer)}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          );
+        }}
       />
       <FormField
         control={form.control}
