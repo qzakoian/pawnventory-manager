@@ -57,7 +57,7 @@ export const CustomerField = ({ form, customers }: EditProductFormProps) => {
                   </PopoverTrigger>
                   <PopoverContent className="w-[300px] p-0">
                     {customers ? (
-                      <Command shouldFilter={false}>
+                      <Command value={field.value || ""} shouldFilter={false}>
                         <CommandInput 
                           placeholder="Search customer..." 
                           value={customerSearch}
