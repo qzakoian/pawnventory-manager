@@ -39,6 +39,7 @@ const editProductSchema = z.object({
 export { editProductSchema };
 
 export const EditProductFormFields = ({ form, categories, customers }: EditProductFormFieldsProps) => {
+  const [open, setOpen] = useState(false);
   const [customerSearch, setCustomerSearch] = useState("");
 
   const getCustomerDisplayName = (customer: Customer) => {
@@ -136,11 +137,12 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
             <FormItem>
               <FormLabel>Customer (optional)</FormLabel>
               <FormControl>
-                <Popover>
+                <Popover open={open} onOpenChange={setOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       role="combobox"
+                      aria-expanded={open}
                       className={cn(
                         "w-full justify-between",
                         !field.value && "text-muted-foreground"
@@ -153,7 +155,7 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[300px] p-0">
-                    <Command defaultValue={field.value || ""}>
+                    <Command>
                       <CommandInput 
                         placeholder="Search customer..." 
                         value={customerSearch}
@@ -162,11 +164,11 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                       <CommandEmpty>No customer found.</CommandEmpty>
                       <CommandGroup>
                         <CommandItem
-                          key="none"
                           value="none"
                           onSelect={() => {
                             form.setValue("customer_id", "none");
                             setCustomerSearch("");
+                            setOpen(false);
                           }}
                         >
                           <Check
@@ -184,6 +186,7 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                             onSelect={() => {
                               form.setValue("customer_id", String(customer.id));
                               setCustomerSearch("");
+                              setOpen(false);
                             }}
                           >
                             <Check
