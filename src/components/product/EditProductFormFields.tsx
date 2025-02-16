@@ -144,13 +144,16 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-[300px] p-0">
-                    <Command>
+                    <Command defaultValue={field.value || ""}>
                       <CommandInput placeholder="Search customer..." />
                       <CommandEmpty>No customer found.</CommandEmpty>
                       <CommandGroup>
                         <CommandItem
+                          key="none"
                           value="none"
-                          onSelect={() => form.setValue("customer_id", "none")}
+                          onSelect={() => {
+                            form.setValue("customer_id", "none");
+                          }}
                         >
                           <Check
                             className={cn(
@@ -164,7 +167,9 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                           <CommandItem
                             key={customer.id}
                             value={String(customer.id)}
-                            onSelect={() => form.setValue("customer_id", String(customer.id))}
+                            onSelect={() => {
+                              form.setValue("customer_id", String(customer.id));
+                            }}
                           >
                             <Check
                               className={cn(
