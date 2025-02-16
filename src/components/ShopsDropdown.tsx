@@ -10,9 +10,10 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Store, User, LogOut } from "lucide-react";
+import { ChevronDown, Store, User, LogOut, Settings } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -104,37 +105,63 @@ export const ShopsDropdown = () => {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[280px] bg-white">
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
+        <div className="flex items-start space-x-3 p-4">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={profilePicture || undefined} />
+            <AvatarFallback>
+              <User className="h-6 w-6" />
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col">
             <p className="text-sm font-medium leading-none">{userName}</p>
-            <p className="text-xs leading-none text-muted-foreground">{userEmail}</p>
+            <p className="text-xs text-muted-foreground mt-1">{userEmail}</p>
           </div>
-        </DropdownMenuLabel>
+        </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => navigate("/account-settings")}>
+        <DropdownMenuItem 
+          className="cursor-pointer hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
+          onClick={() => navigate("/account-settings")}
+        >
+          <Settings className="h-4 w-4 mr-2" />
           Account and settings
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="cursor-pointer">
-            <Store className="h-4 w-4 mr-2" />
-            <span>{selectedShop?.name || "Select Shop"}</span>
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-[200px]">
-            {shops.map((shop) => (
+        <DropdownMenuGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger className="cursor-pointer">
+              <Store className="h-4 w-4 mr-2" />
+              <div className="flex flex-col">
+                <span className="text-xs text-muted-foreground">Shop</span>
+                <span>{selectedShop?.name || "Select Shop"}</span>
+              </div>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className="w-[200px]">
               <DropdownMenuItem
-                key={shop.id}
                 className="cursor-pointer"
-                onClick={() => setSelectedShop(shop)}
+                onClick={() => navigate("/account-settings?tab=shops")}
               >
                 <Store className="h-4 w-4 mr-2" />
-                {shop.name}
+                All my shops
               </DropdownMenuItem>
-            ))}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+              <DropdownMenuSeparator />
+              {shops.map((shop) => (
+                <DropdownMenuItem
+                  key={shop.id}
+                  className="cursor-pointer"
+                  onClick={() => setSelectedShop(shop)}
+                >
+                  <Store className="h-4 w-4 mr-2" />
+                  {shop.name}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-red-600 cursor-pointer" onClick={handleLogout}>
+        <DropdownMenuItem 
+          className="text-red-600 cursor-pointer hover:bg-red-50" 
+          onClick={handleLogout}
+        >
           <LogOut className="h-4 w-4 mr-2" />
           Log out
         </DropdownMenuItem>
