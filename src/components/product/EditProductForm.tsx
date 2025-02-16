@@ -19,7 +19,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 const editProductSchema = z.object({
   model: z.string().min(1, "Model is required"),
@@ -45,6 +53,19 @@ interface EditProductFormProps {
 
 export const EditProductForm = ({ product, isOpen, onClose, onSuccess }: EditProductFormProps) => {
   const { toast } = useToast();
+
+  const { data: categories } = useQuery({
+    queryKey: ['productCategories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('Product Categories')
+        .select('name')
+        .order('name');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const form = useForm<z.infer<typeof editProductSchema>>({
     resolver: zodResolver(editProductSchema),
@@ -137,7 +158,24 @@ export const EditProductForm = ({ product, isOpen, onClose, onSuccess }: EditPro
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories?.map((category) => (
+                          <SelectItem 
+                            key={category.name} 
+                            value={category.name || ""}
+                          >
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
