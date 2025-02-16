@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +18,7 @@ const ProductDetails = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [customerSearch, setCustomerSearch] = useState("");
+  const [selectedValue, setSelectedValue] = useState("");
 
   const productId = id ? parseInt(id) : null;
 
@@ -189,7 +191,7 @@ const ProductDetails = () => {
                     {isLoadingCustomers ? (
                       <div className="p-4 text-sm text-muted-foreground">Loading customers...</div>
                     ) : (
-                      <Command>
+                      <Command value={selectedValue} onValueChange={setSelectedValue}>
                         <CommandInput 
                           placeholder="Search customer..." 
                           value={customerSearch}
@@ -201,9 +203,11 @@ const ProductDetails = () => {
                             {filteredCustomers.map((customer) => (
                               <CommandItem
                                 key={customer.id}
-                                onSelect={() => {
+                                value={String(customer.id)}
+                                onSelect={(currentValue) => {
                                   updateCustomer(customer.id);
                                   setCustomerSearch("");
+                                  setSelectedValue(currentValue);
                                   setOpen(false);
                                 }}
                               >
@@ -228,7 +232,10 @@ const ProductDetails = () => {
                     variant="ghost"
                     size="sm"
                     className="mt-2"
-                    onClick={() => updateCustomer(null)}
+                    onClick={() => {
+                      updateCustomer(null);
+                      setSelectedValue("");
+                    }}
                   >
                     <X className="h-4 w-4 mr-2" />
                     Remove customer
