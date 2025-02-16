@@ -35,6 +35,7 @@ const editProductSchema = z.object({
   sku: z.string().optional(),
   product_category: z.string().min(1, "Category is required"),
   purchase_price_including_VAT: z.number().min(0, "Price must be positive"),
+  customer_id: z.string().optional(),
 });
 
 interface EditProductFormProps {
@@ -45,6 +46,7 @@ interface EditProductFormProps {
     sku: string | null;
     product_category: string | null;
     purchase_price_including_VAT: number | null;
+    customer_id: number | null;
   };
   isOpen: boolean;
   onClose: () => void;
@@ -67,6 +69,19 @@ export const EditProductForm = ({ product, isOpen, onClose, onSuccess }: EditPro
     },
   });
 
+  const { data: customers } = useQuery({
+    queryKey: ['customers'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('Customers')
+        .select('id, first_name, last_name')
+        .order('first_name');
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   const form = useForm<z.infer<typeof editProductSchema>>({
     resolver: zodResolver(editProductSchema),
     defaultValues: {
@@ -75,6 +90,7 @@ export const EditProductForm = ({ product, isOpen, onClose, onSuccess }: EditPro
       sku: product.sku || "",
       product_category: product.product_category || "",
       purchase_price_including_VAT: product.purchase_price_including_VAT || 0,
+      customer_id: product.customer_id ? String(product.customer_id) : undefined,
     },
   });
 
@@ -89,6 +105,7 @@ export const EditProductForm = ({ product, isOpen, onClose, onSuccess }: EditPro
         // Handle optional fields
         imei: values.imei || null,
         sku: values.sku || null,
+        customer_id: values.customer_id ? Number(values.customer_id) : null,
       };
 
       console.log('Sending to Supabase:', updateData); // Debug log
@@ -192,6 +209,37 @@ export const EditProductForm = ({ product, isOpen, onClose, onSuccess }: EditPro
                             value={category.name || ""}
                           >
                             {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="customer_id"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Customer (optional)</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a customer" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">None</SelectItem>
+                        {customers?.map((customer) => (
+                          <SelectItem 
+                            key={customer.id} 
+                            value={String(customer.id)}
+                          >
+                            {customer.first_name} {customer.last_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
