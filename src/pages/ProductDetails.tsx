@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Package, ArrowLeft, Edit, Check, ChevronsUpDown, X } from "lucide-react";
 import { ShopsDropdown } from "@/components/ShopsDropdown";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
@@ -18,7 +18,6 @@ const ProductDetails = () => {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [customerSearch, setCustomerSearch] = useState("");
-  const [selectedValue, setSelectedValue] = useState("");
 
   const productId = id ? parseInt(id) : null;
 
@@ -191,37 +190,37 @@ const ProductDetails = () => {
                     {isLoadingCustomers ? (
                       <div className="p-4 text-sm text-muted-foreground">Loading customers...</div>
                     ) : (
-                      <Command value={selectedValue} onValueChange={setSelectedValue}>
+                      <Command>
                         <CommandInput 
                           placeholder="Search customer..." 
                           value={customerSearch}
                           onValueChange={setCustomerSearch}
                         />
-                        <CommandEmpty>No customer found.</CommandEmpty>
-                        {filteredCustomers.length > 0 && (
-                          <CommandGroup>
-                            {filteredCustomers.map((customer) => (
-                              <CommandItem
-                                key={customer.id}
-                                value={String(customer.id)}
-                                onSelect={(currentValue) => {
-                                  updateCustomer(customer.id);
-                                  setCustomerSearch("");
-                                  setSelectedValue(currentValue);
-                                  setOpen(false);
-                                }}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    product.customer_id === customer.id ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {getCustomerDisplayName(customer)}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        )}
+                        <CommandList>
+                          <CommandEmpty>No customer found.</CommandEmpty>
+                          {filteredCustomers.length > 0 && (
+                            <CommandGroup>
+                              {filteredCustomers.map((customer) => (
+                                <CommandItem
+                                  key={customer.id}
+                                  onSelect={() => {
+                                    updateCustomer(customer.id);
+                                    setCustomerSearch("");
+                                    setOpen(false);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      product.customer_id === customer.id ? "opacity-100" : "opacity-0"
+                                    )}
+                                  />
+                                  {getCustomerDisplayName(customer)}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          )}
+                        </CommandList>
                       </Command>
                     )}
                   </PopoverContent>
@@ -232,10 +231,7 @@ const ProductDetails = () => {
                     variant="ghost"
                     size="sm"
                     className="mt-2"
-                    onClick={() => {
-                      updateCustomer(null);
-                      setSelectedValue("");
-                    }}
+                    onClick={() => updateCustomer(null)}
                   >
                     <X className="h-4 w-4 mr-2" />
                     Remove customer
