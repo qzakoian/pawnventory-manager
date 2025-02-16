@@ -44,6 +44,10 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
       .join(" ") || "Unnamed Customer";
   };
 
+  const foundCustomer = field.value && field.value !== "none" 
+    ? customers?.find((customer) => String(customer.id) === field.value)
+    : null;
+
   return (
     <>
       <FormField
@@ -103,9 +107,9 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                   {categories?.map((category) => (
                     <SelectItem 
                       key={category.name} 
-                      value={category.name || ""}
+                      value={category.name || "uncategorized"}
                     >
-                      {category.name}
+                      {category.name || "Uncategorized"}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -132,12 +136,8 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                       !field.value && "text-muted-foreground"
                     )}
                   >
-                    {field.value && field.value !== "none"
-                      ? customers?.find((customer) => String(customer.id) === field.value)
-                        ? getCustomerDisplayName(
-                            customers.find((customer) => String(customer.id) === field.value)!
-                          )
-                        : "Select customer"
+                    {foundCustomer 
+                      ? getCustomerDisplayName(foundCustomer)
                       : "Select customer"}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
@@ -149,9 +149,7 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                     <CommandGroup>
                       <CommandItem
                         value="none"
-                        onSelect={() => {
-                          form.setValue("customer_id", "none");
-                        }}
+                        onSelect={() => form.setValue("customer_id", "none")}
                       >
                         <Check
                           className={cn(
@@ -161,13 +159,11 @@ export const EditProductFormFields = ({ form, categories, customers }: EditProdu
                         />
                         None
                       </CommandItem>
-                      {customers?.map((customer) => (
+                      {(customers || []).map((customer) => (
                         <CommandItem
                           key={customer.id}
-                          value={getCustomerDisplayName(customer).toLowerCase()}
-                          onSelect={() => {
-                            form.setValue("customer_id", String(customer.id));
-                          }}
+                          value={String(customer.id)}
+                          onSelect={() => form.setValue("customer_id", String(customer.id))}
                         >
                           <Check
                             className={cn(
