@@ -9,6 +9,24 @@ import { useToast } from "@/components/ui/use-toast";
 import { ShopsDropdown } from "@/components/ShopsDropdown";
 import { useShop } from "@/contexts/ShopContext";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import {
   LineChart as RechartsLineChart,
   Line,
   XAxis,
@@ -22,14 +40,12 @@ const profitsData = [
   { date: "12 Jan", freeStock: 2500, buyBack28: 3000, buyBack12: 2000 },
   { date: "16 Jan", freeStock: 3000, buyBack28: 2800, buyBack12: 2200 },
   { date: "20 Jan", freeStock: 2800, buyBack28: 3200, buyBack12: 2400 },
-  // ... more data points
 ];
 
 const cashData = [
   { date: "12 Jan", value: 2000 },
   { date: "16 Jan", value: 2500 },
   { date: "20 Jan", value: 3000 },
-  // ... more data points
 ];
 
 const transactions = [
@@ -49,7 +65,6 @@ const transactions = [
     imei: "010965543890233",
     customer: "John Doe",
   },
-  // ... more transactions
 ];
 
 interface Customer {
@@ -57,6 +72,13 @@ interface Customer {
   first_name: string | null;
   last_name: string | null;
 }
+
+const createCustomerSchema = z.object({
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  email: z.string().email().optional().nullable(),
+  phone_number: z.string().optional().nullable(),
+});
 
 const Index = () => {
   const navigate = useNavigate();
@@ -66,6 +88,17 @@ const Index = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [firstName, setFirstName] = useState<string>("");
   const { selectedShop } = useShop();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const form = useForm<z.infer<typeof createCustomerSchema>>({
+    resolver: zodResolver(createCustomerSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      phone_number: "",
+    },
+  });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -138,6 +171,51 @@ const Index = () => {
     return () => clearTimeout(timeoutId);
   }, [searchQuery, selectedShop]);
 
+  const onSubmit = async (values: z.infer<typeof createCustomerSchema>) => {
+    if (!selectedShop) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please select a shop first",
+      });
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('Customers')
+        .insert([
+          {
+            ...values,
+            shop_id: selectedShop.id,
+          }
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Customer created successfully",
+      });
+
+      setIsDialogOpen(false);
+      form.reset();
+
+      if (data) {
+        navigate(`/customer/${data.id}`);
+      }
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to create customer",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F8F9FF]">
       <header className="bg-[#646ECB] text-white px-6 py-4">
@@ -197,9 +275,75 @@ const Index = () => {
                   ))}
                 </div>
               )}
-              <Button variant="link" className="text-[#646ECB] pl-0 mt-2">
-                <Plus className="h-4 w-4 mr-1" /> Create Customer
-              </Button>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="link" className="text-[#646ECB] pl-0 mt-2">
+                    <Plus className="h-4 w-4 mr-1" /> Create Customer
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Customer</DialogTitle>
+                  </DialogHeader>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="first_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>First Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="last_name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Last Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="email" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone_number"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input {...field} type="tel" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <Button type="submit" className="w-full">Create Customer</Button>
+                    </form>
+                  </Form>
+                </DialogContent>
+              </Dialog>
             </Card>
             <Card className="p-4 glass-card">
               <h3 className="text-lg font-medium text-[#111111] mb-4">Find a Product</h3>
