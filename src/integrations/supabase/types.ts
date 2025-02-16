@@ -312,7 +312,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_random_imei: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_random_sku: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
