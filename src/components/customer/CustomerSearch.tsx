@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -25,6 +25,15 @@ export const CustomerSearch = ({ shopId }: CustomerSearchProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Customer[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handleCustomerSearch(searchQuery);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleCustomerSearch = async (query: string) => {
     if (!query.trim() || !shopId) {
@@ -73,18 +82,6 @@ export const CustomerSearch = ({ shopId }: CustomerSearchProps) => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Button 
-          variant="outline" 
-          className="text-[#646ECB]"
-          onClick={() => handleCustomerSearch(searchQuery)}
-          disabled={isSearching}
-        >
-          {isSearching ? "Searching..." : (
-            <>
-              Find <ArrowRight className="ml-2 h-4 w-4" />
-            </>
-          )}
-        </Button>
       </div>
       {searchResults.length > 0 && (
         <div className="mt-2 space-y-1">
