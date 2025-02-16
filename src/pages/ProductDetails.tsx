@@ -14,10 +14,14 @@ const ProductDetails = () => {
   const { data: product, isLoading } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
+      if (!id) throw new Error('Product ID is required');
+      const productId = parseInt(id);
+      if (isNaN(productId)) throw new Error('Invalid product ID');
+
       const { data, error } = await supabase
         .from('Products')
         .select('*')
-        .eq('id', id)
+        .eq('id', productId)
         .single();
 
       if (error) throw error;
