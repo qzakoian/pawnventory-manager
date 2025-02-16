@@ -1,5 +1,5 @@
 
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -69,14 +69,15 @@ const ProductDetails = () => {
 
       <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
         <div className="space-y-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
+          <Link to="/">
+            <Button
+              variant="ghost"
+              className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
           
           <div className="flex items-start justify-between">
             <div className="space-y-2">
