@@ -5,6 +5,7 @@ import Index from "@/pages/Index";
 import Auth from "@/pages/Auth";
 import AccountSettings from "@/pages/AccountSettings";
 import CustomerProfile from "@/pages/CustomerProfile";
+import ProductDetails from "@/pages/ProductDetails";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ShopProvider } from "@/contexts/ShopContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -36,6 +37,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CustomerProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/product/:id"
+            element={
+              <ProtectedRoute>
+                <ProductDetails />
               </ProtectedRoute>
             }
           />
