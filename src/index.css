@@ -63,7 +63,7 @@
 }
 
 .glass-card {
-  @apply bg-white/90 backdrop-blur-sm border-[#646ECB]/20 border shadow-lg;
+  @apply bg-white/90 backdrop-blur-sm border-[#646ECB]/20 border;
 }
 
 .animate-enter {
