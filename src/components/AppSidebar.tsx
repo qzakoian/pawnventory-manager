@@ -15,7 +15,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { Home, Users, Package, Settings, HelpCircle } from "lucide-react";
+import { Home, Users, Package, Settings, HelpCircle, PanelLeftClose, PanelLeft } from "lucide-react";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -63,7 +63,16 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <div className="flex items-center justify-between px-2 py-2">
+            <SidebarGroupLabel>Menu</SidebarGroupLabel>
+            <SidebarTrigger>
+              {state === "expanded" ? (
+                <PanelLeftClose className="h-4 w-4" />
+              ) : (
+                <PanelLeft className="h-4 w-4" />
+              )}
+            </SidebarTrigger>
+          </div>
           <SidebarGroupContent>
             <SidebarMenu>
               {topMenuItems.map((item) => (
