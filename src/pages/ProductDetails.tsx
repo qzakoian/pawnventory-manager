@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -176,7 +175,7 @@ const ProductDetails = () => {
                       role="combobox"
                       aria-expanded={open}
                       className={cn(
-                        "w-full justify-between",
+                        "w-full justify-between cursor-pointer",
                         !product.customer && "text-muted-foreground"
                       )}
                     >
