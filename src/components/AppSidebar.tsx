@@ -64,8 +64,8 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup>
           <div className="flex items-center justify-between px-2 py-2">
-            <SidebarGroupLabel>Menu</SidebarGroupLabel>
-            <SidebarTrigger>
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">Menu</SidebarGroupLabel>
+            <SidebarTrigger className="group-data-[collapsible=icon]:!flex group-data-[collapsible=icon]:!w-full group-data-[collapsible=icon]:justify-center">
               {state === "expanded" ? (
                 <PanelLeftClose className="h-4 w-4" />
               ) : (
