@@ -62,16 +62,24 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarContent>
-        <SidebarGroup>
+        <div className="mb-4">
           <div className="flex items-center justify-between px-2 py-2">
-            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">Menu</SidebarGroupLabel>
-            <SidebarTrigger className="group-data-[collapsible=icon]:!flex group-data-[collapsible=icon]:!w-full group-data-[collapsible=icon]:justify-center">
+            <div className="flex items-center gap-2">
+              <Package className="h-5 w-5 text-[#646ECB]" />
+              <span className="font-medium group-data-[collapsible=icon]:hidden">Pawn Systems</span>
+            </div>
+            <SidebarTrigger className="group-data-[collapsible=icon]:!flex group-data-[collapsible=icon]:!w-fit">
               {state === "expanded" ? (
                 <PanelLeftClose className="h-4 w-4" />
               ) : (
                 <PanelLeft className="h-4 w-4" />
               )}
             </SidebarTrigger>
+          </div>
+        </div>
+        <SidebarGroup>
+          <div className="flex items-center justify-between px-2 py-2">
+            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">Menu</SidebarGroupLabel>
           </div>
           <SidebarGroupContent>
             <SidebarMenu>
