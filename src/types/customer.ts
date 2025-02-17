@@ -23,6 +23,8 @@ export interface Product {
   purchase_price_including_VAT: number | null;
   sale_price_including_VAT: number | null;
   in_stock: boolean | null;
+  imei: string | null;
+  sku: string | null;
 }
 
 export interface NewProduct {
