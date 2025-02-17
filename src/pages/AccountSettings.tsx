@@ -16,8 +16,9 @@ import { ProfilePicture } from "@/components/account/ProfilePicture";
 import { ProfileForm, formSchema } from "@/components/account/ProfileForm";
 import { ShopsList } from "@/components/account/ShopsList";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { ShopsDropdown } from "@/components/ShopsDropdown";
 import type { z } from "zod";
 
 interface Shop {
@@ -174,46 +175,58 @@ export default function AccountSettings() {
   };
 
   return (
-    <div className="container mx-auto py-8 max-w-2xl">
-      <Button
-        variant="ghost"
-        className="mb-4"
-        onClick={() => navigate('/')}
-      >
-        <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Dashboard
-      </Button>
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Settings</CardTitle>
-          <CardDescription>
-            Manage your account settings and preferences
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="profile" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="profile">Profile</TabsTrigger>
-              <TabsTrigger value="shops">Your Shops</TabsTrigger>
-            </TabsList>
+    <div className="min-h-screen bg-[#F8F9FF]">
+      <header className="bg-[#646ECB] text-white px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <Package className="h-5 w-5" />
+            <span className="font-medium">Pawn Systems</span>
+          </div>
+          <ShopsDropdown />
+        </div>
+      </header>
 
-            <TabsContent value="profile" className="space-y-6">
-              <ProfilePicture 
-                profileUrl={profileUrl} 
-                onImageUpload={handleImageUpload} 
-              />
-              <ProfileForm 
-                form={form} 
-                onSubmit={onSubmit} 
-              />
-            </TabsContent>
+      <div className="container mx-auto py-8 max-w-2xl">
+        <Button
+          variant="ghost"
+          className="mb-4"
+          onClick={() => navigate('/')}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Settings</CardTitle>
+            <CardDescription>
+              Manage your account settings and preferences
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="profile" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="profile">Profile</TabsTrigger>
+                <TabsTrigger value="shops">Your Shops</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="shops" className="space-y-4">
-              <ShopsList shops={shops} />
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+              <TabsContent value="profile" className="space-y-6">
+                <ProfilePicture 
+                  profileUrl={profileUrl} 
+                  onImageUpload={handleImageUpload} 
+                />
+                <ProfileForm 
+                  form={form} 
+                  onSubmit={onSubmit} 
+                />
+              </TabsContent>
+
+              <TabsContent value="shops" className="space-y-4">
+                <ShopsList shops={shops} />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
