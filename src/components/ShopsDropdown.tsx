@@ -71,7 +71,10 @@ export const ShopsDropdown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="w-full justify-between border-gray-200">
+        <Button 
+          variant="outline" 
+          className="w-full justify-between border-gray-200 hover:bg-gray-100 hover:text-gray-900"
+        >
           <div className="flex items-center gap-2">
             <Store className="h-5 w-5 text-gray-500" />
             <span className="text-gray-700">{selectedShop?.name || "Select Shop"}</span>
