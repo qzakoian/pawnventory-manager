@@ -11,6 +11,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "@/components/ui/use-toast";
+import { EditProductDetails } from "@/components/product/EditProductDetails";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -142,6 +143,7 @@ const ProductDetails = () => {
                 {product.model}
               </h1>
             </div>
+            <EditProductDetails product={product} />
           </div>
         </div>
 
