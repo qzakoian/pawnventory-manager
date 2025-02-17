@@ -1,10 +1,10 @@
+
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Plus, Package, ArrowRight } from "lucide-react";
+import { Plus, Package } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState, useEffect } from "react";
-import { ShopsDropdown } from "@/components/ShopsDropdown";
 import { useShop } from "@/contexts/ShopContext";
 import { CustomerSearch } from "@/components/customer/CustomerSearch";
 import { ProductSearch } from "@/components/product/ProductSearch";
@@ -51,7 +51,6 @@ const transactions = [
 
 const Index = () => {
   const [firstName, setFirstName] = useState<string>("");
-
   const { selectedShop } = useShop();
 
   useEffect(() => {
@@ -82,16 +81,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F9FF]">
-      <header className="bg-[#646ECB] text-white px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Package className="h-5 w-5" />
-            <span className="font-medium">Pawn Systems</span>
-          </div>
-          <ShopsDropdown />
-        </div>
-      </header>
-
       <main className="p-6 max-w-7xl mx-auto space-y-8">
         <div>
           <h1 className="text-2xl font-bold text-[#111111]">Hi there {firstName || 'Guest'}</h1>
