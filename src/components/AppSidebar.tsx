@@ -64,7 +64,11 @@ export function AppSidebar() {
       <SidebarContent>
         <div className="mb-4">
           <div className="flex items-center px-4 py-4">
-            <span className="text-xl font-semibold">Pawn Systems</span>
+            <img 
+              src="/lovable-uploads/0a507a6d-3f74-4f53-adc5-861d2d8cfe18.png" 
+              alt="Pawn Systems Logo" 
+              className="h-8"
+            />
           </div>
           <div className="px-3">
             <ShopsDropdown />
