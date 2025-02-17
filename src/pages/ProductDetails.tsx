@@ -1,11 +1,9 @@
-
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, ArrowLeft, Edit, Check, ChevronsUpDown, X } from "lucide-react";
-import { ShopsDropdown } from "@/components/ShopsDropdown";
+import { ArrowLeft, Edit, Check, ChevronsUpDown, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
@@ -111,19 +109,7 @@ const ProductDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FF] cursor-default">
-      <header className="bg-[#646ECB] text-white px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Package className="h-5 w-5" />
-            <span className="font-medium">Pawn Systems</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <ShopsDropdown />
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-[#F8F9FF]">
       <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
         <div className="space-y-4">
           <Link to="/">

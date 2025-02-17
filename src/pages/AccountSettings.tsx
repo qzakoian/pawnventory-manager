@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,9 +15,8 @@ import { ProfilePicture } from "@/components/account/ProfilePicture";
 import { ProfileForm, formSchema } from "@/components/account/ProfileForm";
 import { ShopsList } from "@/components/account/ShopsList";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Package } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { ShopsDropdown } from "@/components/ShopsDropdown";
 import type { z } from "zod";
 
 interface Shop {
@@ -176,16 +174,6 @@ export default function AccountSettings() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FF]">
-      <header className="bg-[#646ECB] text-white px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Package className="h-5 w-5" />
-            <span className="font-medium">Pawn Systems</span>
-          </div>
-          <ShopsDropdown />
-        </div>
-      </header>
-
       <div className="container mx-auto py-8 max-w-2xl">
         <Button
           variant="ghost"

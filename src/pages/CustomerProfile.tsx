@@ -1,42 +1,18 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Package, Plus, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useShop } from "@/contexts/ShopContext";
-import { Customer, Product, NewProduct, EditCustomer } from "@/types/customer";
 import { CustomerInfoCard } from "@/components/customer/CustomerInfoCard";
 import { CustomerProducts } from "@/components/customer/CustomerProducts";
 import { EditCustomerDialog } from "@/components/customer/EditCustomerDialog";
-import { ShopsDropdown } from "@/components/ShopsDropdown";
-import { formatUKPhoneNumber, formatPostcode, isValidUKPhoneNumber, isValidUKPostcode } from "@/utils/validation";
+import { Customer, Product, NewProduct, EditCustomer } from "@/types/customer";
 
 const CustomerProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { selectedShop } = useShop();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,7 +88,7 @@ const CustomerProfile = () => {
   }, [id, toast]);
 
   const handleCreateProduct = async () => {
-    if (!selectedShop || !customer) return;
+    if (!customer) return;
 
     try {
       const { data, error } = await supabase
@@ -121,7 +97,6 @@ const CustomerProfile = () => {
           {
             ...newProduct,
             customer_id: customer.id,
-            shop_id: selectedShop.id,
           }
         ])
         .select()
@@ -236,11 +211,6 @@ const CustomerProfile = () => {
     }
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#F8F9FF] p-6">
@@ -263,18 +233,6 @@ const CustomerProfile = () => {
 
   return (
     <div className="min-h-screen bg-[#F8F9FF]">
-      <header className="bg-[#646ECB] text-white px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Package className="h-5 w-5" />
-            <span className="font-medium">Pawn Systems</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <ShopsDropdown />
-          </div>
-        </div>
-      </header>
-
       <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
         <div className="space-y-4">
           <Button
