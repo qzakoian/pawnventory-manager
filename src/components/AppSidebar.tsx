@@ -6,7 +6,6 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -15,17 +14,28 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { Home, Users, Package, Settings, HelpCircle, PanelLeftClose, PanelLeft } from "lucide-react";
+import { Home, Inbox, BarChart, MessageSquare, Users, Package, Settings, PanelLeftClose, PanelLeft } from "lucide-react";
+import { ShopsDropdown } from "./ShopsDropdown";
 
 export function AppSidebar() {
   const location = useLocation();
   const { state } = useSidebar();
 
-  const topMenuItems = [
+  const menuItems = [
     {
-      title: "Dashboard",
+      title: "Home",
       icon: Home,
       url: "/",
+    },
+    {
+      title: "Inbox",
+      icon: Inbox,
+      url: "/inbox",
+    },
+    {
+      title: "Data sources",
+      icon: BarChart,
+      url: "/data",
     },
     {
       title: "Customers",
@@ -45,11 +55,6 @@ export function AppSidebar() {
       icon: Settings,
       url: "/account-settings",
     },
-    {
-      title: "Help",
-      icon: HelpCircle,
-      url: "/help",
-    },
   ];
 
   const isActiveLink = (path: string) => {
@@ -60,35 +65,32 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" className="border-r">
       <SidebarContent>
         <div className="mb-4">
-          <div className="flex items-center px-2 py-2">
-            <div className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-[#646ECB]" />
-              <span className="font-medium group-data-[collapsible=icon]:hidden">Pawn Systems</span>
-            </div>
+          <div className="flex items-center px-4 py-4">
+            <span className="text-xl font-semibold">Pawn Systems</span>
+          </div>
+          <div className="px-3">
+            <ShopsDropdown />
           </div>
         </div>
         <SidebarGroup>
-          <div className="flex items-center justify-between px-2 py-2">
-            <SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">Menu</SidebarGroupLabel>
-          </div>
           <SidebarGroupContent>
             <SidebarMenu>
-              {topMenuItems.map((item) => (
+              {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
                     tooltip={state === "collapsed" ? item.title : undefined}
                     className={cn(
-                      "flex items-center gap-2",
-                      isActiveLink(item.url) && "bg-[#646ECB]/10 text-[#646ECB]"
+                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100",
+                      isActiveLink(item.url) && "bg-gray-100 font-medium"
                     )}
                   >
-                    <Link to={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                    <Link to={item.url} className="flex items-center gap-3">
+                      <item.icon className="h-5 w-5 text-gray-500" />
+                      <span className="text-gray-700">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -102,17 +104,17 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <div className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-[#646ECB]/10">
-                  <SidebarTrigger className="flex items-center gap-2">
+                <div className="px-4 py-2">
+                  <SidebarTrigger className="flex items-center gap-3 text-gray-700">
                     {state === "expanded" ? (
                       <>
-                        <PanelLeftClose className="h-4 w-4" />
-                        <span className="group-data-[collapsible=icon]:hidden">Collapse sidebar</span>
+                        <PanelLeftClose className="h-5 w-5 text-gray-500" />
+                        <span className="group-data-[collapsible=icon]:hidden">Collapse</span>
                       </>
                     ) : (
                       <>
-                        <PanelLeft className="h-4 w-4" />
-                        <span className="group-data-[collapsible=icon]:hidden">Expand sidebar</span>
+                        <PanelLeft className="h-5 w-5 text-gray-500" />
+                        <span className="group-data-[collapsible=icon]:hidden">Expand</span>
                       </>
                     )}
                   </SidebarTrigger>
@@ -124,13 +126,13 @@ export function AppSidebar() {
                     asChild
                     tooltip={state === "collapsed" ? item.title : undefined}
                     className={cn(
-                      "flex items-center gap-2",
-                      isActiveLink(item.url) && "bg-[#646ECB]/10 text-[#646ECB]"
+                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100",
+                      isActiveLink(item.url) && "bg-gray-100 font-medium"
                     )}
                   >
-                    <Link to={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                    <Link to={item.url} className="flex items-center gap-3">
+                      <item.icon className="h-5 w-5 text-gray-500" />
+                      <span className="text-gray-700">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

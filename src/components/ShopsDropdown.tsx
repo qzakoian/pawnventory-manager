@@ -4,20 +4,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Store, User, LogOut, Settings } from "lucide-react";
+import { Store, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useNavigate } from "react-router-dom";
 import { useShop } from "@/contexts/ShopContext";
 
 interface Shop {
@@ -27,11 +19,7 @@ interface Shop {
 
 export const ShopsDropdown = () => {
   const [shops, setShops] = useState<Shop[]>([]);
-  const [profilePicture, setProfilePicture] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string | null>(null);
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { selectedShop, setSelectedShop } = useShop();
 
   useEffect(() => {
@@ -41,18 +29,13 @@ export const ShopsDropdown = () => {
         
         if (!user) return;
 
-        setUserEmail(user.email);
-
-        const { data: userData, error: userError } = await supabase
+        const { data: userData } = await supabase
           .from('Users')
-          .select('id, profil_picture, first_name, last_name')
+          .select('id')
           .eq('email', user.email)
           .single();
 
-        if (userError) throw userError;
-
-        setProfilePicture(userData.profil_picture);
-        setUserName(`${userData.first_name} ${userData.last_name}`);
+        if (!userData) return;
 
         const { data: shopLinks, error: shopError } = await supabase
           .from('User-Shop links')
@@ -85,86 +68,29 @@ export const ShopsDropdown = () => {
     fetchUserShops();
   }, []);
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 text-white hover:text-white hover:bg-white/20">
-          <Avatar className="h-6 w-6 mr-2">
-            <AvatarImage src={profilePicture || undefined} />
-            <AvatarFallback>
-              <User className="h-4 w-4" />
-            </AvatarFallback>
-          </Avatar>
-          {selectedShop?.name || "Select Shop"}
-          <ChevronDown className="h-4 w-4 ml-2" />
+        <Button variant="outline" className="w-full justify-between border-gray-200">
+          <div className="flex items-center gap-2">
+            <Store className="h-5 w-5 text-gray-500" />
+            <span className="text-gray-700">{selectedShop?.name || "Select Shop"}</span>
+          </div>
+          <ChevronDown className="h-4 w-4 text-gray-500" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[280px] bg-white">
-        <div className="flex items-start space-x-3 p-4">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={profilePicture || undefined} />
-            <AvatarFallback>
-              <User className="h-6 w-6" />
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <p className="text-sm font-medium leading-none">{userName}</p>
-            <p className="text-xs text-muted-foreground mt-1">{userEmail}</p>
-          </div>
-        </div>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          className="cursor-pointer hover:bg-[#646ECB] hover:text-white"
-          onClick={() => navigate("/account-settings")}
-        >
-          <Settings className="h-4 w-4 mr-2" />
-          Account and settings
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="cursor-pointer hover:bg-[#646ECB] hover:text-white data-[state=open]:bg-[#646ECB] data-[state=open]:text-white group">
-              <Store className="h-4 w-4 mr-2" />
-              <div className="flex flex-col">
-                <span className="text-xs text-muted-foreground group-hover:text-white group-data-[state=open]:text-white">Shop</span>
-                <span>{selectedShop?.name || "Select Shop"}</span>
-              </div>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className="w-[200px]">
-              <DropdownMenuItem
-                className="cursor-pointer hover:bg-[#646ECB] hover:text-white"
-                onClick={() => navigate("/account-settings?tab=shops")}
-              >
-                All my shops
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {shops.map((shop) => (
-                <DropdownMenuItem
-                  key={shop.id}
-                  className="cursor-pointer hover:bg-[#646ECB] hover:text-white"
-                  onClick={() => setSelectedShop(shop)}
-                >
-                  <Store className="h-4 w-4 mr-2" />
-                  {shop.name}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem 
-          className="text-red-600 cursor-pointer hover:bg-red-50" 
-          onClick={handleLogout}
-        >
-          <LogOut className="h-4 w-4 mr-2" />
-          Log out
-        </DropdownMenuItem>
+      <DropdownMenuContent align="start" className="w-[200px]">
+        {shops.map((shop) => (
+          <DropdownMenuItem
+            key={shop.id}
+            onClick={() => setSelectedShop(shop)}
+            className="cursor-pointer"
+          >
+            <Store className="mr-2 h-4 w-4 text-gray-500" />
+            <span>{shop.name}</span>
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );
-};
+}
