@@ -14,7 +14,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { Home, Inbox, BarChart, MessageSquare, Users, Package, Settings, PanelLeftClose, PanelLeft } from "lucide-react";
+import { Home, BarChart, MessageSquare, Users, Package, Settings, PanelLeftClose, PanelLeft } from "lucide-react";
 import { ShopsDropdown } from "./ShopsDropdown";
 
 export function AppSidebar() {
@@ -28,12 +28,7 @@ export function AppSidebar() {
       url: "/",
     },
     {
-      title: "Inbox",
-      icon: Inbox,
-      url: "/inbox",
-    },
-    {
-      title: "Data sources",
+      title: "Analytics",
       icon: BarChart,
       url: "/data",
     },
