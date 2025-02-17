@@ -63,18 +63,11 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarContent>
         <div className="mb-4">
-          <div className="flex items-center justify-between px-2 py-2">
+          <div className="flex items-center px-2 py-2">
             <div className="flex items-center gap-2">
               <Package className="h-5 w-5 text-[#646ECB]" />
               <span className="font-medium group-data-[collapsible=icon]:hidden">Pawn Systems</span>
             </div>
-            <SidebarTrigger className="group-data-[collapsible=icon]:!flex group-data-[collapsible=icon]:!w-fit">
-              {state === "expanded" ? (
-                <PanelLeftClose className="h-4 w-4" />
-              ) : (
-                <PanelLeft className="h-4 w-4" />
-              )}
-            </SidebarTrigger>
           </div>
         </div>
         <SidebarGroup>
@@ -106,6 +99,21 @@ export function AppSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarGroup>
+          <div className="px-2 py-2">
+            <SidebarTrigger className="w-full flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-[#646ECB]/10">
+              {state === "expanded" ? (
+                <>
+                  <PanelLeftClose className="h-4 w-4" />
+                  <span className="group-data-[collapsible=icon]:hidden">Collapse sidebar</span>
+                </>
+              ) : (
+                <>
+                  <PanelLeft className="h-4 w-4" />
+                  <span className="group-data-[collapsible=icon]:hidden">Expand sidebar</span>
+                </>
+              )}
+            </SidebarTrigger>
+          </div>
           <SidebarGroupContent>
             <SidebarMenu>
               {bottomMenuItems.map((item) => (
