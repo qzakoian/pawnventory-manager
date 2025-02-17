@@ -10,12 +10,16 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarTrigger,
+  SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { Home, Users, Package, Settings, HelpCircle } from "lucide-react";
 
 export function AppSidebar() {
   const location = useLocation();
+  const { state } = useSidebar();
 
   const topMenuItems = [
     {
@@ -56,7 +60,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar>
+    <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
@@ -66,6 +70,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
+                    tooltip={state === "collapsed" ? item.title : undefined}
                     className={cn(
                       "flex items-center gap-2",
                       isActiveLink(item.url) && "bg-[#646ECB]/10 text-[#646ECB]"
@@ -90,6 +95,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
+                    tooltip={state === "collapsed" ? item.title : undefined}
                     className={cn(
                       "flex items-center gap-2",
                       isActiveLink(item.url) && "bg-[#646ECB]/10 text-[#646ECB]"
@@ -106,6 +112,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   );
 }
