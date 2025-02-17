@@ -2,7 +2,6 @@
 import { format } from "date-fns";
 import { User, Pencil, Mail, Phone, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Customer } from "@/types/customer";
 
 interface CustomerInfoCardProps {
@@ -12,7 +11,7 @@ interface CustomerInfoCardProps {
 
 export const CustomerInfoCard = ({ customer, onEditClick }: CustomerInfoCardProps) => {
   return (
-    <Card className="bg-white shadow-sm border border-gray-100 rounded-xl overflow-hidden">
+    <div className="glass-card rounded-xl">
       <div className="p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-[#2A2A2A]">Customer Information</h2>
@@ -80,6 +79,6 @@ export const CustomerInfoCard = ({ customer, onEditClick }: CustomerInfoCardProp
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
