@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,7 +91,7 @@ const ProductDetails = () => {
 
   if (isLoadingProduct) {
     return (
-      <div className="min-h-screen bg-[#F8F9FF] p-6">
+      <div className="min-h-screen bg-white p-6">
         <div className="max-w-7xl mx-auto">
           Loading...
         </div>
@@ -100,7 +101,7 @@ const ProductDetails = () => {
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-[#F8F9FF] p-6">
+      <div className="min-h-screen bg-white p-6">
         <div className="max-w-7xl mx-auto">
           Product not found
         </div>
@@ -109,7 +110,7 @@ const ProductDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FF]">
+    <div className="min-h-screen bg-white">
       <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
         <div className="space-y-4">
           <Link to="/">
