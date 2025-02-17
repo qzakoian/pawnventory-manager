@@ -28,11 +28,6 @@ export function AppSidebar() {
       url: "/",
     },
     {
-      title: "Analytics",
-      icon: BarChart,
-      url: "/data",
-    },
-    {
       title: "Customers",
       icon: Users,
       url: "/customers",
@@ -41,6 +36,11 @@ export function AppSidebar() {
       title: "Products",
       icon: Package,
       url: "/products",
+    },
+    {
+      title: "Analytics",
+      icon: BarChart,
+      url: "/data",
     },
   ];
 
