@@ -22,9 +22,9 @@ function App() {
       <AuthProvider>
         <ShopProvider>
           <SidebarProvider>
-            <div className="min-h-screen flex w-full">
+            <div className="min-h-screen flex w-full bg-white">
               <AppSidebar />
-              <main className="flex-1">
+              <main className="flex-1 bg-white">
                 <Routes>
                   <Route path="/auth" element={<Auth />} />
                   <Route
