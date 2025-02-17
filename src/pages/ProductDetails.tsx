@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -109,7 +110,7 @@ const ProductDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FF]">
+    <div className="min-h-screen bg-[#F8F9FF] cursor-default">
       <header className="bg-[#646ECB] text-white px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -175,7 +176,7 @@ const ProductDetails = () => {
                       role="combobox"
                       aria-expanded={open}
                       className={cn(
-                        "w-full justify-between cursor-pointer",
+                        "w-full justify-between cursor-default",
                         !product.customer && "text-muted-foreground"
                       )}
                     >
