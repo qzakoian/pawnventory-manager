@@ -1,13 +1,39 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { CustomerInfoCard } from "@/components/customer/CustomerInfoCard";
 import { CustomerProducts } from "@/components/customer/CustomerProducts";
 import { EditCustomerDialog } from "@/components/customer/EditCustomerDialog";
 import { Customer, Product, NewProduct, EditCustomer } from "@/types/customer";
+import { 
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  formatUKPhoneNumber,
+  isValidUKPhoneNumber,
+  formatPostcode,
+  isValidUKPostcode,
+} from "@/utils/validation";
 
 const CustomerProfile = () => {
   const { id } = useParams();
@@ -182,12 +208,8 @@ const CustomerProfile = () => {
         throw error;
       }
 
-      console.log('Update response data:', JSON.stringify(data, null, 2));
-
       if (data && data.length > 0) {
         const updatedCustomer = data[0];
-        console.log('Successfully updated customer:', updatedCustomer);
-        
         setCustomer({
           ...customer,
           ...updatedCustomer
