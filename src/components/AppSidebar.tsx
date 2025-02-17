@@ -60,7 +60,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r bg-[#F8F9FF]">
+    <Sidebar collapsible="icon" className="border-r bg-white">
       <SidebarContent>
         <div className="mb-4">
           <div className="flex items-center px-4 py-4">
