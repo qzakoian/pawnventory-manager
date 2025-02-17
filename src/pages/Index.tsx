@@ -11,7 +11,7 @@ const Index = () => {
   const { selectedShop } = useShop();
 
   return (
-    <div className="min-h-screen bg-[#F8F9FF]">
+    <div className="min-h-screen bg-white">
       <main className="p-6 max-w-7xl mx-auto space-y-8">
         <WelcomeHeader />
         {selectedShop && <QuickAccess shopId={selectedShop.id} />}
