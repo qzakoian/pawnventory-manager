@@ -30,7 +30,7 @@ const Products = () => {
         .from('Products')
         .select('*')
         .eq('shop_id', selectedShop.id)
-        .order('created_at', { ascending: false });
+        .order('creation_date', { ascending: false });
         
       if (error) throw error;
       return data;
