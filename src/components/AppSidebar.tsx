@@ -66,13 +66,13 @@ export function AppSidebar() {
           <div className="flex items-center px-4 py-4">
             {state === "expanded" ? (
               <img 
-                src="/lovable-uploads/0a507a6d-3f74-4f53-adc5-861d2d8cfe18.png" 
+                src="/lovable-uploads/56e957f4-6595-4ef3-bebe-5887cbe0bef4.png" 
                 alt="Pawn Systems Logo" 
                 className="h-8" 
               />
             ) : (
               <img 
-                src="/lovable-uploads/7d942b54-2725-497b-a668-c35b0a82ca87.png" 
+                src="/lovable-uploads/6d264df4-586e-42c3-86be-1d1e9ba01ddb.png" 
                 alt="Pawn Systems Logo Icon" 
                 className="h-8 mx-auto"
               />
