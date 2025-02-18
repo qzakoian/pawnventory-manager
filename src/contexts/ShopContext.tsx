@@ -1,6 +1,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Shop {
   id: number;
@@ -16,14 +17,13 @@ const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export function ShopProvider({ children }: { children: ReactNode }) {
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchDefaultShop = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
         if (!user) {
-          console.log('No user found');
+          console.log('No authenticated user');
           return;
         }
 
@@ -67,7 +67,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     if (!selectedShop) {
       fetchDefaultShop();
     }
-  }, [selectedShop]);
+  }, [selectedShop, user]);
 
   return (
     <ShopContext.Provider value={{ selectedShop, setSelectedShop }}>
