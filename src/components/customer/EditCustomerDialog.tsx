@@ -62,7 +62,20 @@ export const EditCustomerDialog = ({
   }, [customer, form]);
 
   const handleSubmit = (values: CreateCustomerFormData) => {
-    onSave(values);
+    // Convert nullable values to empty strings to match EditCustomer type
+    const editedCustomer: EditCustomer = {
+      first_name: values.first_name || "",
+      last_name: values.last_name || "",
+      email: values.email || "",
+      phone_number: values.phone_number || "",
+      address_line1: values.address_line1 || "",
+      address_line2: values.address_line2 || "",
+      city: values.city || "",
+      postal_code: values.postal_code || "",
+      county: values.county || "",
+    };
+    
+    onSave(editedCustomer);
   };
 
   return (
