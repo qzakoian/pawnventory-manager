@@ -4,10 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { CreateCustomerForm } from "./CreateCustomerForm";
 
 interface Customer {
   id: number;
@@ -75,31 +73,36 @@ export const CustomerSearch = ({ shopId }: CustomerSearchProps) => {
   return (
     <Card className="p-4 glass-card">
       <h3 className="text-lg font-medium text-[#111111] mb-4">Find a Customer</h3>
-      <div className="flex space-x-2">
-        <Input 
-          placeholder="Search by name..." 
-          className="flex-1"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-      {searchResults.length > 0 && (
-        <div className="mt-2 space-y-1">
-          {searchResults.map((customer) => (
-            <div
-              key={customer.id}
-              className="p-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center justify-between"
-              onClick={() => {
-                navigate(`/customer/${customer.id}`);
-              }}
-            >
-              <span>{customer.first_name} {customer.last_name}</span>
-              <ArrowRight className="h-4 w-4 text-[#646ECB]" />
-            </div>
-          ))}
+      <div className="space-y-2">
+        <div className="flex space-x-2">
+          <Input 
+            placeholder="Search by name..." 
+            className="flex-1"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-      )}
-      <CreateCustomerForm shopId={shopId} />
+        {searchResults.length > 0 && (
+          <div className="mt-2 space-y-1">
+            {searchResults.map((customer) => (
+              <div
+                key={customer.id}
+                className="p-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center justify-between"
+                onClick={() => {
+                  navigate(`/customer/${customer.id}`);
+                }}
+              >
+                <span>{customer.first_name} {customer.last_name}</span>
+                <ArrowRight className="h-4 w-4 text-[#646ECB]" />
+              </div>
+            ))}
+          </div>
+        )}
+        <a href="/customers/new" className="text-[#646ECB] hover:text-[#646ECB]/90 inline-flex items-center text-sm mt-2 gap-1.5">
+          <Plus className="h-4 w-4" />
+          Create Customer
+        </a>
+      </div>
     </Card>
   );
 };

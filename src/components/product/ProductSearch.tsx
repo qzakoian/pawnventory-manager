@@ -4,8 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface Product {
@@ -100,8 +99,9 @@ export const ProductSearch = ({ shopId }: ProductSearchProps) => {
             ))}
           </div>
         )}
-        <a href="/products/new" className="text-[#646ECB] hover:text-[#646ECB]/90 inline-flex items-center text-sm mt-2">
-          + Create Product
+        <a href="/products/new" className="text-[#646ECB] hover:text-[#646ECB]/90 inline-flex items-center text-sm mt-2 gap-1.5">
+          <Plus className="h-4 w-4" />
+          Create Product
         </a>
       </div>
     </Card>
