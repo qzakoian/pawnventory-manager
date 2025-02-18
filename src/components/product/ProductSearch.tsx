@@ -75,30 +75,35 @@ export const ProductSearch = ({ shopId }: ProductSearchProps) => {
   return (
     <Card className="p-4 glass-card">
       <h3 className="text-lg font-medium text-[#111111] mb-4">Find a Product</h3>
-      <div className="flex space-x-2">
-        <Input 
-          placeholder="IMEI/SKU/ID" 
-          className="flex-1"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
-      {searchResults.length > 0 && (
-        <div className="mt-2 space-y-1">
-          {searchResults.map((product) => (
-            <div
-              key={product.id}
-              className="p-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center justify-between"
-              onClick={() => {
-                navigate(`/product/${product.id}`);
-              }}
-            >
-              <span>{product.model} {product.imei && `- ${product.imei}`} {product.sku && `(${product.sku})`}</span>
-              <ArrowRight className="h-4 w-4 text-[#646ECB]" />
-            </div>
-          ))}
+      <div className="space-y-2">
+        <div className="flex space-x-2">
+          <Input 
+            placeholder="IMEI/SKU/ID" 
+            className="flex-1"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
-      )}
+        {searchResults.length > 0 && (
+          <div className="mt-2 space-y-1">
+            {searchResults.map((product) => (
+              <div
+                key={product.id}
+                className="p-2 hover:bg-gray-50 rounded-md cursor-pointer flex items-center justify-between"
+                onClick={() => {
+                  navigate(`/product/${product.id}`);
+                }}
+              >
+                <span>{product.model} {product.imei && `- ${product.imei}`} {product.sku && `(${product.sku})`}</span>
+                <ArrowRight className="h-4 w-4 text-[#646ECB]" />
+              </div>
+            ))}
+          </div>
+        )}
+        <a href="/products/new" className="text-[#646ECB] hover:text-[#646ECB]/90 inline-flex items-center text-sm mt-2">
+          + Create Product
+        </a>
+      </div>
     </Card>
   );
 };

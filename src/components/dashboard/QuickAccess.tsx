@@ -18,11 +18,8 @@ export const QuickAccess = ({
             + Create Customer
           </a>
         </div>
-        <div className="space-y-2">
+        <div>
           <ProductSearch shopId={shopId} />
-          <a href="/products/new" className="text-[#646ECB] hover:text-[#646ECB]/90 inline-flex items-center text-sm">
-            + Create Product
-          </a>
         </div>
       </div>
     </section>;
