@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -47,8 +47,30 @@ export const AddProductDialog = ({
     purchase_date: new Date().toISOString().split('T')[0],
   });
 
+  const [buybackRate, setBuybackRate] = useState<number>(0);
+  const [buybackPrice, setBuybackPrice] = useState<number>(0);
+
+  useEffect(() => {
+    if (newProduct.purchase_price_including_VAT && buybackRate) {
+      const calculatedPrice = (newProduct.purchase_price_including_VAT * buybackRate) / 100;
+      setBuybackPrice(calculatedPrice);
+    }
+  }, [newProduct.purchase_price_including_VAT, buybackRate]);
+
+  useEffect(() => {
+    if (newProduct.purchase_price_including_VAT && buybackPrice) {
+      const calculatedRate = (buybackPrice / newProduct.purchase_price_including_VAT) * 100;
+      setBuybackRate(calculatedRate);
+    }
+  }, [newProduct.purchase_price_including_VAT, buybackPrice]);
+
   const handleSubmit = () => {
-    onSubmit(newProduct);
+    const productToSubmit = {
+      ...newProduct,
+      [`${newProduct.scheme}_rate`]: buybackRate,
+      [`${newProduct.scheme}_price`]: buybackPrice,
+    };
+    onSubmit(productToSubmit);
     setNewProduct({
       model: "",
       product_category: "",
@@ -56,7 +78,11 @@ export const AddProductDialog = ({
       purchase_price_including_VAT: 0,
       purchase_date: new Date().toISOString().split('T')[0],
     });
+    setBuybackRate(0);
+    setBuybackPrice(0);
   };
+
+  const isBuybackScheme = newProduct.scheme.includes('buy-back');
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -127,6 +153,28 @@ export const AddProductDialog = ({
               onChange={(e) => setNewProduct({ ...newProduct, purchase_price_including_VAT: parseFloat(e.target.value) })}
             />
           </div>
+          {isBuybackScheme && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="buyback_rate">Rate [%]</Label>
+                <Input
+                  id="buyback_rate"
+                  type="number"
+                  value={buybackRate}
+                  onChange={(e) => setBuybackRate(parseFloat(e.target.value))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="buyback_price">Buy-back Price</Label>
+                <Input
+                  id="buyback_price"
+                  type="number"
+                  value={buybackPrice}
+                  onChange={(e) => setBuybackPrice(parseFloat(e.target.value))}
+                />
+              </div>
+            </div>
+          )}
           <div className="space-y-2">
             <Label htmlFor="purchase_date">Purchase Date</Label>
             <Input
