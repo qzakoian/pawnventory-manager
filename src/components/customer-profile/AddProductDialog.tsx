@@ -52,14 +52,16 @@ export const AddProductDialog = ({
 
   useEffect(() => {
     if (newProduct.purchase_price_including_VAT && buybackRate) {
-      const calculatedPrice = (newProduct.purchase_price_including_VAT * buybackRate) / 100;
+      const interest = (newProduct.purchase_price_including_VAT * buybackRate) / 100;
+      const calculatedPrice = newProduct.purchase_price_including_VAT + interest;
       setBuybackPrice(calculatedPrice);
     }
   }, [newProduct.purchase_price_including_VAT, buybackRate]);
 
   useEffect(() => {
     if (newProduct.purchase_price_including_VAT && buybackPrice) {
-      const calculatedRate = (buybackPrice / newProduct.purchase_price_including_VAT) * 100;
+      const difference = buybackPrice - newProduct.purchase_price_including_VAT;
+      const calculatedRate = (difference / newProduct.purchase_price_including_VAT) * 100;
       setBuybackRate(calculatedRate);
     }
   }, [newProduct.purchase_price_including_VAT, buybackPrice]);
@@ -156,7 +158,7 @@ export const AddProductDialog = ({
           {isBuybackScheme && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="buyback_rate">Rate [%]</Label>
+                <Label htmlFor="buyback_rate">Interest Rate [%]</Label>
                 <Input
                   id="buyback_rate"
                   type="number"
