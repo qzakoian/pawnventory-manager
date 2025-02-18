@@ -91,13 +91,13 @@ export function AppSidebar() {
                     asChild
                     tooltip={state === "collapsed" ? item.title : undefined}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100",
+                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-foreground",
                       isActiveLink(item.url) && "bg-gray-100 font-medium"
                     )}
                   >
                     <Link to={item.url} className="flex items-center gap-3">
                       <item.icon className="h-5 w-5 text-gray-500" />
-                      <span className="text-foreground">{item.title}</span>
+                      <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -116,12 +116,12 @@ export function AppSidebar() {
                     {state === "expanded" ? (
                       <>
                         <PanelLeftClose className="h-5 w-5 text-gray-500" />
-                        <span className="group-data-[collapsible=icon]:hidden">Collapse</span>
+                        <span>Collapse</span>
                       </>
                     ) : (
                       <>
                         <PanelLeft className="h-5 w-5 text-gray-500" />
-                        <span className="group-data-[collapsible=icon]:hidden">Expand</span>
+                        <span>Expand</span>
                       </>
                     )}
                   </SidebarTrigger>
@@ -133,13 +133,13 @@ export function AppSidebar() {
                     asChild
                     tooltip={state === "collapsed" ? item.title : undefined}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100",
+                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-foreground",
                       isActiveLink(item.url) && "bg-gray-100 font-medium"
                     )}
                   >
                     <Link to={item.url} className="flex items-center gap-3">
                       <item.icon className="h-5 w-5 text-gray-500" />
-                      <span className="text-foreground">{item.title}</span>
+                      <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
