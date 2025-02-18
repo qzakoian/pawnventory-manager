@@ -5,9 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { CreateProductForm } from "./CreateProductForm";
 
 interface Product {
   id: number;
@@ -100,7 +99,6 @@ export const ProductSearch = ({ shopId }: ProductSearchProps) => {
           ))}
         </div>
       )}
-      <CreateProductForm shopId={shopId} />
     </Card>
   );
 };

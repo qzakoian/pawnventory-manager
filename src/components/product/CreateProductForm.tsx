@@ -1,3 +1,4 @@
+
 import {
   Form,
   FormControl,
@@ -21,6 +22,7 @@ import * as z from "zod"
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { NewProduct } from "@/types/customer";
+import { Button } from "../ui/button";
 
 const formSchema = z.object({
   model: z.string().min(2, {
@@ -33,10 +35,14 @@ const formSchema = z.object({
     message: "Scheme must be at least 2 characters.",
   }),
   purchase_price_including_VAT: z.number(),
-  purchase_date: z.date(),
+  purchase_date: z.string(), // Changed from z.date() to z.string()
 })
 
-export function CreateProductForm({ onSubmit }: { onSubmit: (data: NewProduct) => void }) {
+interface CreateProductFormProps {
+  onSubmit: (data: NewProduct) => void;
+}
+
+export function CreateProductForm({ onSubmit }: CreateProductFormProps) {
   const [schemes, setSchemes] = useState<string[]>([]);
   
   useEffect(() => {
@@ -61,7 +67,7 @@ export function CreateProductForm({ onSubmit }: { onSubmit: (data: NewProduct) =
       product_category: "",
       scheme: "",
       purchase_price_including_VAT: 0,
-      purchase_date: new Date(),
+      purchase_date: new Date().toISOString().split('T')[0], // Initialize with current date in YYYY-MM-DD format
     },
   })
 
@@ -71,8 +77,9 @@ export function CreateProductForm({ onSubmit }: { onSubmit: (data: NewProduct) =
       product_category: values.product_category,
       scheme: values.scheme,
       purchase_price_including_VAT: values.purchase_price_including_VAT,
-      purchase_date: values.purchase_date.toISOString().split('T')[0],
+      purchase_date: values.purchase_date,
     });
+    form.reset();
   }
 
   return (
@@ -116,24 +123,24 @@ export function CreateProductForm({ onSubmit }: { onSubmit: (data: NewProduct) =
           render={({ field }) => (
             <FormItem>
               <FormLabel>Scheme</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a scheme" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {schemes.map((scheme) => (
-                  <SelectItem key={scheme} value={scheme}>
-                    {scheme}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a scheme" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {schemes.map((scheme) => (
+                    <SelectItem key={scheme} value={scheme}>
+                      {scheme}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="purchase_price_including_VAT"
@@ -157,7 +164,7 @@ export function CreateProductForm({ onSubmit }: { onSubmit: (data: NewProduct) =
             <FormItem>
               <FormLabel>Purchase Date</FormLabel>
               <FormControl>
-                <Input type="date" {...field} onChange={(e) => field.onChange(new Date(e.target.value))} />
+                <Input type="date" {...field} />
               </FormControl>
               <FormDescription>
                 This is the date the product was purchased.
@@ -166,7 +173,7 @@ export function CreateProductForm({ onSubmit }: { onSubmit: (data: NewProduct) =
             </FormItem>
           )}
         />
-        {/* <Button type="submit">Submit</Button> */}
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   )
