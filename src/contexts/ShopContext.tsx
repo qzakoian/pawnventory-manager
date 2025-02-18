@@ -27,6 +27,18 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           return;
         }
 
+        // First get the Users record to get the numeric ID
+        const { data: userData } = await supabase
+          .from('Users')
+          .select('id')
+          .eq('email', user.email)
+          .single();
+
+        if (!userData) {
+          console.log('No user record found');
+          return;
+        }
+
         const { data: shopLinks, error: shopLinksError } = await supabase
           .from('User-Shop links')
           .select(`
@@ -36,7 +48,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
               name
             )
           `)
-          .eq('user_id', user.id)
+          .eq('user_id', userData.id)
           .limit(1);
 
         if (shopLinksError) {
