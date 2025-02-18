@@ -23,7 +23,7 @@ const transactions = [
 export const TransactionsTable = () => {
   return (
     <section>
-      <h2 className="text-xl font-bold text-[#111111] mb-4">Last transactions</h2>
+      <h2 className="text-xl font-bold text-[#454545] mb-4">Last transactions</h2>
       <Card className="glass-card">
         <div className="overflow-x-auto">
           <table className="w-full">
