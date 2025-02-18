@@ -114,7 +114,7 @@ export const CustomerSearch = ({ shopId }: CustomerSearchProps) => {
 
       <Sheet open={isCreateOpen} onOpenChange={setIsCreateOpen}>
         <SheetContent>
-          <CreateCustomerForm onSuccess={() => setIsCreateOpen(false)} />
+          <CreateCustomerForm shopId={shopId} onSuccess={() => setIsCreateOpen(false)} />
         </SheetContent>
       </Sheet>
     </>
