@@ -52,7 +52,7 @@ export function AppSidebar() {
               {menuItems.map(item => <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={state === "collapsed" ? item.title : undefined} className={cn("flex items-center gap-3 px-4 py-2 hover:bg-gray-100", isActiveLink(item.url) && "bg-gray-100 font-medium")}>
                     <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5 text-gray-500" />
+                      <item.icon className="h-5 w-5 text-gray-600" />
                       <span className="text-[#454545]">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
