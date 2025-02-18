@@ -1,5 +1,6 @@
 
 import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import {
   Table,
@@ -16,6 +17,8 @@ interface CustomerProductsProps {
 }
 
 export const CustomerProducts = ({ products }: CustomerProductsProps) => {
+  const navigate = useNavigate();
+
   if (products.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -39,7 +42,11 @@ export const CustomerProducts = ({ products }: CustomerProductsProps) => {
         </TableHeader>
         <TableBody>
           {products.map((product) => (
-            <TableRow key={product.id}>
+            <TableRow 
+              key={product.id} 
+              className="cursor-pointer hover:bg-gray-50"
+              onClick={() => navigate(`/product/${product.id}`)}
+            >
               <TableCell className="font-medium">#{product.id}</TableCell>
               <TableCell>{product.model}</TableCell>
               <TableCell>{product.product_category}</TableCell>
