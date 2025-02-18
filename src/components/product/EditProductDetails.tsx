@@ -1,8 +1,8 @@
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useState } from "react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
-import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -55,17 +55,15 @@ export const EditProductDetails = ({ product }: EditProductDetailsProps) => {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="icon">
-          <Edit className="h-4 w-4" />
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit Product Details</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <Sheet open={open} onOpenChange={setOpen}>
+      <Button variant="outline" size="icon" onClick={() => setOpen(true)}>
+        <Edit className="h-4 w-4" />
+      </Button>
+      <SheetContent className="overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>Edit Product Details</SheetTitle>
+        </SheetHeader>
+        <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           <div className="space-y-2">
             <Label htmlFor="model">Model</Label>
             <Input
@@ -106,9 +104,16 @@ export const EditProductDetails = ({ product }: EditProductDetailsProps) => {
             />
           </div>
 
-          <Button type="submit" className="w-full">Save Changes</Button>
+          <SheetFooter className="mt-6">
+            <Button variant="outline" onClick={() => setOpen(false)} type="button">
+              Cancel
+            </Button>
+            <Button type="submit">
+              Save Changes
+            </Button>
+          </SheetFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
