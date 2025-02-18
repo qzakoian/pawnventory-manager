@@ -1,32 +1,17 @@
-import { useParams, useNavigate } from "react-router-dom";
+
+import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { CustomerInfoCard } from "@/components/customer/CustomerInfoCard";
 import { CustomerProducts } from "@/components/customer/CustomerProducts";
 import { EditCustomerDialog } from "@/components/customer/EditCustomerDialog";
 import { Customer, Product, NewProduct, EditCustomer } from "@/types/customer";
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { CustomerHeader } from "@/components/customer-profile/CustomerHeader";
+import { CustomerStats } from "@/components/customer-profile/CustomerStats";
+import { AddProductDialog } from "@/components/customer-profile/AddProductDialog";
 import {
   formatUKPhoneNumber,
   isValidUKPhoneNumber,
@@ -36,7 +21,6 @@ import {
 
 const CustomerProfile = () => {
   const { id } = useParams();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -44,13 +28,6 @@ const CustomerProfile = () => {
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
   const [isEditCustomerDialogOpen, setIsEditCustomerDialogOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
-  const [newProduct, setNewProduct] = useState<NewProduct>({
-    model: "",
-    product_category: "",
-    scheme: "buy-back",
-    purchase_price_including_VAT: 0,
-    purchase_date: new Date().toISOString().split('T')[0],
-  });
   const [schemes, setSchemes] = useState<string[]>([]);
 
   useEffect(() => {
@@ -65,10 +42,6 @@ const CustomerProfile = () => {
       }
     };
 
-    fetchCategories();
-  }, []);
-
-  useEffect(() => {
     const fetchSchemes = async () => {
       const { data } = await supabase
         .from('Product Schemes')
@@ -80,6 +53,7 @@ const CustomerProfile = () => {
       }
     };
 
+    fetchCategories();
     fetchSchemes();
   }, []);
 
@@ -128,7 +102,7 @@ const CustomerProfile = () => {
     fetchCustomerData();
   }, [id, toast]);
 
-  const handleCreateProduct = async () => {
+  const handleCreateProduct = async (newProduct: NewProduct) => {
     if (!customer) return;
 
     try {
@@ -147,13 +121,6 @@ const CustomerProfile = () => {
 
       setProducts([data, ...products]);
       setIsNewProductDialogOpen(false);
-      setNewProduct({
-        model: "",
-        product_category: "",
-        scheme: "buy-back",
-        purchase_price_including_VAT: 0,
-        purchase_date: new Date().toISOString().split('T')[0],
-      });
 
       toast({
         title: "Success",
@@ -198,7 +165,6 @@ const CustomerProfile = () => {
       : '';
 
     try {
-      console.log('Updating customer with ID:', customer.id);
       const updatePayload = {
         first_name: editedCustomer.first_name,
         last_name: editedCustomer.last_name,
@@ -210,7 +176,6 @@ const CustomerProfile = () => {
         postal_code: formattedPostcode,
         county: editedCustomer.county,
       };
-      console.log('Update payload:', updatePayload);
 
       const { data, error } = await supabase
         .from('Customers')
@@ -218,10 +183,7 @@ const CustomerProfile = () => {
         .eq('id', customer.id)
         .select();
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       if (data && data.length > 0) {
         const updatedCustomer = data[0];
@@ -271,62 +233,12 @@ const CustomerProfile = () => {
   return (
     <div className="min-h-screen bg-white">
       <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
-        <div className="space-y-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate(-1)}
-            className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
-          
-          <div className="space-y-2">
-            <p className="text-gray-500 text-sm">Customer Profile</p>
-            {customer && (
-              <h1 className="text-3xl font-semibold text-[#2A2A2A]">
-                {customer.first_name} {customer.last_name}
-              </h1>
-            )}
-          </div>
-        </div>
+        <CustomerHeader 
+          firstName={customer.first_name || ''} 
+          lastName={customer.last_name || ''} 
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="glass-card rounded-xl">
-            <div className="p-6">
-              <h3 className="text-sm text-gray-500 mb-2">Total Products</h3>
-              <p className="text-3xl font-semibold text-[#2A2A2A]">{products.length}</p>
-              <p className="text-sm text-gray-400 mt-1">All time</p>
-            </div>
-          </div>
-          <div className="glass-card rounded-xl">
-            <div className="p-6">
-              <h3 className="text-sm text-gray-500 mb-2">In Stock</h3>
-              <p className="text-3xl font-semibold text-[#2A2A2A]">
-                {products.filter(p => p.in_stock).length}
-              </p>
-              <p className="text-sm text-gray-400 mt-1">Current inventory</p>
-            </div>
-          </div>
-          <div className="glass-card rounded-xl">
-            <div className="p-6">
-              <h3 className="text-sm text-gray-500 mb-2">Sold</h3>
-              <p className="text-3xl font-semibold text-[#2A2A2A]">
-                {products.filter(p => !p.in_stock).length}
-              </p>
-              <p className="text-sm text-gray-400 mt-1">All time</p>
-            </div>
-          </div>
-          <div className="glass-card rounded-xl">
-            <div className="p-6">
-              <h3 className="text-sm text-gray-500 mb-2">Total Value</h3>
-              <p className="text-3xl font-semibold text-[#2A2A2A]">
-                £{products.reduce((sum, p) => sum + (p.purchase_price_including_VAT || 0), 0).toFixed(2)}
-              </p>
-              <p className="text-sm text-gray-400 mt-1">Purchase price</p>
-            </div>
-          </div>
-        </div>
+        <CustomerStats products={products} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-1">
@@ -355,94 +267,14 @@ const CustomerProfile = () => {
           </div>
         </div>
 
-        <Dialog open={isNewProductDialogOpen} onOpenChange={setIsNewProductDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Product</DialogTitle>
-              <DialogDescription>
-                Create a new product for {customer.first_name} {customer.last_name}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="model">Model</Label>
-                <Input
-                  id="model"
-                  value={newProduct.model}
-                  onChange={(e) => setNewProduct({ ...newProduct, model: e.target.value })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
-                <Select
-                  value={newProduct.product_category}
-                  onValueChange={(value) => setNewProduct({ ...newProduct, product_category: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Categories</SelectLabel>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="scheme">Scheme</Label>
-                <Select
-                  value={newProduct.scheme}
-                  onValueChange={(value) => setNewProduct({ ...newProduct, scheme: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select scheme" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Schemes</SelectLabel>
-                      {schemes.map((scheme) => (
-                        <SelectItem key={scheme} value={scheme}>
-                          {scheme}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="purchase_price">Purchase Price (inc. VAT)</Label>
-                <Input
-                  id="purchase_price"
-                  type="number"
-                  value={newProduct.purchase_price_including_VAT}
-                  onChange={(e) => setNewProduct({ ...newProduct, purchase_price_including_VAT: parseFloat(e.target.value) })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="purchase_date">Purchase Date</Label>
-                <Input
-                  id="purchase_date"
-                  type="date"
-                  value={newProduct.purchase_date}
-                  onChange={(e) => setNewProduct({ ...newProduct, purchase_date: e.target.value })}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsNewProductDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleCreateProduct}>
-                Create Product
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <AddProductDialog
+          isOpen={isNewProductDialogOpen}
+          onOpenChange={setIsNewProductDialogOpen}
+          onSubmit={handleCreateProduct}
+          customerName={`${customer.first_name} ${customer.last_name}`}
+          categories={categories}
+          schemes={schemes}
+        />
 
         <EditCustomerDialog
           open={isEditCustomerDialogOpen}
