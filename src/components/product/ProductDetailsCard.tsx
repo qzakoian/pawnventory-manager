@@ -1,23 +1,17 @@
 
 import { Card } from "@/components/ui/card";
-import { CustomerSelect } from "./CustomerSelect";
 import { Product } from "@/types/customer";
 
 interface ProductDetailsCardProps {
   product: Product;
-  customers: Array<{ id: number; first_name: string | null; last_name: string | null; }>;
-  isLoadingCustomers: boolean;
-  onCustomerUpdate: (customerId: number | null) => void;
 }
 
 export const ProductDetailsCard = ({
-  product,
-  customers,
-  isLoadingCustomers,
-  onCustomerUpdate
+  product
 }: ProductDetailsCardProps) => {
   return (
     <Card className="p-6">
+      <h2 className="text-lg font-semibold mb-4">Product Information</h2>
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
@@ -38,13 +32,6 @@ export const ProductDetailsCard = ({
               <p className="font-medium">{product.sku}</p>
             </div>
           )}
-
-          <CustomerSelect
-            customers={customers}
-            selectedCustomer={product.customer}
-            onCustomerSelect={onCustomerUpdate}
-            isLoading={isLoadingCustomers}
-          />
         </div>
 
         <div className="space-y-4">

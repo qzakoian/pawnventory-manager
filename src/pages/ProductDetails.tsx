@@ -7,6 +7,7 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { EditProductDetails } from "@/components/product/EditProductDetails";
 import { ProductDetailsCard } from "@/components/product/ProductDetailsCard";
+import { CustomerDetailsCard } from "@/components/product/CustomerDetailsCard";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -115,12 +116,16 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        <ProductDetailsCard
-          product={product}
-          customers={customers || []}
-          isLoadingCustomers={isLoadingCustomers}
-          onCustomerUpdate={updateCustomer}
-        />
+        <div className="space-y-6">
+          <ProductDetailsCard product={product} />
+          
+          <CustomerDetailsCard
+            customers={customers || []}
+            selectedCustomer={product.customer}
+            isLoadingCustomers={isLoadingCustomers}
+            onCustomerUpdate={updateCustomer}
+          />
+        </div>
       </main>
     </div>
   );
