@@ -25,6 +25,7 @@ export interface Product {
   in_stock: boolean | null;
   imei: string | null;
   sku: string | null;
+  customer: Customer | null;  // Added this line to include the customer relationship
 }
 
 export interface NewProduct {
