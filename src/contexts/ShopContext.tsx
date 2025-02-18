@@ -22,17 +22,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         
-        if (!user) return;
+        if (!user) {
+          console.log('No user found');
+          return;
+        }
 
-        const { data: userData } = await supabase
-          .from('Users')
-          .select('id')
-          .eq('email', user.email)
-          .single();
-
-        if (!userData) return;
-
-        const { data: shopLinks } = await supabase
+        const { data: shopLinks, error: shopLinksError } = await supabase
           .from('User-Shop links')
           .select(`
             shop_id,
@@ -41,8 +36,13 @@ export function ShopProvider({ children }: { children: ReactNode }) {
               name
             )
           `)
-          .eq('user_id', userData.id)
+          .eq('user_id', user.id)
           .limit(1);
+
+        if (shopLinksError) {
+          console.error('Error fetching shop links:', shopLinksError);
+          return;
+        }
 
         if (shopLinks && shopLinks.length > 0 && shopLinks[0].Shops) {
           setSelectedShop(shopLinks[0].Shops);
