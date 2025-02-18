@@ -1,182 +1,173 @@
-
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
-import { useState } from "react";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import * as z from "zod"
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { NewProduct } from "@/types/customer";
 
-const createProductSchema = z.object({
-  model: z.string().min(1, "Model is required"),
-  imei: z.string().optional(),
-  sku: z.string().optional(),
-  product_category: z.string().min(1, "Category is required"),
-  purchase_price_including_VAT: z.number().min(0, "Price must be positive"),
-});
+const formSchema = z.object({
+  model: z.string().min(2, {
+    message: "Model must be at least 2 characters.",
+  }),
+  product_category: z.string().min(2, {
+    message: "Category must be at least 2 characters.",
+  }),
+  scheme: z.string().min(2, {
+    message: "Scheme must be at least 2 characters.",
+  }),
+  purchase_price_including_VAT: z.number(),
+  purchase_date: z.date(),
+})
 
-interface CreateProductFormProps {
-  shopId: number;
-}
+export function CreateProductForm({ onSubmit }: { onSubmit: (data: NewProduct) => void }) {
+  const [schemes, setSchemes] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const fetchSchemes = async () => {
+      const { data } = await supabase
+        .from('Product Schemes')
+        .select('name')
+        .order('name');
+      
+      if (data) {
+        setSchemes(data.map(scheme => scheme.name || "").filter(Boolean));
+      }
+    };
 
-export const CreateProductForm = ({ shopId }: CreateProductFormProps) => {
-  const navigate = useNavigate();
-  const { toast } = useToast();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+    fetchSchemes();
+  }, []);
 
-  const form = useForm<z.infer<typeof createProductSchema>>({
-    resolver: zodResolver(createProductSchema),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       model: "",
-      imei: "",
-      sku: "",
       product_category: "",
+      scheme: "",
       purchase_price_including_VAT: 0,
+      purchase_date: new Date(),
     },
-  });
+  })
 
-  const onSubmit = async (values: z.infer<typeof createProductSchema>) => {
-    try {
-      const { data, error } = await supabase
-        .from('Products')
-        .insert([
-          {
-            ...values,
-            shop_id: shopId,
-            purchase_date: new Date().toISOString(),
-          }
-        ])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      toast({
-        title: "Success",
-        description: "Product created successfully",
-      });
-
-      setIsDialogOpen(false);
-      form.reset();
-
-      if (data) {
-        navigate(`/product/${data.id}`);
-      }
-    } catch (error) {
-      console.error('Error creating product:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to create product",
-      });
-    }
-  };
+  function onSubmitForm(values: z.infer<typeof formSchema>) {
+    onSubmit({
+      model: values.model,
+      product_category: values.product_category,
+      scheme: values.scheme,
+      purchase_price_including_VAT: values.purchase_price_including_VAT,
+      purchase_date: values.purchase_date.toISOString().split('T')[0],
+    });
+  }
 
   return (
-    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
-        <Button variant="link" className="text-[#646ECB] pl-0 mt-2 gap-1.5">
-          <Plus className="h-4 w-4" />
-          Create Product
-        </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Create New Product</DialogTitle>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="model"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Model</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="imei"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>IMEI (optional)</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="sku"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>SKU (optional)</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="product_category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="purchase_price_including_VAT"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Purchase Price (inc. VAT)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="number" 
-                      {...field} 
-                      onChange={e => field.onChange(parseFloat(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button type="submit" className="w-full">Create Product</Button>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
-  );
-};
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmitForm)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="model"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Model</FormLabel>
+              <FormControl>
+                <Input placeholder="iPhone 14" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is the product model.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="product_category"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <FormControl>
+                <Input placeholder="Mobile Phone" {...field} />
+              </FormControl>
+              <FormDescription>
+                This is the product category.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="scheme"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Scheme</FormLabel>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a scheme" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {schemes.map((scheme) => (
+                  <SelectItem key={scheme} value={scheme}>
+                    {scheme}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+        <FormField
+          control={form.control}
+          name="purchase_price_including_VAT"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Purchase Price (inc. VAT)</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="100" {...field} onChange={(e) => field.onChange(Number(e.target.value))} />
+              </FormControl>
+              <FormDescription>
+                This is the price of the product.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="purchase_date"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Purchase Date</FormLabel>
+              <FormControl>
+                <Input type="date" {...field} onChange={(e) => field.onChange(new Date(e.target.value))} />
+              </FormControl>
+              <FormDescription>
+                This is the date the product was purchased.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* <Button type="submit">Submit</Button> */}
+      </form>
+    </Form>
+  )
+}

@@ -112,6 +112,24 @@ export type Database = {
         }
         Relationships: []
       }
+      "Product Schemes": {
+        Row: {
+          created_at: string
+          id: number
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string | null
+        }
+        Relationships: []
+      }
       Products: {
         Row: {
           "12-week-buy-back_price": number | null
@@ -195,6 +213,13 @@ export type Database = {
             columns: ["product_category"]
             isOneToOne: false
             referencedRelation: "Product Categories"
+            referencedColumns: ["name"]
+          },
+          {
+            foreignKeyName: "Products_scheme_fkey"
+            columns: ["scheme"]
+            isOneToOne: false
+            referencedRelation: "Product Schemes"
             referencedColumns: ["name"]
           },
           {

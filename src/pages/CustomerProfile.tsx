@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -52,6 +51,7 @@ const CustomerProfile = () => {
     purchase_price_including_VAT: 0,
     purchase_date: new Date().toISOString().split('T')[0],
   });
+  const [schemes, setSchemes] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -66,6 +66,21 @@ const CustomerProfile = () => {
     };
 
     fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchSchemes = async () => {
+      const { data } = await supabase
+        .from('Product Schemes')
+        .select('name')
+        .order('name');
+      
+      if (data) {
+        setSchemes(data.map(scheme => scheme.name || "").filter(Boolean));
+      }
+    };
+
+    fetchSchemes();
   }, []);
 
   useEffect(() => {
@@ -390,8 +405,11 @@ const CustomerProfile = () => {
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Schemes</SelectLabel>
-                      <SelectItem value="buy-back">Buy Back</SelectItem>
-                      <SelectItem value="pawn">Pawn</SelectItem>
+                      {schemes.map((scheme) => (
+                        <SelectItem key={scheme} value={scheme}>
+                          {scheme}
+                        </SelectItem>
+                      ))}
                     </SelectGroup>
                   </SelectContent>
                 </Select>
