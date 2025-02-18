@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -117,14 +116,13 @@ const ProductDetails = () => {
         </div>
 
         <div className="space-y-6">
-          <ProductDetailsCard product={product} />
-          
           <CustomerDetailsCard
             customers={customers || []}
             selectedCustomer={product.customer}
             isLoadingCustomers={isLoadingCustomers}
             onCustomerUpdate={updateCustomer}
           />
+          <ProductDetailsCard product={product} />
         </div>
       </main>
     </div>

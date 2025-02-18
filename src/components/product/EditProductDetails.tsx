@@ -56,8 +56,9 @@ export const EditProductDetails = ({ product }: EditProductDetailsProps) => {
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <Button variant="outline" size="icon" onClick={() => setOpen(true)}>
-        <Edit className="h-4 w-4" />
+      <Button variant="outline" onClick={() => setOpen(true)}>
+        <Edit className="h-4 w-4 mr-2" />
+        Edit
       </Button>
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
