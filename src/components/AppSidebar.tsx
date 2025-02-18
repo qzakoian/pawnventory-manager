@@ -97,7 +97,7 @@ export function AppSidebar() {
                   >
                     <Link to={item.url} className="flex items-center gap-3">
                       <item.icon className="h-5 w-5 text-gray-500" />
-                      <span className="text-gray-700">{item.title}</span>
+                      <span className="text-foreground">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -112,7 +112,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <div className="px-4 py-2">
-                  <SidebarTrigger className="flex items-center gap-3 text-gray-700">
+                  <SidebarTrigger className="flex items-center gap-3 text-foreground">
                     {state === "expanded" ? (
                       <>
                         <PanelLeftClose className="h-5 w-5 text-gray-500" />
@@ -139,7 +139,7 @@ export function AppSidebar() {
                   >
                     <Link to={item.url} className="flex items-center gap-3">
                       <item.icon className="h-5 w-5 text-gray-500" />
-                      <span className="text-gray-700">{item.title}</span>
+                      <span className="text-foreground">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
