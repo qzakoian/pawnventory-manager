@@ -1,10 +1,7 @@
-
 import { Card } from "@/components/ui/card";
-
 export const OverviewCards = () => {
-  return (
-    <section>
-      <h2 className="text-xl font-bold text-[#111111] mb-4">Overview</h2>
+  return <section>
+      <h2 className="text-xl font-bold text-[#454545] mb-4">Overview</h2>
       <div className="grid md:grid-cols-3 gap-4">
         <Card className="p-4 glass-card">
           <div className="flex items-center justify-between">
@@ -28,6 +25,5 @@ export const OverviewCards = () => {
           <p className="text-2xl font-bold mt-2">£1,563.55</p>
         </Card>
       </div>
-    </section>
-  );
+    </section>;
 };
