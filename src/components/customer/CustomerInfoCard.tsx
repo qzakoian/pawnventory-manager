@@ -18,7 +18,7 @@ export const CustomerInfoCard = ({ customer, onEditClick }: CustomerInfoCardProp
           <Button 
             variant="outline" 
             onClick={onEditClick}
-            className="hover:bg-secondary/10 transition-colors"
+            className="hover:bg-accent/10 transition-colors"
             size="sm"
           >
             <Pencil className="h-4 w-4 mr-2" />
