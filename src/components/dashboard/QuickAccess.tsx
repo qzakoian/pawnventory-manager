@@ -1,8 +1,11 @@
+
 import { CustomerSearch } from "@/components/customer/CustomerSearch";
 import { ProductSearch } from "@/components/product/ProductSearch";
+
 interface QuickAccessProps {
   shopId: number;
 }
+
 export const QuickAccess = ({
   shopId
 }: QuickAccessProps) => {

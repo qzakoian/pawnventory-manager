@@ -21,7 +21,7 @@ export const ProfitsChart = () => {
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-[#111111]">Profits</h2>
+        <h2 className="text-xl font-bold text-[#454545]">Profits</h2>
         <Button variant="outline" size="sm">View more stats</Button>
       </div>
       <Card className="p-4 glass-card">

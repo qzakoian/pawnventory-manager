@@ -33,7 +33,7 @@ export const WelcomeHeader = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-[#111111]">Hi there {firstName || 'Guest'}</h1>
+      <h1 className="text-2xl font-bold text-[#454545]">Hi there {firstName || 'Guest'}</h1>
       <p className="text-[#2A2A2A] mt-1">Here is your Dashboard, enjoy!</p>
     </div>
   );
