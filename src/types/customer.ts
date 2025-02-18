@@ -25,7 +25,13 @@ export interface Product {
   in_stock: boolean | null;
   imei: string | null;
   sku: string | null;
-  customer: Customer | null;  // Added this line to include the customer relationship
+  "12-week-buy-back_price"?: number;
+  "12-week-buy-back_rate"?: number;
+  "28-day-buy-back_price"?: number;
+  "28-day-buy-back_rate"?: number;
+  creation_date?: string;
+  customer_id?: number;
+  customer?: Customer | null;  // Made customer optional since it's not always included
 }
 
 export interface NewProduct {
