@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { NewProduct } from "@/types/customer";
+import { useShop } from "@/contexts/ShopContext";
 
 interface AddProductDialogProps {
   isOpen: boolean;
@@ -39,6 +40,7 @@ export const AddProductDialog = ({
   categories,
   schemes,
 }: AddProductDialogProps) => {
+  const { selectedShop } = useShop();
   const [newProduct, setNewProduct] = useState<NewProduct>({
     model: "",
     product_category: "",
@@ -71,6 +73,7 @@ export const AddProductDialog = ({
       ...newProduct,
       [`${newProduct.scheme}_rate`]: buybackRate,
       [`${newProduct.scheme}_price`]: buybackPrice,
+      shop_id: selectedShop?.id,
     };
     onSubmit(productToSubmit);
     setNewProduct({
