@@ -99,10 +99,13 @@ export const ProductSearch = ({ shopId }: ProductSearchProps) => {
             ))}
           </div>
         )}
-        <a href="/products/new" className="text-[#646ECB] hover:text-[#646ECB]/90 hover:underline inline-flex items-center text-sm mt-2 gap-1.5">
+        <button 
+          onClick={() => navigate('/products/new')}
+          className="text-[#646ECB] hover:text-[#646ECB]/90 hover:underline inline-flex items-center text-sm mt-2 gap-1.5"
+        >
           <Plus className="h-4 w-4" />
           Create Product
-        </a>
+        </button>
       </div>
     </Card>
   );
