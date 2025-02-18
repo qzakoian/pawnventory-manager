@@ -22,6 +22,7 @@ import {
 } from "@/components/ui/select";
 import { NewProduct } from "@/types/customer";
 import { useShop } from "@/contexts/ShopContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AddProductDialogProps {
   isOpen: boolean;
@@ -51,6 +52,8 @@ export const AddProductDialog = ({
 
   const [buybackRate, setBuybackRate] = useState<number>(0);
   const [buybackPrice, setBuybackPrice] = useState<number>(0);
+  const [imei, setImei] = useState<string>("");
+  const [sku, setSku] = useState<string>("");
 
   useEffect(() => {
     if (newProduct.purchase_price_including_VAT && buybackRate) {
@@ -68,12 +71,28 @@ export const AddProductDialog = ({
     }
   }, [newProduct.purchase_price_including_VAT, buybackPrice]);
 
+  const generateRandomIMEI = async () => {
+    const { data, error } = await supabase.rpc('generate_random_imei');
+    if (!error && data) {
+      setImei(data);
+    }
+  };
+
+  const generateRandomSKU = async () => {
+    const { data, error } = await supabase.rpc('generate_random_sku');
+    if (!error && data) {
+      setSku(data);
+    }
+  };
+
   const handleSubmit = () => {
     const productToSubmit = {
       ...newProduct,
       [`${newProduct.scheme}_rate`]: buybackRate,
       [`${newProduct.scheme}_price`]: buybackPrice,
       shop_id: selectedShop?.id,
+      imei,
+      sku,
     };
     onSubmit(productToSubmit);
     setNewProduct({
@@ -85,6 +104,8 @@ export const AddProductDialog = ({
     });
     setBuybackRate(0);
     setBuybackPrice(0);
+    setImei("");
+    setSku("");
   };
 
   const isBuybackScheme = newProduct.scheme.includes('buy-back');
@@ -180,6 +201,36 @@ export const AddProductDialog = ({
               </div>
             </div>
           )}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="imei">IMEI</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="imei"
+                  value={imei}
+                  onChange={(e) => setImei(e.target.value)}
+                  placeholder="Enter IMEI"
+                />
+                <Button type="button" variant="outline" onClick={generateRandomIMEI} className="shrink-0">
+                  Generate
+                </Button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="sku">SKU</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="sku"
+                  value={sku}
+                  onChange={(e) => setSku(e.target.value)}
+                  placeholder="Enter SKU"
+                />
+                <Button type="button" variant="outline" onClick={generateRandomSKU} className="shrink-0">
+                  Generate
+                </Button>
+              </div>
+            </div>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="purchase_date">Purchase Date</Label>
             <Input
