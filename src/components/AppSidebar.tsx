@@ -60,7 +60,7 @@ export function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r bg-white">
+    <Sidebar collapsible="icon" className="border-r bg-white text-foreground">
       <SidebarContent>
         <div className="mb-4">
           <div className="flex items-center px-4 py-4">
@@ -91,7 +91,7 @@ export function AppSidebar() {
                     asChild
                     tooltip={state === "collapsed" ? item.title : undefined}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-foreground",
+                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100",
                       isActiveLink(item.url) && "bg-gray-100 font-medium"
                     )}
                   >
@@ -112,16 +112,16 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <div className="px-4 py-2">
-                  <SidebarTrigger className="flex items-center gap-3 text-foreground">
+                  <SidebarTrigger className="flex items-center gap-3">
                     {state === "expanded" ? (
                       <>
                         <PanelLeftClose className="h-5 w-5 text-gray-500" />
-                        <span>Collapse</span>
+                        <span className="group-data-[collapsible=icon]:hidden">Collapse</span>
                       </>
                     ) : (
                       <>
                         <PanelLeft className="h-5 w-5 text-gray-500" />
-                        <span>Expand</span>
+                        <span className="group-data-[collapsible=icon]:hidden">Expand</span>
                       </>
                     )}
                   </SidebarTrigger>
@@ -133,7 +133,7 @@ export function AppSidebar() {
                     asChild
                     tooltip={state === "collapsed" ? item.title : undefined}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-foreground",
+                      "flex items-center gap-3 px-4 py-2 hover:bg-gray-100",
                       isActiveLink(item.url) && "bg-gray-100 font-medium"
                     )}
                   >
