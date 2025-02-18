@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, ChevronsUpDown } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
@@ -99,18 +99,6 @@ export const CustomerSelect = ({
           )}
         </PopoverContent>
       </Popover>
-      {selectedCustomer && (
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="mt-2"
-          onClick={() => onCustomerSelect(null)}
-        >
-          <X className="h-4 w-4 mr-2" />
-          Remove customer
-        </Button>
-      )}
     </div>
   );
 };
