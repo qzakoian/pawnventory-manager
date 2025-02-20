@@ -177,7 +177,7 @@ export default function AccountSettings() {
       <div className="container mx-auto py-8 max-w-2xl">
         <Button
           variant="ghost"
-          className="mb-4"
+          className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
           onClick={() => navigate('/')}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
