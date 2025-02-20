@@ -173,7 +173,7 @@ export default function AccountSettings() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FF]">
+    <div className="min-h-screen bg-white">
       <div className="container mx-auto py-8 max-w-2xl">
         <Button
           variant="ghost"
