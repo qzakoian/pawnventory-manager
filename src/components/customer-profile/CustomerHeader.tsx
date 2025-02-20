@@ -19,7 +19,7 @@ export const CustomerHeader = ({ firstName, lastName }: CustomerHeaderProps) => 
         className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
-        Back to Dashboard
+        Back to Home
       </Button>
       
       <div className="space-y-2">
