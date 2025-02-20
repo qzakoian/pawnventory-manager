@@ -137,7 +137,7 @@ export const ProductFormFields = ({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="buyback_price">Buy-back Price</Label>
+            <Label htmlFor="buyback_price">Buy-back Price (inc. VAT)</Label>
             <Input
               id="buyback_price"
               type="number"
