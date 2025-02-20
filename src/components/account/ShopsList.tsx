@@ -1,14 +1,16 @@
 
 import { useState } from "react";
-import { Store, Pencil, Check, X } from "lucide-react";
+import { Store, Pencil, Check, X, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface Shop {
   id: number;
   name: string | null;
+  profile_picture?: string | null;
 }
 
 interface ShopsListProps {
@@ -59,6 +61,48 @@ export function ShopsList({ shops }: ShopsListProps) {
     setNewName("");
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, shopId: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${shopId}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('shop-profile-pictures')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('shop-profile-pictures')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('Shops')
+        .update({ profile_picture: publicUrl })
+        .eq('id', shopId);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Success",
+        description: "Shop profile picture updated successfully",
+      });
+
+      // Refresh the page to show updated data
+      window.location.reload();
+    } catch (error) {
+      console.error('Error uploading shop profile picture:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to upload shop profile picture",
+      });
+    }
+  };
+
   if (shops.length === 0) {
     return (
       <div className="text-center py-8 text-gray-500">
@@ -76,7 +120,27 @@ export function ShopsList({ shops }: ShopsListProps) {
           className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center">
-            <Store className="h-5 w-5 mr-3 text-gray-500" />
+            <div className="relative group">
+              <Avatar className="h-10 w-10 mr-3">
+                <AvatarImage src={shop.profile_picture || undefined} alt={shop.name || 'Shop'} />
+                <AvatarFallback>
+                  <Store className="h-5 w-5 text-gray-500" />
+                </AvatarFallback>
+              </Avatar>
+              <label
+                htmlFor={`shop-image-${shop.id}`}
+                className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+              >
+                <Upload className="h-4 w-4 text-white" />
+                <input
+                  type="file"
+                  id={`shop-image-${shop.id}`}
+                  accept="image/*"
+                  onChange={(e) => handleImageUpload(e, shop.id)}
+                  className="hidden"
+                />
+              </label>
+            </div>
             {editingShop === shop.id ? (
               <Input
                 value={newName}
