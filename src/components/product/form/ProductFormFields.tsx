@@ -3,6 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ProductFormFieldsProps {
   model: string;
@@ -85,12 +92,16 @@ export const ProductFormFields = ({
 
       <div className="space-y-2">
         <Label htmlFor="scheme">Scheme</Label>
-        <Input
-          id="scheme"
-          value={scheme}
-          onChange={(e) => setScheme(e.target.value)}
-          placeholder="Enter scheme"
-        />
+        <Select value={scheme} onValueChange={setScheme}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a scheme" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="sale">Sale</SelectItem>
+            <SelectItem value="28-day-buy-back">28 Day Buy-back</SelectItem>
+            <SelectItem value="12-week-buy-back">12 Week Buy-back</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="space-y-2">
