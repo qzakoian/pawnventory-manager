@@ -15,7 +15,7 @@ import { ProfilePicture } from "@/components/account/ProfilePicture";
 import { ProfileForm, formSchema } from "@/components/account/ProfileForm";
 import { ShopsList } from "@/components/account/ShopsList";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import type { z } from "zod";
 
@@ -172,17 +172,42 @@ export default function AccountSettings() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate('/auth');
+    } catch (error) {
+      console.error('Error logging out:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to log out",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto py-8 max-w-2xl">
-        <Button
-          variant="ghost"
-          className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB] mb-4"
-          onClick={() => navigate('/')}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Home
-        </Button>
+        <div className="flex justify-between items-center mb-4">
+          <Button
+            variant="ghost"
+            className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
+            onClick={() => navigate('/')}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Home
+          </Button>
+          <Button
+            variant="ghost"
+            className="text-red-600 hover:bg-red-50 hover:text-red-700"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Logout
+          </Button>
+        </div>
         <Card>
           <CardHeader>
             <CardTitle>Account Settings</CardTitle>
