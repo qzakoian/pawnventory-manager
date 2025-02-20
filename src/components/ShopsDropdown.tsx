@@ -11,10 +11,12 @@ import { Store, ChevronDown } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useShop } from "@/contexts/ShopContext";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface Shop {
   id: number;
   name: string | null;
+  profile_picture: string | null;
 }
 
 export const ShopsDropdown = () => {
@@ -43,7 +45,8 @@ export const ShopsDropdown = () => {
             shop_id,
             Shops (
               id,
-              name
+              name,
+              profile_picture
             )
           `)
           .eq('user_id', userData.id);
@@ -76,7 +79,12 @@ export const ShopsDropdown = () => {
           className="w-full justify-between border-gray-200 hover:bg-gray-100 hover:text-gray-900"
         >
           <div className="flex items-center gap-2">
-            <Store className="h-5 w-5 text-gray-500" />
+            <Avatar className="h-5 w-5">
+              <AvatarImage src={selectedShop?.profile_picture || undefined} alt={selectedShop?.name || "Shop"} />
+              <AvatarFallback>
+                <Store className="h-4 w-4 text-gray-500" />
+              </AvatarFallback>
+            </Avatar>
             <span className="text-gray-700">{selectedShop?.name || "Select Shop"}</span>
           </div>
           <ChevronDown className="h-4 w-4 text-gray-500" />
@@ -89,7 +97,12 @@ export const ShopsDropdown = () => {
             onClick={() => setSelectedShop(shop)}
             className="cursor-pointer"
           >
-            <Store className="mr-2 h-4 w-4 text-gray-500" />
+            <Avatar className="h-4 w-4 mr-2">
+              <AvatarImage src={shop.profile_picture || undefined} alt={shop.name || "Shop"} />
+              <AvatarFallback>
+                <Store className="h-3 w-3 text-gray-500" />
+              </AvatarFallback>
+            </Avatar>
             <span>{shop.name}</span>
           </DropdownMenuItem>
         ))}

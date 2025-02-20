@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Shop {
   id: number;
   name: string | null;
+  profile_picture: string | null;
 }
 
 interface ShopContextType {
@@ -45,7 +46,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
             shop_id,
             Shops (
               id,
-              name
+              name,
+              profile_picture
             )
           `)
           .eq('user_id', userData.id)
