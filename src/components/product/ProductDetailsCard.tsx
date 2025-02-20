@@ -72,7 +72,7 @@ export const ProductDetailsCard = ({
               </div>
               
               <div>
-                <h3 className="text-sm text-gray-500">Buy-back Price</h3>
+                <h3 className="text-sm text-gray-500">Buy-back Price (inc. VAT)</h3>
                 <p className="font-medium">
                   {formatCurrency(product[`${product.scheme}_price`])}
                 </p>
