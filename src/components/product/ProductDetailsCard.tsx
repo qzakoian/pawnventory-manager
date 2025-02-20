@@ -1,6 +1,7 @@
 
 import { Card } from "@/components/ui/card";
 import { Product } from "@/types/customer";
+import { EditProductDetails } from "./EditProductDetails";
 
 interface ProductDetailsCardProps {
   product: Product;
@@ -18,7 +19,10 @@ export const ProductDetailsCard = ({
 
   return (
     <Card className="p-6">
-      <h2 className="text-lg font-semibold mb-4">Product Information</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold">Product Information</h2>
+        <EditProductDetails product={product} />
+      </div>
       <div className="grid md:grid-cols-2 gap-6">
         <div className="space-y-4">
           <div>
