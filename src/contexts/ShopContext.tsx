@@ -9,11 +9,6 @@ interface Shop {
   profile_picture: string | null;
 }
 
-interface ShopLink {
-  shop_id: number;
-  Shops: Shop;
-}
-
 interface ShopContextType {
   selectedShop: Shop | null;
   setSelectedShop: (shop: Shop | null) => void;
@@ -36,7 +31,6 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         const { data: shopLinks, error: shopLinksError } = await supabase
           .from('User-Shop links')
           .select(`
-            shop_id,
             Shops (
               id,
               name,
@@ -51,10 +45,14 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        if (shopLinks && shopLinks.length > 0) {
-          const shopLink = shopLinks[0] as ShopLink;
-          if (shopLink.Shops) {
-            setSelectedShop(shopLink.Shops);
+        if (shopLinks && shopLinks.length > 0 && shopLinks[0].Shops) {
+          const shop = shopLinks[0].Shops;
+          if (
+            typeof shop === 'object' &&
+            shop !== null &&
+            'id' in shop
+          ) {
+            setSelectedShop(shop as Shop);
           }
         }
       } catch (error) {

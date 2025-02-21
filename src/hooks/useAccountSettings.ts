@@ -51,7 +51,6 @@ export function useAccountSettings() {
         const { data: shopLinks, error: shopError } = await supabase
           .from('User-Shop links')
           .select(`
-            shop_id,
             Shops (
               id,
               name
@@ -61,11 +60,16 @@ export function useAccountSettings() {
 
         if (shopError) throw shopError;
 
-        const userShops = shopLinks
-          .map(link => link.Shops)
-          .filter((shop): shop is Shop => shop !== null);
-
-        setShops(userShops);
+        if (shopLinks) {
+          const userShops = shopLinks
+            .map(link => link.Shops)
+            .filter((shop): shop is Shop => 
+              shop !== null && 
+              typeof shop === 'object' &&
+              'id' in shop
+            );
+          setShops(userShops);
+        }
       } catch (error) {
         console.error('Error loading user data:', error);
         toast({

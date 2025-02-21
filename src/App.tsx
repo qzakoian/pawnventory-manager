@@ -5,7 +5,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ShopProvider } from "@/contexts/ShopContext";
 import { AppSidebar } from "@/components/AppSidebar";
 import { Toaster } from "@/components/ui/toaster";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 // Import your pages
@@ -31,13 +31,13 @@ function App() {
               <div className="flex-1">
                 <Routes>
                   <Route path="/auth" element={<Auth />} />
-                  <Route element={<ProtectedRoute />}>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/customers" element={<Customers />} />
-                    <Route path="/account-settings" element={<AccountSettings />} />
-                    <Route path="/customer/:id" element={<CustomerProfile />} />
-                    <Route path="/product/:id" element={<ProductDetails />} />
+                  <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
+                    <Route index element={<Index />} />
+                    <Route path="products" element={<Products />} />
+                    <Route path="customers" element={<Customers />} />
+                    <Route path="account-settings" element={<AccountSettings />} />
+                    <Route path="customer/:id" element={<CustomerProfile />} />
+                    <Route path="product/:id" element={<ProductDetails />} />
                   </Route>
                   <Route path="*" element={<NotFound />} />
                 </Routes>
