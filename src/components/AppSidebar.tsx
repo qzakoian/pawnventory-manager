@@ -46,29 +46,31 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r bg-white text-foreground">
       <SidebarContent>
         <div className="mb-4">
-          <div className="flex items-center justify-center p-2">
-            <div className={cn(
-              "relative overflow-hidden transition-all duration-200 w-full",
-              state === "expanded" ? "h-48" : "h-32"
-            )}>
-              {selectedShop?.profile_picture ? (
-                <img 
-                  src={selectedShop.profile_picture} 
-                  alt={selectedShop.name || "Shop"}
-                  className="w-full h-full object-contain"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-muted">
-                  <Store className={cn(
-                    "text-gray-500",
-                    state === "expanded" ? "h-24 w-24" : "h-16 w-16"
-                  )} />
-                </div>
-              )}
+          <div className="flex flex-col">
+            <div className="p-2">
+              <div className={cn(
+                "relative overflow-hidden transition-all duration-200 w-full",
+                state === "expanded" ? "h-48" : "h-32"
+              )}>
+                {selectedShop?.profile_picture ? (
+                  <img 
+                    src={selectedShop.profile_picture} 
+                    alt={selectedShop.name || "Shop"}
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-muted">
+                    <Store className={cn(
+                      "text-gray-500",
+                      state === "expanded" ? "h-24 w-24" : "h-16 w-16"
+                    )} />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-          <div className="px-3 py-[16px]">
-            <ShopsDropdown />
+            <div className="px-3">
+              <ShopsDropdown />
+            </div>
           </div>
         </div>
         <SidebarGroup>
