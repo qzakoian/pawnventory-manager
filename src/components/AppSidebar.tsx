@@ -46,10 +46,10 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r bg-white text-foreground">
       <SidebarContent>
         <div className="mb-4">
-          <div className="flex items-center justify-center px-4 py-4">
+          <div className="flex items-center justify-center p-2">
             <div className={cn(
-              "relative overflow-hidden transition-all duration-200",
-              state === "expanded" ? "h-36 w-36" : "h-24 w-24"
+              "relative overflow-hidden transition-all duration-200 w-full",
+              state === "expanded" ? "h-48" : "h-32"
             )}>
               {selectedShop?.profile_picture ? (
                 <img 
@@ -61,7 +61,7 @@ export function AppSidebar() {
                 <div className="w-full h-full flex items-center justify-center bg-muted">
                   <Store className={cn(
                     "text-gray-500",
-                    state === "expanded" ? "h-18 w-18" : "h-12 w-12"
+                    state === "expanded" ? "h-24 w-24" : "h-16 w-16"
                   )} />
                 </div>
               )}
