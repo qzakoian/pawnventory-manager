@@ -254,42 +254,27 @@ export type Database = {
       }
       "User-Shop links": {
         Row: {
+          access_type: Database["public"]["Enums"]["shop_access_type"]
           created_at: string
           id: number
-          link_type: string | null
           shop_id: number | null
-          user_id: number | null
+          user_id: string | null
         }
         Insert: {
+          access_type?: Database["public"]["Enums"]["shop_access_type"]
           created_at?: string
           id?: number
-          link_type?: string | null
           shop_id?: number | null
-          user_id?: number | null
+          user_id?: string | null
         }
         Update: {
+          access_type?: Database["public"]["Enums"]["shop_access_type"]
           created_at?: string
           id?: number
-          link_type?: string | null
           shop_id?: number | null
-          user_id?: number | null
+          user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "User-Shop links_shop_id_fkey"
-            columns: ["shop_id"]
-            isOneToOne: false
-            referencedRelation: "Shops"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "User-Shop links_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "Users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       Users: {
         Row: {
@@ -350,7 +335,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      shop_access_type: "owner" | "admin" | "staff"
     }
     CompositeTypes: {
       [_ in never]: never
