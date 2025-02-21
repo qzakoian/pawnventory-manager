@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/AppSidebar";
 import { Toaster } from "@/components/ui/toaster";
 import { Routes, Route, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 // Import your pages
 import Auth from "@/pages/Auth";
@@ -24,24 +25,26 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ShopProvider>
-          <div className="flex">
-            <AppSidebar />
-            <div className="flex-1">
-              <Routes>
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
-                  <Route index element={<Index />} />
-                  <Route path="products" element={<Products />} />
-                  <Route path="customers" element={<Customers />} />
-                  <Route path="account-settings" element={<AccountSettings />} />
-                  <Route path="customer/:id" element={<CustomerProfile />} />
-                  <Route path="product/:id" element={<ProductDetails />} />
-                </Route>
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+          <SidebarProvider>
+            <div className="flex w-full">
+              <AppSidebar />
+              <div className="flex-1">
+                <Routes>
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
+                    <Route index element={<Index />} />
+                    <Route path="products" element={<Products />} />
+                    <Route path="customers" element={<Customers />} />
+                    <Route path="account-settings" element={<AccountSettings />} />
+                    <Route path="customer/:id" element={<CustomerProfile />} />
+                    <Route path="product/:id" element={<ProductDetails />} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
             </div>
-          </div>
-          <Toaster />
+            <Toaster />
+          </SidebarProvider>
         </ShopProvider>
       </AuthProvider>
     </QueryClientProvider>
