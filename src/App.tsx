@@ -26,23 +26,27 @@ function App() {
       <AuthProvider>
         <ShopProvider>
           <SidebarProvider>
-            <div className="flex w-full">
-              <AppSidebar />
-              <div className="flex-1">
-                <Routes>
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
-                    <Route index element={<Index />} />
-                    <Route path="products" element={<Products />} />
-                    <Route path="customers" element={<Customers />} />
-                    <Route path="account-settings" element={<AccountSettings />} />
-                    <Route path="customer/:id" element={<CustomerProfile />} />
-                    <Route path="product/:id" element={<ProductDetails />} />
-                  </Route>
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
-            </div>
+            <Routes>
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/" element={
+                <ProtectedRoute>
+                  <div className="flex w-full">
+                    <AppSidebar />
+                    <div className="flex-1">
+                      <Outlet />
+                    </div>
+                  </div>
+                </ProtectedRoute>
+              }>
+                <Route index element={<Index />} />
+                <Route path="products" element={<Products />} />
+                <Route path="customers" element={<Customers />} />
+                <Route path="account-settings" element={<AccountSettings />} />
+                <Route path="customer/:id" element={<CustomerProfile />} />
+                <Route path="product/:id" element={<ProductDetails />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
             <Toaster />
           </SidebarProvider>
         </ShopProvider>
