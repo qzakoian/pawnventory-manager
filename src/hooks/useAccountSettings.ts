@@ -57,7 +57,7 @@ export function useAccountSettings() {
               name
             )
           `)
-          .eq('user_id', userData.id);
+          .eq('user_id', user.id);
 
         if (shopError) throw shopError;
 

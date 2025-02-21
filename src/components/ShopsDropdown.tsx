@@ -27,16 +27,7 @@ export const ShopsDropdown = () => {
     const fetchUserShops = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        
         if (!user) return;
-
-        const { data: userData } = await supabase
-          .from('Users')
-          .select('id')
-          .eq('email', user.email)
-          .single();
-
-        if (!userData) return;
 
         const { data: shopLinks, error: shopError } = await supabase
           .from('User-Shop links')
@@ -48,7 +39,7 @@ export const ShopsDropdown = () => {
               profile_picture
             )
           `)
-          .eq('user_id', userData.id);
+          .eq('user_id', user.id);
 
         if (shopError) throw shopError;
 
