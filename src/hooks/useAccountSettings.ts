@@ -12,8 +12,8 @@ interface Shop {
   name: string | null;
 }
 
-interface ShopLink {
-  Shops: Shop | null;
+type ShopLinkRow = {
+  Shops: Shop;
 }
 
 export function useAccountSettings() {
@@ -52,10 +52,10 @@ export function useAccountSettings() {
         });
         setProfileUrl(userData.profil_picture);
 
-        const { data: shopLinks, error: shopError } = await supabase
+        const { data, error: shopError } = await supabase
           .from('User-Shop links')
           .select(`
-            Shops:Shops (
+            Shops (
               id,
               name
             )
@@ -64,14 +64,14 @@ export function useAccountSettings() {
 
         if (shopError) throw shopError;
 
-        if (shopLinks) {
-          const userShops = shopLinks
-            .map((link: ShopLink) => link.Shops)
-            .filter((shop): shop is Shop => 
-              shop !== null && 
-              'id' in shop &&
-              'name' in shop
-            );
+        if (data) {
+          const userShops = data
+            .filter((link): link is ShopLinkRow => 
+              link.Shops !== null && 
+              typeof link.Shops === 'object' &&
+              'id' in link.Shops
+            )
+            .map(link => link.Shops);
           setShops(userShops);
         }
       } catch (error) {

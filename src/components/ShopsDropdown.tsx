@@ -18,8 +18,8 @@ interface Shop {
   profile_picture: string | null;
 }
 
-interface ShopLink {
-  Shops: Shop | null;
+type ShopLinkRow = {
+  Shops: Shop;
 }
 
 export const ShopsDropdown = () => {
@@ -33,10 +33,10 @@ export const ShopsDropdown = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        const { data: shopLinks, error: shopError } = await supabase
+        const { data, error } = await supabase
           .from('User-Shop links')
           .select(`
-            Shops:Shops (
+            Shops (
               id,
               name,
               profile_picture
@@ -44,17 +44,16 @@ export const ShopsDropdown = () => {
           `)
           .eq('user_id', user.id);
 
-        if (shopError) throw shopError;
+        if (error) throw error;
 
-        if (shopLinks) {
-          const userShops = shopLinks
-            .map((link: ShopLink) => link.Shops)
-            .filter((shop): shop is Shop => 
-              shop !== null && 
-              'id' in shop &&
-              'name' in shop &&
-              'profile_picture' in shop
-            );
+        if (data) {
+          const userShops = data
+            .filter((link): link is ShopLinkRow => 
+              link.Shops !== null && 
+              typeof link.Shops === 'object' &&
+              'id' in link.Shops
+            )
+            .map(link => link.Shops);
           setShops(userShops);
         }
       } catch (error) {
