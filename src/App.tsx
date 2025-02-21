@@ -20,36 +20,45 @@ import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
+function ProtectedLayout() {
+  return (
+    <ShopProvider>
+      <SidebarProvider>
+        <div className="flex w-full">
+          <AppSidebar />
+          <div className="flex-1">
+            <Outlet />
+          </div>
+        </div>
+      </SidebarProvider>
+    </ShopProvider>
+  );
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ShopProvider>
-          <SidebarProvider>
-            <Routes>
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <div className="flex w-full">
-                    <AppSidebar />
-                    <div className="flex-1">
-                      <Outlet />
-                    </div>
-                  </div>
-                </ProtectedRoute>
-              }>
-                <Route index element={<Index />} />
-                <Route path="products" element={<Products />} />
-                <Route path="customers" element={<Customers />} />
-                <Route path="account-settings" element={<AccountSettings />} />
-                <Route path="customer/:id" element={<CustomerProfile />} />
-                <Route path="product/:id" element={<ProductDetails />} />
-              </Route>
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Toaster />
-          </SidebarProvider>
-        </ShopProvider>
+        <Routes>
+          <Route path="/auth" element={<Auth />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <ProtectedLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Index />} />
+            <Route path="products" element={<Products />} />
+            <Route path="customers" element={<Customers />} />
+            <Route path="account-settings" element={<AccountSettings />} />
+            <Route path="customer/:id" element={<CustomerProfile />} />
+            <Route path="product/:id" element={<ProductDetails />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        <Toaster />
       </AuthProvider>
     </QueryClientProvider>
   );
