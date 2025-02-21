@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { Home, BarChart, MessageSquare, Users, Package, Settings, PanelLeftClose, PanelLeft, Store } from "lucide-react";
 import { ShopsDropdown } from "./ShopsDropdown";
 import { useShop } from "@/contexts/ShopContext";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 export function AppSidebar() {
   const location = useLocation();
@@ -49,14 +48,14 @@ export function AppSidebar() {
         <div className="mb-4">
           <div className="flex items-center justify-center px-4 py-4">
             <div className={cn(
-              "relative rounded-full overflow-hidden transition-all duration-200",
+              "relative overflow-hidden transition-all duration-200",
               state === "expanded" ? "h-36 w-36" : "h-24 w-24"
             )}>
               {selectedShop?.profile_picture ? (
                 <img 
                   src={selectedShop.profile_picture} 
                   alt={selectedShop.name || "Shop"}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-muted">
