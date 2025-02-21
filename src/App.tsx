@@ -1,5 +1,4 @@
 
-import { BrowserRouter as Router } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ShopProvider } from "@/contexts/ShopContext";
@@ -23,30 +22,28 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <AuthProvider>
-          <ShopProvider>
-            <div className="flex">
-              <AppSidebar />
-              <div className="flex-1">
-                <Routes>
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
-                    <Route index element={<Index />} />
-                    <Route path="products" element={<Products />} />
-                    <Route path="customers" element={<Customers />} />
-                    <Route path="account-settings" element={<AccountSettings />} />
-                    <Route path="customer/:id" element={<CustomerProfile />} />
-                    <Route path="product/:id" element={<ProductDetails />} />
-                  </Route>
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
+      <AuthProvider>
+        <ShopProvider>
+          <div className="flex">
+            <AppSidebar />
+            <div className="flex-1">
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
+                  <Route index element={<Index />} />
+                  <Route path="products" element={<Products />} />
+                  <Route path="customers" element={<Customers />} />
+                  <Route path="account-settings" element={<AccountSettings />} />
+                  <Route path="customer/:id" element={<CustomerProfile />} />
+                  <Route path="product/:id" element={<ProductDetails />} />
+                </Route>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
             </div>
-            <Toaster />
-          </ShopProvider>
-        </AuthProvider>
-      </Router>
+          </div>
+          <Toaster />
+        </ShopProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
