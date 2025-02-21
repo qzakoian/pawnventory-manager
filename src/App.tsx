@@ -1,90 +1,52 @@
 
-import { Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ShopProvider } from "@/contexts/ShopContext";
+import { AppSidebar } from "@/components/AppSidebar";
 import { Toaster } from "@/components/ui/toaster";
-import Index from "@/pages/Index";
+import { Routes, Route } from "react-router-dom";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+
+// Import your pages
 import Auth from "@/pages/Auth";
+import Index from "@/pages/Index";
+import Products from "@/pages/Products";
+import Customers from "@/pages/Customers";
 import AccountSettings from "@/pages/AccountSettings";
 import CustomerProfile from "@/pages/CustomerProfile";
 import ProductDetails from "@/pages/ProductDetails";
-import Customers from "@/pages/Customers";
-import Products from "@/pages/Products";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { ShopProvider } from "@/contexts/ShopContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AppSidebar } from "@/components/AppSidebar";
-import { SidebarProvider } from "@/components/ui/sidebar";
+import NotFound from "@/pages/NotFound";
 
-// Create a client
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <ShopProvider>
-          <SidebarProvider>
-            <div className="min-h-screen flex w-full bg-white">
+      <Router>
+        <AuthProvider>
+          <ShopProvider>
+            <div className="flex">
               <AppSidebar />
-              <main className="flex-1 bg-white">
+              <div className="flex-1">
                 <Routes>
                   <Route path="/auth" element={<Auth />} />
-                  <Route
-                    path="/"
-                    element={
-                      <ProtectedRoute>
-                        <Index />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/customers"
-                    element={
-                      <ProtectedRoute>
-                        <Customers />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/products"
-                    element={
-                      <ProtectedRoute>
-                        <Products />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/account-settings"
-                    element={
-                      <ProtectedRoute>
-                        <AccountSettings />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/customer/:id"
-                    element={
-                      <ProtectedRoute>
-                        <CustomerProfile />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/product/:id"
-                    element={
-                      <ProtectedRoute>
-                        <ProductDetails />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route path="*" element={<Navigate to="/" />} />
+                  <Route element={<ProtectedRoute />}>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/customers" element={<Customers />} />
+                    <Route path="/account-settings" element={<AccountSettings />} />
+                    <Route path="/customer/:id" element={<CustomerProfile />} />
+                    <Route path="/product/:id" element={<ProductDetails />} />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
-              </main>
-              <Toaster />
+              </div>
             </div>
-          </SidebarProvider>
-        </ShopProvider>
-      </AuthProvider>
+            <Toaster />
+          </ShopProvider>
+        </AuthProvider>
+      </Router>
     </QueryClientProvider>
   );
 }

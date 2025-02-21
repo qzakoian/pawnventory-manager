@@ -9,6 +9,11 @@ interface Shop {
   profile_picture: string | null;
 }
 
+interface ShopLink {
+  shop_id: number;
+  Shops: Shop;
+}
+
 interface ShopContextType {
   selectedShop: Shop | null;
   setSelectedShop: (shop: Shop | null) => void;
@@ -46,8 +51,11 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        if (shopLinks && shopLinks.length > 0 && shopLinks[0].Shops) {
-          setSelectedShop(shopLinks[0].Shops);
+        if (shopLinks && shopLinks.length > 0) {
+          const shopLink = shopLinks[0] as ShopLink;
+          if (shopLink.Shops) {
+            setSelectedShop(shopLink.Shops);
+          }
         }
       } catch (error) {
         console.error('Error fetching default shop:', error);

@@ -18,6 +18,11 @@ interface Shop {
   profile_picture: string | null;
 }
 
+interface ShopLink {
+  shop_id: number;
+  Shops: Shop;
+}
+
 export const ShopsDropdown = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const { toast } = useToast();
@@ -43,11 +48,12 @@ export const ShopsDropdown = () => {
 
         if (shopError) throw shopError;
 
-        const userShops = shopLinks
-          .map(link => link.Shops)
-          .filter((shop): shop is Shop => shop !== null);
-
-        setShops(userShops);
+        if (shopLinks) {
+          const userShops = shopLinks
+            .filter((link): link is ShopLink => link.Shops !== null)
+            .map(link => link.Shops);
+          setShops(userShops);
+        }
       } catch (error) {
         console.error('Error fetching shops:', error);
         toast({
