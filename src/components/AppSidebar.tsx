@@ -50,7 +50,7 @@ export function AppSidebar() {
           <div className="flex items-center justify-center px-4 py-4">
             <Avatar className={cn(
               "transition-all duration-200",
-              state === "expanded" ? "h-12 w-12" : "h-8 w-8"
+              state === "expanded" ? "h-36 w-36" : "h-24 w-24"
             )}>
               <AvatarImage 
                 src={selectedShop?.profile_picture || undefined} 
@@ -59,7 +59,7 @@ export function AppSidebar() {
               <AvatarFallback>
                 <Store className={cn(
                   "text-gray-500",
-                  state === "expanded" ? "h-6 w-6" : "h-4 w-4"
+                  state === "expanded" ? "h-18 w-18" : "h-12 w-12"
                 )} />
               </AvatarFallback>
             </Avatar>
