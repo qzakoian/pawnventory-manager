@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,10 +9,6 @@ import type { z } from "zod";
 interface Shop {
   id: number;
   name: string | null;
-}
-
-type ShopLinkRow = {
-  Shops: Shop;
 }
 
 export function useAccountSettings() {
@@ -54,24 +49,17 @@ export function useAccountSettings() {
 
         const { data, error: shopError } = await supabase
           .from('User-Shop links')
-          .select(`
-            Shops (
-              id,
-              name
-            )
-          `)
+          .select('shop_id, Shops!inner(id, name)')
           .eq('user_id', user.id);
 
         if (shopError) throw shopError;
 
         if (data) {
-          const userShops = data
-            .filter((link): link is ShopLinkRow => 
-              link.Shops !== null && 
-              typeof link.Shops === 'object' &&
-              'id' in link.Shops
-            )
-            .map(link => link.Shops);
+          const userShops = data.map(link => link.Shops).filter((shop): shop is Shop => 
+            shop !== null && 
+            typeof shop === 'object' &&
+            'id' in shop
+          );
           setShops(userShops);
         }
       } catch (error) {

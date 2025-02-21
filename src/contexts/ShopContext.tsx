@@ -9,10 +9,6 @@ interface Shop {
   profile_picture: string | null;
 }
 
-type ShopLinkRow = {
-  Shops: Shop;
-}
-
 interface ShopContextType {
   selectedShop: Shop | null;
   setSelectedShop: (shop: Shop | null) => void;
@@ -34,13 +30,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
         const { data, error } = await supabase
           .from('User-Shop links')
-          .select(`
-            Shops (
-              id,
-              name,
-              profile_picture
-            )
-          `)
+          .select('shop_id, Shops!inner(id, name, profile_picture)')
           .eq('user_id', user.id)
           .limit(1);
 
@@ -49,14 +39,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        if (data && data.length > 0) {
-          const shopLink = data[0];
-          if (shopLink && 
-              shopLink.Shops && 
-              typeof shopLink.Shops === 'object' &&
-              'id' in shopLink.Shops) {
-            setSelectedShop(shopLink.Shops);
-          }
+        if (data && data.length > 0 && data[0].Shops) {
+          setSelectedShop(data[0].Shops);
         }
       } catch (error) {
         console.error('Error fetching default shop:', error);

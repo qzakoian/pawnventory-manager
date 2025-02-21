@@ -18,10 +18,6 @@ interface Shop {
   profile_picture: string | null;
 }
 
-type ShopLinkRow = {
-  Shops: Shop;
-}
-
 export const ShopsDropdown = () => {
   const [shops, setShops] = useState<Shop[]>([]);
   const { toast } = useToast();
@@ -35,25 +31,17 @@ export const ShopsDropdown = () => {
 
         const { data, error } = await supabase
           .from('User-Shop links')
-          .select(`
-            Shops (
-              id,
-              name,
-              profile_picture
-            )
-          `)
+          .select('shop_id, Shops!inner(id, name, profile_picture)')
           .eq('user_id', user.id);
 
         if (error) throw error;
 
         if (data) {
-          const userShops = data
-            .filter((link): link is ShopLinkRow => 
-              link.Shops !== null && 
-              typeof link.Shops === 'object' &&
-              'id' in link.Shops
-            )
-            .map(link => link.Shops);
+          const userShops = data.map(link => link.Shops).filter((shop): shop is Shop => 
+            shop !== null && 
+            typeof shop === 'object' &&
+            'id' in shop
+          );
           setShops(userShops);
         }
       } catch (error) {

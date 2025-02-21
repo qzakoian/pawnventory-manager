@@ -274,7 +274,15 @@ export type Database = {
           shop_id?: number | null
           user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "User-Shop links_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "Shops"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       Users: {
         Row: {
