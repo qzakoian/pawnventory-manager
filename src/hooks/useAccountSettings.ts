@@ -12,6 +12,10 @@ interface Shop {
   name: string | null;
 }
 
+interface ShopLink {
+  Shops: Shop | null;
+}
+
 export function useAccountSettings() {
   const [profileUrl, setProfileUrl] = useState<string | null>(null);
   const [shops, setShops] = useState<Shop[]>([]);
@@ -51,7 +55,7 @@ export function useAccountSettings() {
         const { data: shopLinks, error: shopError } = await supabase
           .from('User-Shop links')
           .select(`
-            Shops (
+            Shops:Shops (
               id,
               name
             )
@@ -62,11 +66,11 @@ export function useAccountSettings() {
 
         if (shopLinks) {
           const userShops = shopLinks
-            .map(link => link.Shops)
+            .map((link: ShopLink) => link.Shops)
             .filter((shop): shop is Shop => 
               shop !== null && 
-              typeof shop === 'object' &&
-              'id' in shop
+              'id' in shop &&
+              'name' in shop
             );
           setShops(userShops);
         }
