@@ -48,21 +48,25 @@ export function AppSidebar() {
       <SidebarContent>
         <div className="mb-4">
           <div className="flex items-center justify-center px-4 py-4">
-            <Avatar className={cn(
-              "transition-all duration-200",
+            <div className={cn(
+              "relative rounded-full overflow-hidden transition-all duration-200",
               state === "expanded" ? "h-36 w-36" : "h-24 w-24"
             )}>
-              <AvatarImage 
-                src={selectedShop?.profile_picture || undefined} 
-                alt={selectedShop?.name || "Shop"} 
-              />
-              <AvatarFallback>
-                <Store className={cn(
-                  "text-gray-500",
-                  state === "expanded" ? "h-18 w-18" : "h-12 w-12"
-                )} />
-              </AvatarFallback>
-            </Avatar>
+              {selectedShop?.profile_picture ? (
+                <img 
+                  src={selectedShop.profile_picture} 
+                  alt={selectedShop.name || "Shop"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-muted">
+                  <Store className={cn(
+                    "text-gray-500",
+                    state === "expanded" ? "h-18 w-18" : "h-12 w-12"
+                  )} />
+                </div>
+              )}
+            </div>
           </div>
           <div className="px-3 py-[16px]">
             <ShopsDropdown />
