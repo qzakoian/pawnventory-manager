@@ -37,35 +37,27 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         setError(null);
 
-        // First, get the shop IDs for this user
-        const { data: linkData, error: linkError } = await supabase
+        // Now we can use a simpler join query since RLS is disabled
+        const { data: userShops, error: queryError } = await supabase
           .from('User-Shop links')
-          .select('shop_id')
+          .select(`
+            Shops:shop_id (
+              id,
+              name,
+              profile_picture
+            )
+          `)
           .eq('user_id', user.id)
           .limit(1)
-          .maybeSingle();
+          .single();
 
-        if (linkError) {
-          throw linkError;
+        if (queryError) {
+          throw queryError;
         }
 
-        if (linkData) {
-          // Then, get the shop details
-          const { data: shopData, error: shopError } = await supabase
-            .from('Shops')
-            .select('id, name, profile_picture')
-            .eq('id', linkData.shop_id)
-            .single();
-
-          if (shopError) {
-            throw shopError;
-          }
-
-          if (shopData) {
-            setSelectedShop(shopData);
-          }
+        if (userShops?.Shops) {
+          setSelectedShop(userShops.Shops);
         } else {
-          // If no shop is found, show a toast notification
           toast({
             title: "No shop found",
             description: "Please create or join a shop to continue.",
@@ -73,7 +65,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           });
         }
       } catch (error) {
-        console.error('Error fetching default shop:', error);
+        console.error('Error fetching shop:', error);
         setError('Failed to load shop data');
         toast({
           title: "Error",
