@@ -23,14 +23,14 @@ const queryClient = new QueryClient();
 function ProtectedLayout() {
   return (
     <ShopProvider>
-      <SidebarProvider>
-        <div className="flex w-full">
+      <div className="flex w-full">
+        <SidebarProvider>
           <AppSidebar />
           <div className="flex-1">
             <Outlet />
           </div>
-        </div>
-      </SidebarProvider>
+        </SidebarProvider>
+      </div>
     </ShopProvider>
   );
 }
