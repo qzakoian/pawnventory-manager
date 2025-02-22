@@ -20,38 +20,46 @@ interface Shop {
 
 export const ShopsDropdown = () => {
   const [shops, setShops] = useState<Shop[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const { selectedShop, setSelectedShop } = useShop();
 
   useEffect(() => {
     const fetchUserShops = async () => {
       try {
-        // Get shops in a single query using inner join
-        const { data: shopData, error } = await supabase
+        setIsLoading(true);
+        // First check if we have an authenticated user
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError) throw authError;
+        if (!user) {
+          console.log("No authenticated user found");
+          return;
+        }
+
+        // Get shops data with a simpler query first to the User-Shop links
+        const { data: linkData, error: linkError } = await supabase
           .from('User-Shop links')
-          .select(`
-            shop_id,
-            Shops:shop_id (
-              id,
-              name,
-              profile_picture
-            )
-          `)
-          .order('created_at', { ascending: false });
+          .select('shop_id')
+          .eq('user_id', user.id);
 
-        if (error) throw error;
+        if (linkError) throw linkError;
 
-        if (shopData) {
-          // Transform the data to match our Shop interface
-          const formattedShops = shopData
-            .map(item => item.Shops)
-            .filter((shop): shop is Shop => shop !== null);
+        if (linkData && linkData.length > 0) {
+          // Then get the shop details
+          const { data: shopData, error: shopError } = await supabase
+            .from('Shops')
+            .select('id, name, profile_picture')
+            .in('id', linkData.map(link => link.shop_id));
 
-          setShops(formattedShops);
-          
-          // If no shop is selected yet and we have shops, select the first one
-          if (!selectedShop && formattedShops.length > 0) {
-            setSelectedShop(formattedShops[0]);
+          if (shopError) throw shopError;
+
+          if (shopData) {
+            setShops(shopData);
+            // If no shop is selected yet and we have shops, select the first one
+            if (!selectedShop && shopData.length > 0) {
+              setSelectedShop(shopData[0]);
+            }
           }
         }
       } catch (error) {
@@ -61,11 +69,22 @@ export const ShopsDropdown = () => {
           title: "Error",
           description: "Failed to load shops",
         });
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchUserShops();
-  }, []); // Dependencies array should be empty to prevent unnecessary fetches
+  }, [selectedShop, setSelectedShop, toast]);
+
+  if (isLoading) {
+    return (
+      <Button variant="outline" className="w-full justify-between" disabled>
+        <span className="text-gray-500">Loading shops...</span>
+        <ChevronDown className="h-4 w-4 text-gray-400" />
+      </Button>
+    );
+  }
 
   return (
     <DropdownMenu>
