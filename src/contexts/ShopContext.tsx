@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Shop {
   id: number;
@@ -12,21 +13,29 @@ interface Shop {
 interface ShopContextType {
   selectedShop: Shop | null;
   setSelectedShop: (shop: Shop | null) => void;
+  isLoading: boolean;
+  error: string | null;
 }
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export function ShopProvider({ children }: { children: ReactNode }) {
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchDefaultShop = async () => {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        if (!user) {
-          console.log('No authenticated user');
-          return;
-        }
+        setIsLoading(true);
+        setError(null);
 
         // First, get the shop IDs for this user
         const { data: linkData, error: linkError } = await supabase
@@ -34,11 +43,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           .select('shop_id')
           .eq('user_id', user.id)
           .limit(1)
-          .single();
+          .maybeSingle();
 
         if (linkError) {
-          console.error('Error fetching shop links:', linkError);
-          return;
+          throw linkError;
         }
 
         if (linkData) {
@@ -50,26 +58,38 @@ export function ShopProvider({ children }: { children: ReactNode }) {
             .single();
 
           if (shopError) {
-            console.error('Error fetching shop:', shopError);
-            return;
+            throw shopError;
           }
 
           if (shopData) {
             setSelectedShop(shopData);
           }
+        } else {
+          // If no shop is found, show a toast notification
+          toast({
+            title: "No shop found",
+            description: "Please create or join a shop to continue.",
+            variant: "destructive",
+          });
         }
       } catch (error) {
         console.error('Error fetching default shop:', error);
+        setError('Failed to load shop data');
+        toast({
+          title: "Error",
+          description: "Failed to load shop data. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (!selectedShop) {
-      fetchDefaultShop();
-    }
-  }, [selectedShop, user]);
+    fetchDefaultShop();
+  }, [user, toast]);
 
   return (
-    <ShopContext.Provider value={{ selectedShop, setSelectedShop }}>
+    <ShopContext.Provider value={{ selectedShop, setSelectedShop, isLoading, error }}>
       {children}
     </ShopContext.Provider>
   );

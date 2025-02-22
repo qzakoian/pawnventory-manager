@@ -8,17 +8,49 @@ import { CashLevels } from "@/components/dashboard/CashLevels";
 import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
 
 const Index = () => {
-  const { selectedShop } = useShop();
+  const { selectedShop, isLoading, error } = useShop();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <main className="p-6 max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Loading shop data...</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white">
+        <main className="p-6 max-w-7xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-red-500">{error}</div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
       <main className="p-6 max-w-7xl mx-auto space-y-8">
         <WelcomeHeader />
-        {selectedShop && <QuickAccess shopId={selectedShop.id} />}
-        <OverviewCards />
-        <ProfitsChart />
-        <CashLevels />
-        <TransactionsTable />
+        {selectedShop ? (
+          <>
+            <QuickAccess shopId={selectedShop.id} />
+            <OverviewCards />
+            <ProfitsChart />
+            <CashLevels />
+            <TransactionsTable />
+          </>
+        ) : (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">No shop selected. Please create or join a shop to continue.</div>
+          </div>
+        )}
       </main>
     </div>
   );
