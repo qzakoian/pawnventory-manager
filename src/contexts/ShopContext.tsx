@@ -28,35 +28,20 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        // First, get the shop IDs for this user
-        const { data: linkData, error: linkError } = await supabase
+        const { data, error } = await supabase
           .from('User-Shop links')
-          .select('shop_id')
+          .select('shop_id, Shops!inner(id, name, profile_picture)')
           .eq('user_id', user.id)
           .limit(1)
-          .single();
+          .maybeSingle();
 
-        if (linkError) {
-          console.error('Error fetching shop links:', linkError);
+        if (error) {
+          console.error('Error fetching shop links:', error);
           return;
         }
 
-        if (linkData) {
-          // Then, get the shop details
-          const { data: shopData, error: shopError } = await supabase
-            .from('Shops')
-            .select('id, name, profile_picture')
-            .eq('id', linkData.shop_id)
-            .single();
-
-          if (shopError) {
-            console.error('Error fetching shop:', shopError);
-            return;
-          }
-
-          if (shopData) {
-            setSelectedShop(shopData);
-          }
+        if (data && data.Shops) {
+          setSelectedShop(data.Shops);
         }
       } catch (error) {
         console.error('Error fetching default shop:', error);

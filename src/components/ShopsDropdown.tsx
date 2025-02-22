@@ -29,27 +29,20 @@ export const ShopsDropdown = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        // First, get all shop IDs for this user
-        const { data: linkData, error: linkError } = await supabase
+        const { data, error } = await supabase
           .from('User-Shop links')
-          .select('shop_id')
+          .select('shop_id, Shops!inner(id, name, profile_picture)')
           .eq('user_id', user.id);
 
-        if (linkError) throw linkError;
+        if (error) throw error;
 
-        if (linkData && linkData.length > 0) {
-          // Then, get all shop details
-          const shopIds = linkData.map(link => link.shop_id);
-          const { data: shopData, error: shopError } = await supabase
-            .from('Shops')
-            .select('id, name, profile_picture')
-            .in('id', shopIds);
-
-          if (shopError) throw shopError;
-
-          if (shopData) {
-            setShops(shopData);
-          }
+        if (data) {
+          const userShops = data.map(link => link.Shops).filter((shop): shop is Shop => 
+            shop !== null && 
+            typeof shop === 'object' &&
+            'id' in shop
+          );
+          setShops(userShops);
         }
       } catch (error) {
         console.error('Error fetching shops:', error);
