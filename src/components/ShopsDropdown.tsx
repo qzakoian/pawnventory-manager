@@ -66,7 +66,7 @@ export const ShopsDropdown = () => {
     };
 
     fetchUserShops();
-  }, [selectedShop, setSelectedShop]);
+  }, []); // Remove selectedShop and setSelectedShop from dependencies
 
   return (
     <DropdownMenu>
