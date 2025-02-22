@@ -289,7 +289,7 @@ export type Database = {
           created_at: string
           email: string | null
           first_name: string | null
-          id: number
+          id: string
           last_name: string | null
           plan_id: string | null
           profil_picture: string | null
@@ -300,7 +300,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
-          id?: number
+          id: string
           last_name?: string | null
           plan_id?: string | null
           profil_picture?: string | null
@@ -311,7 +311,7 @@ export type Database = {
           created_at?: string
           email?: string | null
           first_name?: string | null
-          id?: number
+          id?: string
           last_name?: string | null
           plan_id?: string | null
           profil_picture?: string | null
