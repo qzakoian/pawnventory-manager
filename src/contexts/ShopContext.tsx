@@ -37,17 +37,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         setError(null);
 
-        // Now we can use a simpler join query since RLS is disabled
-        const { data: userShops, error: queryError } = await supabase
-          .from('User-Shop links')
-          .select(`
-            Shops:shop_id (
-              id,
-              name,
-              profile_picture
-            )
-          `)
-          .eq('user_id', user.id)
+        // Query the shops table directly - RLS will handle access control
+        const { data: shops, error: queryError } = await supabase
+          .from('Shops')
+          .select('id, name, profile_picture')
           .limit(1)
           .single();
 
@@ -55,8 +48,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           throw queryError;
         }
 
-        if (userShops?.Shops) {
-          setSelectedShop(userShops.Shops);
+        if (shops) {
+          setSelectedShop(shops);
         } else {
           toast({
             title: "No shop found",
