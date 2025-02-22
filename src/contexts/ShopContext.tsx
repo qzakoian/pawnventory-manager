@@ -37,10 +37,16 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         setError(null);
 
-        // Query the shops table directly - RLS will handle access control
-        const { data: shops, error: queryError } = await supabase
-          .from('Shops')
-          .select('id, name, profile_picture')
+        const { data: shopData, error: queryError } = await supabase
+          .from('User-Shop links')
+          .select(`
+            shop:shop_id (
+              id,
+              name,
+              profile_picture
+            )
+          `)
+          .eq('user_id', user.id)
           .limit(1)
           .single();
 
@@ -48,8 +54,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           throw queryError;
         }
 
-        if (shops) {
-          setSelectedShop(shops);
+        if (shopData?.shop) {
+          setSelectedShop(shopData.shop);
         } else {
           toast({
             title: "No shop found",
