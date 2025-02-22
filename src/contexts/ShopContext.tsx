@@ -37,24 +37,47 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         setError(null);
 
-        // Get all shops the user has access to
-        const { data: shopData, error: shopError } = await supabase
-          .from('Shops')
-          .select('id, name, profile_picture')
+        // First, get the shop IDs for this user
+        const { data: linkData, error: linkError } = await supabase
+          .from('User-Shop links')
+          .select('shop_id')
+          .eq('user_id', user.id)
           .limit(1)
           .maybeSingle();
 
-        if (shopError) throw shopError;
+        if (linkError) {
+          throw linkError;
+        }
 
-        if (shopData) {
-          setSelectedShop(shopData);
+        if (linkData) {
+          // Then, get the shop details
+          const { data: shopData, error: shopError } = await supabase
+            .from('Shops')
+            .select('id, name, profile_picture')
+            .eq('id', linkData.shop_id)
+            .single();
+
+          if (shopError) {
+            throw shopError;
+          }
+
+          if (shopData) {
+            setSelectedShop(shopData);
+          }
+        } else {
+          // If no shop is found, show a toast notification
+          toast({
+            title: "No shop found",
+            description: "Please create or join a shop to continue.",
+            variant: "destructive",
+          });
         }
       } catch (error) {
         console.error('Error fetching default shop:', error);
         setError('Failed to load shop data');
         toast({
           title: "Error",
-          description: "Failed to load shop data",
+          description: "Failed to load shop data. Please try again later.",
           variant: "destructive",
         });
       } finally {
