@@ -22,16 +22,14 @@ const queryClient = new QueryClient();
 
 function ProtectedLayout() {
   return (
-    <ShopProvider>
-      <SidebarProvider>
-        <div className="flex w-full">
-          <AppSidebar />
-          <div className="flex-1">
-            <Outlet />
-          </div>
+    <SidebarProvider>
+      <div className="flex w-full">
+        <AppSidebar />
+        <div className="flex-1">
+          <Outlet />
         </div>
-      </SidebarProvider>
-    </ShopProvider>
+      </div>
+    </SidebarProvider>
   );
 }
 
@@ -45,7 +43,9 @@ function App() {
             path="/"
             element={
               <ProtectedRoute>
-                <ProtectedLayout />
+                <ShopProvider>
+                  <ProtectedLayout />
+                </ShopProvider>
               </ProtectedRoute>
             }
           >
