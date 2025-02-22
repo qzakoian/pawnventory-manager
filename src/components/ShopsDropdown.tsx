@@ -26,33 +26,32 @@ export const ShopsDropdown = () => {
   useEffect(() => {
     const fetchUserShops = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        // First, get all shop IDs for this user
-        const { data: linkData, error: linkError } = await supabase
+        // Get shops in a single query using inner join
+        const { data: shopData, error } = await supabase
           .from('User-Shop links')
-          .select('shop_id')
-          .eq('user_id', user.id);
+          .select(`
+            shop_id,
+            Shops:shop_id (
+              id,
+              name,
+              profile_picture
+            )
+          `)
+          .order('created_at', { ascending: false });
 
-        if (linkError) throw linkError;
+        if (error) throw error;
 
-        if (linkData && linkData.length > 0) {
-          // Then, get all shop details
-          const shopIds = linkData.map(link => link.shop_id);
-          const { data: shopData, error: shopError } = await supabase
-            .from('Shops')
-            .select('id, name, profile_picture')
-            .in('id', shopIds);
+        if (shopData) {
+          // Transform the data to match our Shop interface
+          const formattedShops = shopData
+            .map(item => item.Shops)
+            .filter((shop): shop is Shop => shop !== null);
 
-          if (shopError) throw shopError;
-
-          if (shopData) {
-            setShops(shopData);
-            // If no shop is selected yet and we have shops, select the first one
-            if (!selectedShop && shopData.length > 0) {
-              setSelectedShop(shopData[0]);
-            }
+          setShops(formattedShops);
+          
+          // If no shop is selected yet and we have shops, select the first one
+          if (!selectedShop && formattedShops.length > 0) {
+            setSelectedShop(formattedShops[0]);
           }
         }
       } catch (error) {
@@ -66,7 +65,7 @@ export const ShopsDropdown = () => {
     };
 
     fetchUserShops();
-  }, []); // Remove selectedShop and setSelectedShop from dependencies
+  }, []); // Dependencies array should be empty to prevent unnecessary fetches
 
   return (
     <DropdownMenu>
@@ -92,4 +91,4 @@ export const ShopsDropdown = () => {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};
