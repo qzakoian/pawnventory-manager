@@ -49,6 +49,10 @@ export const ShopsDropdown = () => {
 
           if (shopData) {
             setShops(shopData);
+            // If no shop is selected yet and we have shops, select the first one
+            if (!selectedShop && shopData.length > 0) {
+              setSelectedShop(shopData[0]);
+            }
           }
         }
       } catch (error) {
@@ -62,7 +66,7 @@ export const ShopsDropdown = () => {
     };
 
     fetchUserShops();
-  }, []);
+  }, [selectedShop, setSelectedShop]);
 
   return (
     <DropdownMenu>
