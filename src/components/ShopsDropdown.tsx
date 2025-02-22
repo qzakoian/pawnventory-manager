@@ -25,41 +25,21 @@ export const ShopsDropdown = () => {
   const { selectedShop, setSelectedShop } = useShop();
 
   useEffect(() => {
-    const fetchUserShops = async () => {
+    const fetchShops = async () => {
       try {
         setIsLoading(true);
-        // First check if we have an authenticated user
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
         
-        if (authError) throw authError;
-        if (!user) {
-          console.log("No authenticated user found");
-          return;
-        }
+        const { data: shopData, error: shopError } = await supabase
+          .from('Shops')
+          .select('id, name, profile_picture');
 
-        // Get shops data with a simpler query first to the User-Shop links
-        const { data: linkData, error: linkError } = await supabase
-          .from('User-Shop links')
-          .select('shop_id')
-          .eq('user_id', user.id);
+        if (shopError) throw shopError;
 
-        if (linkError) throw linkError;
-
-        if (linkData && linkData.length > 0) {
-          // Then get the shop details
-          const { data: shopData, error: shopError } = await supabase
-            .from('Shops')
-            .select('id, name, profile_picture')
-            .in('id', linkData.map(link => link.shop_id));
-
-          if (shopError) throw shopError;
-
-          if (shopData) {
-            setShops(shopData);
-            // If no shop is selected yet and we have shops, select the first one
-            if (!selectedShop && shopData.length > 0) {
-              setSelectedShop(shopData[0]);
-            }
+        if (shopData) {
+          setShops(shopData);
+          // Only set selected shop if none is selected and we have shops
+          if (!selectedShop && shopData.length > 0) {
+            setSelectedShop(shopData[0]);
           }
         }
       } catch (error) {
@@ -74,8 +54,8 @@ export const ShopsDropdown = () => {
       }
     };
 
-    fetchUserShops();
-  }, [selectedShop, setSelectedShop, toast]);
+    fetchShops();
+  }, [toast, setSelectedShop]); // Remove selectedShop from dependencies
 
   if (isLoading) {
     return (
