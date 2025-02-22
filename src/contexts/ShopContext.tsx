@@ -37,28 +37,35 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         setError(null);
 
-        // Get all shops linked to this user
-        const { data: userShops, error: linkError } = await supabase
+        // First, get the shop IDs for this user
+        const { data: linkData, error: linkError } = await supabase
           .from('User-Shop links')
-          .select(`
-            shop_id,
-            Shops:shop_id (
-              id,
-              name,
-              profile_picture
-            )
-          `)
-          .eq('user_id', user.id);
+          .select('shop_id')
+          .eq('user_id', user.id)
+          .limit(1)
+          .maybeSingle();
 
-        if (linkError) throw linkError;
+        if (linkError) {
+          throw linkError;
+        }
 
-        if (userShops && userShops.length > 0) {
-          // Get the first shop's details
-          const firstShop = userShops[0].Shops;
-          if (firstShop) {
-            setSelectedShop(firstShop);
+        if (linkData) {
+          // Then, get the shop details
+          const { data: shopData, error: shopError } = await supabase
+            .from('Shops')
+            .select('id, name, profile_picture')
+            .eq('id', linkData.shop_id)
+            .single();
+
+          if (shopError) {
+            throw shopError;
+          }
+
+          if (shopData) {
+            setSelectedShop(shopData);
           }
         } else {
+          // If no shop is found, show a toast notification
           toast({
             title: "No shop found",
             description: "Please create or join a shop to continue.",
@@ -66,7 +73,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           });
         }
       } catch (error) {
-        console.error('Error fetching shops:', error);
+        console.error('Error fetching default shop:', error);
         setError('Failed to load shop data');
         toast({
           title: "Error",
