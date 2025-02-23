@@ -40,37 +40,24 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
 
-      const { data: shopLinks, error: linkError } = await supabase
-        .from('User-Shop links')
-        .select('shop_id')
-        .eq('user_id', user.id);  // Add explicit user_id filter
-
-      if (linkError) {
-        console.error('Error fetching shop links:', linkError);
-        throw linkError;
-      }
-
-      if (!shopLinks?.length) {
-        setShops([]);
-        setSelectedShop(null);
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: shopData, error: shopError } = await supabase
+      // First, get all shops the user has access to
+      const { data: shops, error: shopError } = await supabase
         .from('Shops')
-        .select('id, name, profile_picture')
-        .in('id', shopLinks.map(link => link.shop_id));
+        .select('id, name, profile_picture');
 
       if (shopError) {
         console.error('Error fetching shops:', shopError);
         throw shopError;
       }
 
-      if (shopData) {
-        setShops(shopData);
-        if (!selectedShop && shopData.length > 0) {
-          setSelectedShop(shopData[0]);
+      if (shops) {
+        console.log('Fetched shops:', shops);
+        setShops(shops);
+        
+        // If no shop is selected and we have shops, select the first one
+        if (!selectedShop && shops.length > 0) {
+          console.log('Setting initial shop:', shops[0]);
+          setSelectedShop(shops[0]);
         }
       }
     } catch (error) {
@@ -91,8 +78,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   // Fetch shops when user changes
   useEffect(() => {
     if (user) {
+      console.log('User authenticated, fetching shops...');
       fetchShops();
     } else {
+      console.log('No user, clearing shops...');
       setShops([]);
       setSelectedShop(null);
       setIsLoading(false);
