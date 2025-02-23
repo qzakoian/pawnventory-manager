@@ -2,7 +2,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, SidebarRail, useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { Home, BarChart, MessageSquare, Users, Package, Settings, PanelLeftClose, PanelLeft, Store } from "lucide-react";
+import { Home, BarChart, MessageSquare, Users, Package, Settings, Store, ArrowLeft } from "lucide-react";
 import { ShopsDropdown } from "./ShopsDropdown";
 import { useShop } from "@/contexts/ShopContext";
 
@@ -45,31 +45,41 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" className="border-r bg-white text-foreground">
       <SidebarContent>
-        <div className="mb-4">
-          <div className="flex flex-col">
-            <div className="p-2">
-              <div className={cn(
-                "relative overflow-hidden transition-all duration-200 w-full",
-                state === "expanded" ? "h-48" : "h-32"
-              )}>
-                {selectedShop?.profile_picture ? (
-                  <img 
-                    src={selectedShop.profile_picture} 
-                    alt={selectedShop.name || "Shop"}
-                    className="w-full h-full object-contain"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-muted">
-                    <Store className={cn(
-                      "text-gray-500",
-                      state === "expanded" ? "h-24 w-24" : "h-16 w-16"
-                    )} />
-                  </div>
-                )}
+        <div className="relative">
+          {/* Collapse button moved to top right */}
+          <div className="absolute right-2 top-2 z-10">
+            <SidebarTrigger className="flex items-center gap-2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700">
+              <ArrowLeft className="h-4 w-4" />
+              {state === "expanded" && <span>Reduce the sidebar</span>}
+            </SidebarTrigger>
+          </div>
+          
+          <div className="mb-4">
+            <div className="flex flex-col">
+              <div className="p-2">
+                <div className={cn(
+                  "relative overflow-hidden transition-all duration-200 w-full",
+                  state === "expanded" ? "h-48" : "h-32"
+                )}>
+                  {selectedShop?.profile_picture ? (
+                    <img 
+                      src={selectedShop.profile_picture} 
+                      alt={selectedShop.name || "Shop"}
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-muted">
+                      <Store className={cn(
+                        "text-gray-500",
+                        state === "expanded" ? "h-24 w-24" : "h-16 w-16"
+                      )} />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="px-3">
-              <ShopsDropdown />
+              <div className="px-3">
+                <ShopsDropdown />
+              </div>
             </div>
           </div>
         </div>
@@ -94,23 +104,6 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <div className="px-4 py-2">
-                  <SidebarTrigger className="flex items-center gap-3">
-                    {state === "expanded" ? (
-                      <>
-                        <PanelLeftClose className="h-5 w-5 text-gray-500" />
-                        <span className="group-data-[collapsible=icon]:hidden">Collapse</span>
-                      </>
-                    ) : (
-                      <>
-                        <PanelLeft className="h-5 w-5 text-gray-500" />
-                        <span className="group-data-[collapsible=icon]:hidden">Expand</span>
-                      </>
-                    )}
-                  </SidebarTrigger>
-                </div>
-              </SidebarMenuItem>
               {bottomMenuItems.map(item => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={state === "collapsed" ? item.title : undefined} className={cn("flex items-center gap-3 px-4 py-2 hover:bg-gray-100", isActiveLink(item.url) && "bg-gray-100 font-medium")}>
