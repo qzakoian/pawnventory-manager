@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Store, Pencil, Check, X, Upload, UserPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -130,18 +129,42 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
     try {
       const { data: linkData, error: linkError } = await supabase
         .from('User-Shop links')
-        .select('id, user_id, access_type, Users(email)')
+        .select('id, user_id, access_type')
         .eq('shop_id', shop.id);
 
       if (linkError) throw linkError;
 
-      const formattedMembers = linkData.map(link => ({
-        id: link.id,
-        user_id: link.user_id,
-        email: link.Users?.email || 'Unknown',
-        access_type: link.access_type,
-      }));
+      if (!linkData) {
+        setMembers([]);
+        return;
+      }
 
+      const memberPromises = linkData.map(async (link) => {
+        const { data: userData, error: userError } = await supabase
+          .from('Users')
+          .select('email')
+          .eq('id', link.user_id)
+          .single();
+
+        if (userError) {
+          console.error('Error fetching user data:', userError);
+          return {
+            id: link.id,
+            user_id: link.user_id,
+            email: 'Unknown',
+            access_type: link.access_type as 'owner' | 'admin' | 'staff'
+          };
+        }
+
+        return {
+          id: link.id,
+          user_id: link.user_id,
+          email: userData?.email || 'Unknown',
+          access_type: link.access_type as 'owner' | 'admin' | 'staff'
+        };
+      });
+
+      const formattedMembers = await Promise.all(memberPromises);
       setMembers(formattedMembers);
     } catch (error) {
       console.error('Error loading shop members:', error);
@@ -150,12 +173,12 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
         title: "Error",
         description: "Failed to load shop members",
       });
+      setMembers([]);
     }
   };
 
   const handleAddMember = async (shopId: number) => {
     try {
-      // First, check if the user exists
       const { data: userData, error: userError } = await supabase
         .from('Users')
         .select('id')
@@ -171,7 +194,6 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
         return;
       }
 
-      // Add the user to the shop
       const { error: linkError } = await supabase
         .from('User-Shop links')
         .insert({
@@ -187,7 +209,6 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
         description: "Member added successfully",
       });
 
-      // Refresh members list
       await loadShopMembers(selectedShop!);
       setNewMemberEmail("");
     } catch (error) {
@@ -214,7 +235,6 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
         description: "Role updated successfully",
       });
 
-      // Refresh members list
       await loadShopMembers(selectedShop!);
     } catch (error) {
       console.error('Error updating role:', error);
@@ -240,7 +260,6 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
         description: "Member removed successfully",
       });
 
-      // Refresh members list
       await loadShopMembers(selectedShop!);
     } catch (error) {
       console.error('Error removing member:', error);
