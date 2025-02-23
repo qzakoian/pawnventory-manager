@@ -121,19 +121,19 @@ export function ShopsList({ shops }: ShopsListProps) {
         >
           <div className="flex items-center">
             <div className="relative group">
-              <Avatar className="h-10 w-10 mr-3">
+              <div className="h-10 w-10 mr-3 rounded-full overflow-hidden">
                 {shop.profile_picture ? (
-                  <AvatarImage 
-                    src={shop.profile_picture} 
-                    alt={shop.name || 'Shop'}
-                    className="object-contain"
+                  <img 
+                    src={shop.profile_picture}
+                    alt={shop.name || "Shop"}
+                    className="w-full h-full object-contain bg-white"
                   />
                 ) : (
-                  <AvatarFallback>
+                  <div className="w-full h-full flex items-center justify-center bg-muted">
                     <Store className="h-5 w-5 text-gray-500" />
-                  </AvatarFallback>
+                  </div>
                 )}
-              </Avatar>
+              </div>
               <label
                 htmlFor={`shop-image-${shop.id}`}
                 className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
