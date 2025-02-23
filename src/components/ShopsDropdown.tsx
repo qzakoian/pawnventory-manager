@@ -19,7 +19,7 @@ export const ShopsDropdown = () => {
   if (isLoading) {
     return (
       <Button variant="outline" className="w-full justify-between" disabled>
-        <span className="text-gray-500">
+        <span className={cn("text-gray-500", isCollapsed && "w-full text-center")}>
           {isCollapsed ? "..." : "Loading shops..."}
         </span>
         {!isCollapsed && <ChevronDown className="h-4 w-4 text-gray-400" />}
@@ -37,8 +37,8 @@ export const ShopsDropdown = () => {
         <Button 
           variant="outline" 
           className={cn(
-            "w-full justify-between border-gray-200 hover:bg-gray-100 hover:text-gray-900",
-            isCollapsed && "px-2"
+            "w-full border-gray-200 hover:bg-gray-100 hover:text-gray-900",
+            isCollapsed ? "px-2 justify-center" : "justify-between"
           )}
         >
           <span className="text-gray-700">{displayText}</span>
