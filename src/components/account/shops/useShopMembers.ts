@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,19 +32,15 @@ export function useShopMembers() {
     }
   };
 
+  const initializeOwnerStatus = async (shopId: number) => {
+    const isOwner = await checkOwnerStatus(shopId);
+    setIsShopOwner(isOwner);
+    return isOwner;
+  };
+
   const loadShopMembers = async (shop: Shop) => {
     try {
-      const isOwner = await checkOwnerStatus(shop.id);
-      setIsShopOwner(isOwner);
-
-      if (!isOwner) {
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "Only shop owners can manage members",
-        });
-        return;
-      }
+      await initializeOwnerStatus(shop.id);
 
       const { data: linkData, error: linkError } = await supabase
         .from('User-Shop links')
@@ -228,6 +223,7 @@ export function useShopMembers() {
     loadShopMembers,
     handleAddMember,
     handleUpdateRole,
-    handleRemoveMember
+    handleRemoveMember,
+    initializeOwnerStatus
   };
 }

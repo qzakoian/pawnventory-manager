@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Store } from "lucide-react";
 import { useShopMembers } from "./shops/useShopMembers";
 import { MemberManagementSheet } from "./shops/MemberManagementSheet";
@@ -24,8 +24,16 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
     loadShopMembers,
     handleAddMember,
     handleUpdateRole,
-    handleRemoveMember
+    handleRemoveMember,
+    initializeOwnerStatus
   } = useShopMembers();
+
+  useEffect(() => {
+    // Initialize owner status for the first shop if available
+    if (shops.length > 0) {
+      initializeOwnerStatus(shops[0].id);
+    }
+  }, [shops]);
 
   const handleMemberManage = (shop: Shop) => {
     setSelectedShop(shop);
