@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Shop } from './types';
 import { Store, Pencil, Check, X, Upload, Users } from "lucide-react";
@@ -110,19 +111,21 @@ export function ShopListItem({ shop, isShopOwner, onMemberManage }: ShopListItem
               <Store className="h-5 w-5 text-gray-500" />
             </AvatarFallback>
           </Avatar>
-          <label
-            htmlFor={`shop-image-${shop.id}`}
-            className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
-          >
-            <Upload className="h-4 w-4 text-white" />
-            <input
-              type="file"
-              id={`shop-image-${shop.id}`}
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-          </label>
+          {!isShopOwner ? null : (
+            <label
+              htmlFor={`shop-image-${shop.id}`}
+              className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+            >
+              <Upload className="h-4 w-4 text-white" />
+              <input
+                type="file"
+                id={`shop-image-${shop.id}`}
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </label>
+          )}
         </div>
         {editingShop ? (
           <Input
@@ -136,42 +139,46 @@ export function ShopListItem({ shop, isShopOwner, onMemberManage }: ShopListItem
         )}
       </div>
       <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onMemberManage}
-        >
-          <Users className="h-4 w-4 mr-2" />
-          {isShopOwner ? "Manage Members" : "View Members"}
-        </Button>
-        {editingShop ? (
+        {!isShopOwner ? null : (
           <>
             <Button
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={handleSave}
-              className="text-green-600 hover:text-green-700 hover:bg-green-50"
+              onClick={onMemberManage}
             >
-              <Check className="h-4 w-4" />
+              <Users className="h-4 w-4 mr-2" />
+              Manage Members
             </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleCancel}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            {editingShop ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSave}
+                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCancel}
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleEdit}
+                className="text-gray-600 hover:text-gray-700 hover:bg-gray-100"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
           </>
-        ) : (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleEdit}
-            className="text-gray-600 hover:text-gray-700 hover:bg-gray-100"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
         )}
       </div>
     </div>
