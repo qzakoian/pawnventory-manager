@@ -40,18 +40,31 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
 
-      // First, get all shops the user has access to
-      const { data: shops, error: shopError } = await supabase
-        .from('Shops')
-        .select('id, name, profile_picture');
+      // Get shops through User-Shop links table
+      const { data: userShops, error: shopError } = await supabase
+        .from('User-Shop links')
+        .select(`
+          shop_id,
+          Shops:shop_id (
+            id,
+            name,
+            profile_picture
+          )
+        `)
+        .eq('user_id', user.id);
 
       if (shopError) {
-        console.error('Error fetching shops:', shopError);
+        console.error('Error fetching user shops:', shopError);
         throw shopError;
       }
 
-      if (shops) {
-        console.log('Fetched shops:', shops);
+      if (userShops) {
+        // Transform the data to match our Shop interface
+        const shops: Shop[] = userShops
+          .map(link => link.Shops)
+          .filter((shop): shop is Shop => shop !== null);
+
+        console.log('Fetched user shops:', shops);
         setShops(shops);
         
         // If no shop is selected and we have shops, select the first one
