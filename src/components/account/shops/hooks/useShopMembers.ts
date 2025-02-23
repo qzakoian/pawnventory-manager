@@ -1,9 +1,15 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { Shop, ShopMember } from './types';
+import { Shop, ShopMember } from '../types';
+import {
+  checkUserAccess,
+  fetchShopMembers,
+  addShopMember,
+  updateMemberRole,
+  removeMember
+} from '../api/shopMembersApi';
 
 export function useShopMembers() {
   const [members, setMembers] = useState<ShopMember[]>([]);
@@ -14,79 +20,18 @@ export function useShopMembers() {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const checkUserAccess = async (shopId: number) => {
-    if (!user) return { isOwner: false, isAdmin: false };
-    
-    try {
-      const { data, error } = await supabase
-        .from('User-Shop links')
-        .select('access_type')
-        .eq('shop_id', shopId)
-        .eq('user_id', user.id)
-        .single();
-
-      if (error) throw error;
-
-      return {
-        isOwner: data?.access_type === 'owner',
-        isAdmin: data?.access_type === 'admin'
-      };
-    } catch (error) {
-      console.error('Error checking user access:', error);
-      return { isOwner: false, isAdmin: false };
-    }
-  };
-
   const initializeOwnerStatus = async (shopId: number) => {
-    const { isOwner, isAdmin } = await checkUserAccess(shopId);
+    const { isOwner, isAdmin } = await checkUserAccess(user?.id, shopId);
     setIsShopOwner(isOwner);
     setIsShopAdmin(isAdmin);
-    return isOwner || isAdmin; // Return true if user is either owner or admin
+    return isOwner || isAdmin;
   };
 
   const loadShopMembers = async (shop: Shop) => {
     try {
       await initializeOwnerStatus(shop.id);
-
-      const { data: linkData, error: linkError } = await supabase
-        .from('User-Shop links')
-        .select('id, user_id, access_type')
-        .eq('shop_id', shop.id);
-
-      if (linkError) throw linkError;
-
-      if (!linkData) {
-        setMembers([]);
-        return;
-      }
-
-      const memberPromises = linkData.map(async (link) => {
-        const { data: userData, error: userError } = await supabase
-          .from('Users')
-          .select('email')
-          .eq('id', link.user_id)
-          .single();
-
-        if (userError) {
-          console.error('Error fetching user data:', userError);
-          return {
-            id: link.id,
-            user_id: link.user_id,
-            email: 'Unknown',
-            access_type: link.access_type as 'owner' | 'admin' | 'staff'
-          };
-        }
-
-        return {
-          id: link.id,
-          user_id: link.user_id,
-          email: userData?.email || 'Unknown',
-          access_type: link.access_type as 'owner' | 'admin' | 'staff'
-        };
-      });
-
-      const formattedMembers = await Promise.all(memberPromises);
-      setMembers(formattedMembers);
+      const membersList = await fetchShopMembers(shop.id);
+      setMembers(membersList);
     } catch (error) {
       console.error('Error loading shop members:', error);
       toast({
@@ -109,31 +54,7 @@ export function useShopMembers() {
     }
 
     try {
-      const { data: userData, error: userError } = await supabase
-        .from('Users')
-        .select('id')
-        .eq('email', newMemberEmail)
-        .single();
-
-      if (userError) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "User not found",
-        });
-        return;
-      }
-
-      const { error: linkError } = await supabase
-        .from('User-Shop links')
-        .insert({
-          user_id: userData.id,
-          shop_id: shopId,
-          access_type: newMemberRole,
-        });
-
-      if (linkError) throw linkError;
-
+      await addShopMember(newMemberEmail, shopId, newMemberRole);
       toast({
         title: "Success",
         description: "Member added successfully",
@@ -162,13 +83,7 @@ export function useShopMembers() {
     }
 
     try {
-      const { error } = await supabase
-        .from('User-Shop links')
-        .update({ access_type: newRole })
-        .eq('id', memberId);
-
-      if (error) throw error;
-
+      await updateMemberRole(memberId, newRole);
       toast({
         title: "Success",
         description: "Role updated successfully",
@@ -196,13 +111,7 @@ export function useShopMembers() {
     }
 
     try {
-      const { error } = await supabase
-        .from('User-Shop links')
-        .delete()
-        .eq('id', memberId);
-
-      if (error) throw error;
-
+      await removeMember(memberId);
       toast({
         title: "Success",
         description: "Member removed successfully",
@@ -221,7 +130,7 @@ export function useShopMembers() {
 
   return {
     members,
-    isShopOwner: isShopOwner || isShopAdmin, // Return true if user is either owner or admin
+    isShopOwner: isShopOwner || isShopAdmin,
     newMemberEmail,
     setNewMemberEmail,
     newMemberRole,
