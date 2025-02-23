@@ -25,14 +25,21 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const [shops, setShops] = useState<Shop[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [hasLoaded, setHasLoaded] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
   const fetchShops = async () => {
+    // If we've already loaded shops and still have a user, don't reload
+    if (hasLoaded && user && shops.length > 0) {
+      return;
+    }
+
     if (!user) {
       setShops([]);
       setSelectedShop(null);
       setIsLoading(false);
+      setHasLoaded(false);
       return;
     }
 
@@ -72,6 +79,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
           console.log('Setting initial shop:', shops[0]);
           setSelectedShop(shops[0]);
         }
+
+        setHasLoaded(true);
       }
     } catch (error) {
       console.error('Error in fetchShops:', error);
@@ -98,6 +107,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       setShops([]);
       setSelectedShop(null);
       setIsLoading(false);
+      setHasLoaded(false);
     }
   }, [user]);
 
