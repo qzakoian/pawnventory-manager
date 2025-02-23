@@ -22,7 +22,7 @@ export const ShopsDropdown = () => {
         <span className="text-gray-500">
           {isCollapsed ? "..." : "Loading shops..."}
         </span>
-        <ChevronDown className="h-4 w-4 text-gray-400" />
+        {!isCollapsed && <ChevronDown className="h-4 w-4 text-gray-400" />}
       </Button>
     );
   }
@@ -42,7 +42,7 @@ export const ShopsDropdown = () => {
           )}
         >
           <span className="text-gray-700">{displayText}</span>
-          <ChevronDown className="h-4 w-4 text-gray-500" />
+          {!isCollapsed && <ChevronDown className="h-4 w-4 text-gray-500" />}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-[200px]">
