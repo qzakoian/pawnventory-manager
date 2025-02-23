@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,13 +8,14 @@ import { Shop, ShopMember } from './types';
 export function useShopMembers() {
   const [members, setMembers] = useState<ShopMember[]>([]);
   const [isShopOwner, setIsShopOwner] = useState(false);
+  const [isShopAdmin, setIsShopAdmin] = useState(false);
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState<'admin' | 'staff'>('staff');
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const checkOwnerStatus = async (shopId: number) => {
-    if (!user) return false;
+  const checkUserAccess = async (shopId: number) => {
+    if (!user) return { isOwner: false, isAdmin: false };
     
     try {
       const { data, error } = await supabase
@@ -25,17 +27,21 @@ export function useShopMembers() {
 
       if (error) throw error;
 
-      return data?.access_type === 'owner';
+      return {
+        isOwner: data?.access_type === 'owner',
+        isAdmin: data?.access_type === 'admin'
+      };
     } catch (error) {
-      console.error('Error checking owner status:', error);
-      return false;
+      console.error('Error checking user access:', error);
+      return { isOwner: false, isAdmin: false };
     }
   };
 
   const initializeOwnerStatus = async (shopId: number) => {
-    const isOwner = await checkOwnerStatus(shopId);
+    const { isOwner, isAdmin } = await checkUserAccess(shopId);
     setIsShopOwner(isOwner);
-    return isOwner;
+    setIsShopAdmin(isAdmin);
+    return isOwner || isAdmin; // Return true if user is either owner or admin
   };
 
   const loadShopMembers = async (shop: Shop) => {
@@ -93,11 +99,11 @@ export function useShopMembers() {
   };
 
   const handleAddMember = async (shopId: number) => {
-    if (!isShopOwner) {
+    if (!isShopOwner && !isShopAdmin) {
       toast({
         variant: "destructive",
         title: "Access Denied",
-        description: "Only shop owners can add members",
+        description: "Only shop owners and admins can add members",
       });
       return;
     }
@@ -146,11 +152,11 @@ export function useShopMembers() {
   };
 
   const handleUpdateRole = async (memberId: number, newRole: 'admin' | 'staff', shop: Shop) => {
-    if (!isShopOwner) {
+    if (!isShopOwner && !isShopAdmin) {
       toast({
         variant: "destructive",
         title: "Access Denied",
-        description: "Only shop owners can update roles",
+        description: "Only shop owners and admins can update roles",
       });
       return;
     }
@@ -180,11 +186,11 @@ export function useShopMembers() {
   };
 
   const handleRemoveMember = async (memberId: number, shop: Shop) => {
-    if (!isShopOwner) {
+    if (!isShopOwner && !isShopAdmin) {
       toast({
         variant: "destructive",
         title: "Access Denied",
-        description: "Only shop owners can remove members",
+        description: "Only shop owners and admins can remove members",
       });
       return;
     }
@@ -215,7 +221,7 @@ export function useShopMembers() {
 
   return {
     members,
-    isShopOwner,
+    isShopOwner: isShopOwner || isShopAdmin, // Return true if user is either owner or admin
     newMemberEmail,
     setNewMemberEmail,
     newMemberRole,
