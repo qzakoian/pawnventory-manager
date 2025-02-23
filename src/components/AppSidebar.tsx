@@ -83,7 +83,7 @@ export function AppSidebar() {
 
       <SidebarFooter className="p-0">
         <SidebarGroup className="p-0">
-          <SidebarGroupContent className="px-[8px]">
+          <SidebarGroupContent className="px-[8px] py-[16px]">
             <SidebarMenu>
               {bottomMenuItems.map(item => <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={state === "collapsed" ? item.title : undefined} className={cn("flex items-center gap-3 px-4 py-2 hover:bg-gray-100", isActiveLink(item.url) && "bg-gray-100 font-medium")}>
