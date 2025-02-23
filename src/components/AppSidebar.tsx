@@ -90,16 +90,16 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
-        <SidebarGroup>
+      <SidebarFooter className="p-0">
+        <SidebarGroup className="p-0">
           <SidebarGroupContent>
             <SidebarMenu>
               {bottomMenuItems.map(item => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild tooltip={state === "collapsed" ? item.title : undefined} className={cn("flex items-center gap-3 px-4 py-2 hover:bg-gray-100", isActiveLink(item.url) && "bg-gray-100 font-medium")}>
                     <Link to={item.url} className="flex items-center gap-3">
-                      <item.icon className="h-5 w-5 text-gray-500" />
-                      <span>{item.title}</span>
+                      <item.icon className="h-5 w-5 text-gray-600" />
+                      <span className="text-[#454545]">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
