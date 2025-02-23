@@ -40,23 +40,20 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       setIsLoading(true);
       setError(null);
 
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        setShops([]);
-        setSelectedShop(null);
-        return;
-      }
-
       const { data: shopLinks, error: linkError } = await supabase
         .from('User-Shop links')
-        .select('shop_id');
+        .select('shop_id')
+        .eq('user_id', user.id);  // Add explicit user_id filter
 
-      if (linkError) throw linkError;
+      if (linkError) {
+        console.error('Error fetching shop links:', linkError);
+        throw linkError;
+      }
 
       if (!shopLinks?.length) {
         setShops([]);
         setSelectedShop(null);
+        setIsLoading(false);
         return;
       }
 
@@ -65,7 +62,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         .select('id, name, profile_picture')
         .in('id', shopLinks.map(link => link.shop_id));
 
-      if (shopError) throw shopError;
+      if (shopError) {
+        console.error('Error fetching shops:', shopError);
+        throw shopError;
+      }
 
       if (shopData) {
         setShops(shopData);
@@ -74,7 +74,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         }
       }
     } catch (error) {
-      console.error('Error fetching shops:', error);
+      console.error('Error in fetchShops:', error);
       setError('Failed to load shops');
       toast({
         title: "Error",
@@ -88,25 +88,15 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Set up auth state change listener
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        setShops([]);
-        setSelectedShop(null);
-      } else {
-        fetchShops();
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
-
   // Fetch shops when user changes
   useEffect(() => {
-    fetchShops();
+    if (user) {
+      fetchShops();
+    } else {
+      setShops([]);
+      setSelectedShop(null);
+      setIsLoading(false);
+    }
   }, [user]);
 
   const value = {
