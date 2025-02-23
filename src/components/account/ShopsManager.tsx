@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Store, Pencil, Check, X, Upload, UserPlus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Sheet,
   SheetContent,
@@ -44,7 +45,29 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
   const [members, setMembers] = useState<ShopMember[]>([]);
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [newMemberRole, setNewMemberRole] = useState<'admin' | 'staff'>('staff');
+  const [isShopOwner, setIsShopOwner] = useState(false);
+  const { user } = useAuth();
   const { toast } = useToast();
+
+  const checkOwnerStatus = async (shopId: number) => {
+    if (!user) return false;
+    
+    try {
+      const { data, error } = await supabase
+        .from('User-Shop links')
+        .select('access_type')
+        .eq('shop_id', shopId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (error) throw error;
+
+      return data?.access_type === 'owner';
+    } catch (error) {
+      console.error('Error checking owner status:', error);
+      return false;
+    }
+  };
 
   const handleEdit = (shop: Shop) => {
     setEditingShop(shop.id);
@@ -127,6 +150,18 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
 
   const loadShopMembers = async (shop: Shop) => {
     try {
+      const isOwner = await checkOwnerStatus(shop.id);
+      setIsShopOwner(isOwner);
+
+      if (!isOwner) {
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "Only shop owners can manage members",
+        });
+        return;
+      }
+
       const { data: linkData, error: linkError } = await supabase
         .from('User-Shop links')
         .select('id, user_id, access_type')
@@ -178,6 +213,15 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
   };
 
   const handleAddMember = async (shopId: number) => {
+    if (!isShopOwner) {
+      toast({
+        variant: "destructive",
+        title: "Access Denied",
+        description: "Only shop owners can add members",
+      });
+      return;
+    }
+
     try {
       const { data: userData, error: userError } = await supabase
         .from('Users')
@@ -222,6 +266,15 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
   };
 
   const handleUpdateRole = async (memberId: number, newRole: 'owner' | 'admin' | 'staff') => {
+    if (!isShopOwner) {
+      toast({
+        variant: "destructive",
+        title: "Access Denied",
+        description: "Only shop owners can update roles",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('User-Shop links')
@@ -247,6 +300,15 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
   };
 
   const handleRemoveMember = async (memberId: number) => {
+    if (!isShopOwner) {
+      toast({
+        variant: "destructive",
+        title: "Access Denied",
+        description: "Only shop owners can remove members",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('User-Shop links')
@@ -335,43 +397,47 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
                   }}
                 >
                   <Users className="h-4 w-4 mr-2" />
-                  Manage Members
+                  {isShopOwner ? "Manage Members" : "View Members"}
                 </Button>
               </SheetTrigger>
               <SheetContent>
                 <SheetHeader>
-                  <SheetTitle>Manage Shop Members</SheetTitle>
+                  <SheetTitle>
+                    {isShopOwner ? "Manage Shop Members" : "Shop Members"}
+                  </SheetTitle>
                 </SheetHeader>
                 <div className="mt-6 space-y-6">
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-medium">Add New Member</h3>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Email address"
-                        value={newMemberEmail}
-                        onChange={(e) => setNewMemberEmail(e.target.value)}
-                      />
-                      <Select
-                        value={newMemberRole}
-                        onValueChange={(value: 'admin' | 'staff') => setNewMemberRole(value)}
-                      >
-                        <SelectTrigger className="w-[120px]">
-                          <SelectValue placeholder="Role" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="admin">Admin</SelectItem>
-                          <SelectItem value="staff">Staff</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button
-                        size="sm"
-                        onClick={() => handleAddMember(shop.id)}
-                        disabled={!newMemberEmail}
-                      >
-                        <UserPlus className="h-4 w-4" />
-                      </Button>
+                  {isShopOwner && (
+                    <div className="space-y-4">
+                      <h3 className="text-sm font-medium">Add New Member</h3>
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Email address"
+                          value={newMemberEmail}
+                          onChange={(e) => setNewMemberEmail(e.target.value)}
+                        />
+                        <Select
+                          value={newMemberRole}
+                          onValueChange={(value: 'admin' | 'staff') => setNewMemberRole(value)}
+                        >
+                          <SelectTrigger className="w-[120px]">
+                            <SelectValue placeholder="Role" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="admin">Admin</SelectItem>
+                            <SelectItem value="staff">Staff</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          size="sm"
+                          onClick={() => handleAddMember(shop.id)}
+                          disabled={!newMemberEmail}
+                        >
+                          <UserPlus className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium">Current Members</h3>
@@ -387,34 +453,32 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
                               {member.access_type}
                             </p>
                           </div>
-                          <div className="flex gap-2">
-                            {member.access_type !== 'owner' && (
-                              <>
-                                <Select
-                                  value={member.access_type}
-                                  onValueChange={(value: 'admin' | 'staff') => 
-                                    handleUpdateRole(member.id, value)
-                                  }
-                                >
-                                  <SelectTrigger className="w-[100px]">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="admin">Admin</SelectItem>
-                                    <SelectItem value="staff">Staff</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleRemoveMember(member.id)}
-                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </>
-                            )}
-                          </div>
+                          {isShopOwner && member.access_type !== 'owner' && (
+                            <div className="flex gap-2">
+                              <Select
+                                value={member.access_type}
+                                onValueChange={(value: 'admin' | 'staff') => 
+                                  handleUpdateRole(member.id, value)
+                                }
+                              >
+                                <SelectTrigger className="w-[100px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                  <SelectItem value="staff">Staff</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleRemoveMember(member.id)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
