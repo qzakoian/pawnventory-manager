@@ -2,7 +2,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ProfilePicture } from "./ProfilePicture";
 import { ProfileForm } from "./ProfileForm";
-import { ShopsList } from "./ShopsList";
+import { ShopsManager } from "./ShopsManager";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { formSchema } from "./ProfileForm";
@@ -38,7 +38,7 @@ export function AccountTabs({ form, onSubmit, profileUrl, onImageUpload, shops }
       </TabsContent>
 
       <TabsContent value="shops" className="space-y-4">
-        <ShopsList shops={shops} />
+        <ShopsManager shops={shops} />
       </TabsContent>
     </Tabs>
   );
