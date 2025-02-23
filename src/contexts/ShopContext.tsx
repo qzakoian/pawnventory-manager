@@ -28,61 +28,97 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchShops = async () => {
-      if (!user) {
-        setIsLoading(false);
+  const fetchShops = async () => {
+    if (!user) {
+      setShops([]);
+      setSelectedShop(null);
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        setShops([]);
+        setSelectedShop(null);
         return;
       }
 
-      try {
-        setIsLoading(true);
-        setError(null);
+      const { data: shopLinks, error: linkError } = await supabase
+        .from('User-Shop links')
+        .select('shop_id');
 
-        // Get shops data through the User-Shop links
-        const { data: linkData, error: linkError } = await supabase
-          .from('User-Shop links')
-          .select('shop_id')
-          .eq('user_id', user.id);
+      if (linkError) throw linkError;
 
-        if (linkError) throw linkError;
-
-        if (linkData && linkData.length > 0) {
-          const { data: shopData, error: shopError } = await supabase
-            .from('Shops')
-            .select('id, name, profile_picture')
-            .in('id', linkData.map(link => link.shop_id));
-
-          if (shopError) throw shopError;
-
-          if (shopData) {
-            setShops(shopData);
-            // Only set selected shop if none is selected and we have shops
-            if (!selectedShop && shopData.length > 0) {
-              setSelectedShop(shopData[0]);
-            }
-          }
-        } else {
-          setShops([]);
-        }
-      } catch (error) {
-        console.error('Error fetching shops:', error);
-        setError('Failed to load shops');
-        toast({
-          title: "Error",
-          description: "Failed to load shops. Please try again later.",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
+      if (!shopLinks?.length) {
+        setShops([]);
+        setSelectedShop(null);
+        return;
       }
-    };
 
+      const { data: shopData, error: shopError } = await supabase
+        .from('Shops')
+        .select('id, name, profile_picture')
+        .in('id', shopLinks.map(link => link.shop_id));
+
+      if (shopError) throw shopError;
+
+      if (shopData) {
+        setShops(shopData);
+        if (!selectedShop && shopData.length > 0) {
+          setSelectedShop(shopData[0]);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching shops:', error);
+      setError('Failed to load shops');
+      toast({
+        title: "Error",
+        description: "Failed to load shops. Please try again later.",
+        variant: "destructive",
+      });
+      setShops([]);
+      setSelectedShop(null);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Set up auth state change listener
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session) {
+        setShops([]);
+        setSelectedShop(null);
+      } else {
+        fetchShops();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Fetch shops when user changes
+  useEffect(() => {
     fetchShops();
-  }, [user, toast]); // Removed selectedShop dependency
+  }, [user]);
+
+  const value = {
+    selectedShop,
+    setSelectedShop,
+    isLoading,
+    error,
+    shops
+  };
 
   return (
-    <ShopContext.Provider value={{ selectedShop, setSelectedShop, isLoading, error, shops }}>
+    <ShopContext.Provider value={value}>
       {children}
     </ShopContext.Provider>
   );
