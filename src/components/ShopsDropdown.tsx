@@ -1,5 +1,4 @@
 
-import { useState, useEffect } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,74 +7,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ChevronDown } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
 import { useShop } from "@/contexts/ShopContext";
 
-interface Shop {
-  id: number;
-  name: string | null;
-  profile_picture: string | null;
-}
-
 export const ShopsDropdown = () => {
-  const [shops, setShops] = useState<Shop[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-  const { selectedShop, setSelectedShop } = useShop();
-
-  useEffect(() => {
-    const fetchUserShops = async () => {
-      try {
-        setIsLoading(true);
-        // First check if we have an authenticated user
-        const { data: { user }, error: authError } = await supabase.auth.getUser();
-        
-        if (authError) throw authError;
-        if (!user) {
-          console.log("No authenticated user found");
-          return;
-        }
-
-        // Get shops data with a simpler query first to the User-Shop links
-        const { data: linkData, error: linkError } = await supabase
-          .from('User-Shop links')
-          .select('shop_id')
-          .eq('user_id', user.id);
-
-        if (linkError) throw linkError;
-
-        if (linkData && linkData.length > 0) {
-          // Then get the shop details
-          const { data: shopData, error: shopError } = await supabase
-            .from('Shops')
-            .select('id, name, profile_picture')
-            .in('id', linkData.map(link => link.shop_id));
-
-          if (shopError) throw shopError;
-
-          if (shopData) {
-            setShops(shopData);
-            // If no shop is selected yet and we have shops, select the first one
-            if (!selectedShop && shopData.length > 0) {
-              setSelectedShop(shopData[0]);
-            }
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching shops:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load shops",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserShops();
-  }, [setSelectedShop, toast]); // Removed selectedShop dependency
+  const { selectedShop, setSelectedShop, shops, isLoading } = useShop();
 
   if (isLoading) {
     return (

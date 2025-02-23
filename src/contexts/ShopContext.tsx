@@ -15,19 +15,21 @@ interface ShopContextType {
   setSelectedShop: (shop: Shop | null) => void;
   isLoading: boolean;
   error: string | null;
+  shops: Shop[];
 }
 
 const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export function ShopProvider({ children }: { children: ReactNode }) {
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
+  const [shops, setShops] = useState<Shop[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchDefaultShop = async () => {
+    const fetchShops = async () => {
       if (!user) {
         setIsLoading(false);
         return;
@@ -37,32 +39,38 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         setIsLoading(true);
         setError(null);
 
-        // Query the shops table directly - RLS will handle access control
-        const { data: shop, error: queryError } = await supabase
-          .from('Shops')
-          .select('id, name, profile_picture')
-          .limit(1)
-          .maybeSingle();
+        // Get shops data through the User-Shop links
+        const { data: linkData, error: linkError } = await supabase
+          .from('User-Shop links')
+          .select('shop_id')
+          .eq('user_id', user.id);
 
-        if (queryError) {
-          throw queryError;
-        }
+        if (linkError) throw linkError;
 
-        if (shop) {
-          setSelectedShop(shop);
+        if (linkData && linkData.length > 0) {
+          const { data: shopData, error: shopError } = await supabase
+            .from('Shops')
+            .select('id, name, profile_picture')
+            .in('id', linkData.map(link => link.shop_id));
+
+          if (shopError) throw shopError;
+
+          if (shopData) {
+            setShops(shopData);
+            // Only set selected shop if none is selected and we have shops
+            if (!selectedShop && shopData.length > 0) {
+              setSelectedShop(shopData[0]);
+            }
+          }
         } else {
-          toast({
-            title: "No shop found",
-            description: "Please create or join a shop to continue.",
-            variant: "destructive",
-          });
+          setShops([]);
         }
       } catch (error) {
-        console.error('Error fetching shop:', error);
-        setError('Failed to load shop data');
+        console.error('Error fetching shops:', error);
+        setError('Failed to load shops');
         toast({
           title: "Error",
-          description: "Failed to load shop data. Please try again later.",
+          description: "Failed to load shops. Please try again later.",
           variant: "destructive",
         });
       } finally {
@@ -70,11 +78,11 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    fetchDefaultShop();
-  }, [user, toast]);
+    fetchShops();
+  }, [user, toast]); // Removed selectedShop dependency
 
   return (
-    <ShopContext.Provider value={{ selectedShop, setSelectedShop, isLoading, error }}>
+    <ShopContext.Provider value={{ selectedShop, setSelectedShop, isLoading, error, shops }}>
       {children}
     </ShopContext.Provider>
   );
