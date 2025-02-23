@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Store } from "lucide-react";
-import { useShopMembers } from "./shops/useShopMembers";
+import { useShopMembers } from "./shops/hooks/useShopMembers"; // Updated import path
 import { MemberManagementSheet } from "./shops/MemberManagementSheet";
 import { ShopListItem } from "./shops/ShopListItem";
 import { Sheet } from "@/components/ui/sheet";
