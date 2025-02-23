@@ -122,10 +122,17 @@ export function ShopsList({ shops }: ShopsListProps) {
           <div className="flex items-center">
             <div className="relative group">
               <Avatar className="h-10 w-10 mr-3">
-                <AvatarImage src={shop.profile_picture || undefined} alt={shop.name || 'Shop'} />
-                <AvatarFallback>
-                  <Store className="h-5 w-5 text-gray-500" />
-                </AvatarFallback>
+                {shop.profile_picture ? (
+                  <AvatarImage 
+                    src={shop.profile_picture} 
+                    alt={shop.name || 'Shop'}
+                    className="object-contain"
+                  />
+                ) : (
+                  <AvatarFallback>
+                    <Store className="h-5 w-5 text-gray-500" />
+                  </AvatarFallback>
+                )}
               </Avatar>
               <label
                 htmlFor={`shop-image-${shop.id}`}
