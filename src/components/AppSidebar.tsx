@@ -2,7 +2,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, SidebarRail, useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { Home, BarChart, Users, Package, Settings, Store, PanelLeftClose } from "lucide-react";
+import { Home, BarChart, Users, Package, Settings, Store, ArrowLeft } from "lucide-react";
 import { ShopsDropdown } from "./ShopsDropdown";
 import { useShop } from "@/contexts/ShopContext";
 
@@ -48,11 +48,10 @@ export function AppSidebar() {
         {/* Collapse button container */}
         <div className="absolute right-0 top-0 z-50 p-2">
           <SidebarTrigger className="flex items-center gap-2 rounded-md px-2 py-1 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700">
-            <PanelLeftClose className={cn(
+            <ArrowLeft className={cn(
               "h-4 w-4 transition-transform",
               state === "expanded" ? "" : "rotate-180"
             )} />
-            {state === "expanded" && <span>Reduce the sidebar</span>}
           </SidebarTrigger>
         </div>
 
