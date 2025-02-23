@@ -1,11 +1,9 @@
-
 import { useState } from "react";
 import { Shop } from './types';
 import { Store, Pencil, Check, X, Upload, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -138,16 +136,14 @@ export function ShopListItem({ shop, isShopOwner, onMemberManage }: ShopListItem
         )}
       </div>
       <div className="flex gap-2">
-        <SheetTrigger asChild>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onMemberManage}
-          >
-            <Users className="h-4 w-4 mr-2" />
-            {isShopOwner ? "Manage Members" : "View Members"}
-          </Button>
-        </SheetTrigger>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onMemberManage}
+        >
+          <Users className="h-4 w-4 mr-2" />
+          {isShopOwner ? "Manage Members" : "View Members"}
+        </Button>
         {editingShop ? (
           <>
             <Button

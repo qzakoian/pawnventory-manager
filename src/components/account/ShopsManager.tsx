@@ -4,6 +4,7 @@ import { Store } from "lucide-react";
 import { useShopMembers } from "./shops/useShopMembers";
 import { MemberManagementSheet } from "./shops/MemberManagementSheet";
 import { ShopListItem } from "./shops/ShopListItem";
+import { Sheet } from "@/components/ui/sheet";
 import type { Shop } from "./shops/types";
 
 interface ShopsManagerProps {
@@ -52,22 +53,24 @@ export function ShopsManager({ shops }: ShopsManagerProps) {
         />
       ))}
       
-      {selectedShop && (
-        <MemberManagementSheet
-          shop={selectedShop}
-          isOpen={isSheetOpen}
-          onOpenChange={setIsSheetOpen}
-          isShopOwner={isShopOwner}
-          members={members}
-          newMemberEmail={newMemberEmail}
-          setNewMemberEmail={setNewMemberEmail}
-          newMemberRole={newMemberRole}
-          setNewMemberRole={setNewMemberRole}
-          onAddMember={handleAddMember}
-          onUpdateRole={handleUpdateRole}
-          onRemoveMember={handleRemoveMember}
-        />
-      )}
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        {selectedShop && (
+          <MemberManagementSheet
+            shop={selectedShop}
+            isOpen={isSheetOpen}
+            onOpenChange={setIsSheetOpen}
+            isShopOwner={isShopOwner}
+            members={members}
+            newMemberEmail={newMemberEmail}
+            setNewMemberEmail={setNewMemberEmail}
+            newMemberRole={newMemberRole}
+            setNewMemberRole={setNewMemberRole}
+            onAddMember={handleAddMember}
+            onUpdateRole={handleUpdateRole}
+            onRemoveMember={handleRemoveMember}
+          />
+        )}
+      </Sheet>
     </div>
   );
 }
