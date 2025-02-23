@@ -59,7 +59,7 @@ export function AppSidebar() {
                   </div>}
               </div>
             </div>
-            <div className="px-[6px]">
+            <div className="px-[7px]">
               <ShopsDropdown />
             </div>
           </div>
