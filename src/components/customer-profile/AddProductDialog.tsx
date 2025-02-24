@@ -11,18 +11,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { NewProduct } from "@/types/customer";
 import { useShop } from "@/contexts/ShopContext";
 import { supabase } from "@/integrations/supabase/client";
+import { ProductBasicFields } from "./add-product/ProductBasicFields";
+import { BuybackFields } from "./add-product/BuybackFields";
+import { IdentifierFields } from "./add-product/IdentifierFields";
 
 interface AddProductDialogProps {
   isOpen: boolean;
@@ -138,77 +132,13 @@ export const AddProductDialog = ({
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="model">Model</Label>
-            <Input
-              id="model"
-              value={newProduct.model}
-              onChange={(e) => setNewProduct({ ...newProduct, model: e.target.value })}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="brand">Brand</Label>
-            <Select
-              value={newProduct.brand}
-              onValueChange={(value) => setNewProduct({ ...newProduct, brand: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select brand" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Brands</SelectLabel>
-                  {brands.map((brand) => (
-                    <SelectItem key={brand} value={brand}>
-                      {brand}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Select
-              value={newProduct.product_category}
-              onValueChange={(value) => setNewProduct({ ...newProduct, product_category: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Categories</SelectLabel>
-                  {categories.map((category) => (
-                    <SelectItem key={category} value={category}>
-                      {category}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="scheme">Scheme</Label>
-            <Select
-              value={newProduct.scheme}
-              onValueChange={(value) => setNewProduct({ ...newProduct, scheme: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select scheme" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Schemes</SelectLabel>
-                  {schemes.map((scheme) => (
-                    <SelectItem key={scheme} value={scheme}>
-                      {scheme}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
+          <ProductBasicFields
+            newProduct={newProduct}
+            onProductChange={setNewProduct}
+            brands={brands}
+            categories={categories}
+            schemes={schemes}
+          />
           <div className="space-y-2">
             <Label htmlFor="purchase_price">Purchase Price (inc. VAT)</Label>
             <Input
@@ -219,57 +149,21 @@ export const AddProductDialog = ({
             />
           </div>
           {isBuybackScheme && (
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="buyback_rate">Interest Rate [%]</Label>
-                <Input
-                  id="buyback_rate"
-                  type="number"
-                  value={buybackRate}
-                  onChange={(e) => setBuybackRate(parseFloat(e.target.value))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="buyback_price">Buy-back Price</Label>
-                <Input
-                  id="buyback_price"
-                  type="number"
-                  value={buybackPrice}
-                  onChange={(e) => setBuybackPrice(parseFloat(e.target.value))}
-                />
-              </div>
-            </div>
+            <BuybackFields
+              buybackRate={buybackRate}
+              buybackPrice={buybackPrice}
+              onBuybackRateChange={setBuybackRate}
+              onBuybackPriceChange={setBuybackPrice}
+            />
           )}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="imei">IMEI</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="imei"
-                  value={imei}
-                  onChange={(e) => setImei(e.target.value)}
-                  placeholder="Enter IMEI"
-                />
-                <Button type="button" variant="outline" onClick={generateRandomIMEI} className="shrink-0">
-                  Generate
-                </Button>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="sku">SKU</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="sku"
-                  value={sku}
-                  onChange={(e) => setSku(e.target.value)}
-                  placeholder="Enter SKU"
-                />
-                <Button type="button" variant="outline" onClick={generateRandomSKU} className="shrink-0">
-                  Generate
-                </Button>
-              </div>
-            </div>
-          </div>
+          <IdentifierFields
+            imei={imei}
+            sku={sku}
+            onImeiChange={setImei}
+            onSkuChange={setSku}
+            onGenerateImei={generateRandomIMEI}
+            onGenerateSku={generateRandomSKU}
+          />
           <div className="space-y-2">
             <Label htmlFor="purchase_date">Purchase Date</Label>
             <Input
