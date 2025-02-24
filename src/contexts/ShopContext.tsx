@@ -1,8 +1,9 @@
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
 
 interface Shop {
   id: number;
@@ -22,100 +23,66 @@ const ShopContext = createContext<ShopContextType | undefined>(undefined);
 
 export function ShopProvider({ children }: { children: ReactNode }) {
   const [selectedShop, setSelectedShop] = useState<Shop | null>(null);
-  const [shops, setShops] = useState<Shop[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [hasLoaded, setHasLoaded] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
 
   const fetchShops = async () => {
-    // If we've already loaded shops and still have a user, don't reload
-    if (hasLoaded && user && shops.length > 0) {
-      return;
-    }
-
     if (!user) {
-      setShops([]);
-      setSelectedShop(null);
-      setIsLoading(false);
-      setHasLoaded(false);
-      return;
+      return [];
     }
 
-    try {
-      setIsLoading(true);
-      setError(null);
+    const { data: userShops, error: shopError } = await supabase
+      .from('User-Shop links')
+      .select(`
+        shop_id,
+        Shops:shop_id (
+          id,
+          name,
+          profile_picture
+        )
+      `)
+      .eq('user_id', user.id);
 
-      // Get shops through User-Shop links table
-      const { data: userShops, error: shopError } = await supabase
-        .from('User-Shop links')
-        .select(`
-          shop_id,
-          Shops:shop_id (
-            id,
-            name,
-            profile_picture
-          )
-        `)
-        .eq('user_id', user.id);
+    if (shopError) {
+      throw shopError;
+    }
 
-      if (shopError) {
-        console.error('Error fetching user shops:', shopError);
-        throw shopError;
-      }
+    if (!userShops) {
+      return [];
+    }
 
-      if (userShops) {
-        // Transform the data to match our Shop interface
-        const shops: Shop[] = userShops
-          .map(link => link.Shops)
-          .filter((shop): shop is Shop => shop !== null);
+    return userShops
+      .map(link => link.Shops)
+      .filter((shop): shop is Shop => shop !== null);
+  };
 
-        console.log('Fetched user shops:', shops);
-        setShops(shops);
-        
-        // If no shop is selected and we have shops, select the first one
-        if (!selectedShop && shops.length > 0) {
-          console.log('Setting initial shop:', shops[0]);
-          setSelectedShop(shops[0]);
-        }
-
-        setHasLoaded(true);
-      }
-    } catch (error) {
-      console.error('Error in fetchShops:', error);
-      setError('Failed to load shops');
+  const {
+    data: shops = [],
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ['shops', user?.id],
+    queryFn: fetchShops,
+    enabled: !!user,
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to load shops. Please try again later.",
         variant: "destructive",
       });
-      setShops([]);
-      setSelectedShop(null);
-    } finally {
-      setIsLoading(false);
     }
-  };
+  });
 
-  // Fetch shops when user changes
-  useEffect(() => {
-    if (user) {
-      console.log('User authenticated, fetching shops...');
-      fetchShops();
-    } else {
-      console.log('No user, clearing shops...');
-      setShops([]);
-      setSelectedShop(null);
-      setIsLoading(false);
-      setHasLoaded(false);
-    }
-  }, [user]);
+  // Set initial shop if none is selected
+  if (!selectedShop && shops.length > 0 && !isLoading) {
+    setSelectedShop(shops[0]);
+  }
 
   const value = {
     selectedShop,
     setSelectedShop,
     isLoading,
-    error,
+    error: error ? 'Failed to load shops' : null,
     shops
   };
 
