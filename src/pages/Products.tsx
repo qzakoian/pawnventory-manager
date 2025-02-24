@@ -16,6 +16,7 @@ import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ArrowRight } from "lucide-react";
 import { ProductSearch } from "@/components/product/ProductSearch";
+import { ImportProductsDialog } from "@/components/product/import/ImportProductsDialog";
 
 const Products = () => {
   const { selectedShop } = useShop();
@@ -42,7 +43,10 @@ const Products = () => {
     <div className="min-h-screen bg-white">
       <main className="p-6 max-w-7xl mx-auto space-y-8">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground mb-6">Products</h1>
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-semibold text-foreground">Products</h1>
+            {selectedShop && <ImportProductsDialog shopId={selectedShop.id} />}
+          </div>
           
           {selectedShop && <ProductSearch shopId={selectedShop.id} />}
           
