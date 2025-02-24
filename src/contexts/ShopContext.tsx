@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
@@ -26,10 +26,8 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const fetchShops = async () => {
-    if (!user) {
-      return [];
-    }
+  const fetchShops = useCallback(async () => {
+    if (!user) return [];
 
     const { data: userShops, error: shopError } = await supabase
       .from('User-Shop links')
@@ -43,18 +41,13 @@ export function ShopProvider({ children }: { children: ReactNode }) {
       `)
       .eq('user_id', user.id);
 
-    if (shopError) {
-      throw shopError;
-    }
-
-    if (!userShops) {
-      return [];
-    }
+    if (shopError) throw shopError;
+    if (!userShops) return [];
 
     return userShops
       .map(link => link.Shops)
       .filter((shop): shop is Shop => shop !== null);
-  };
+  }, [user]);
 
   const {
     data: shops = [],
@@ -64,7 +57,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     queryKey: ['shops', user?.id],
     queryFn: fetchShops,
     enabled: !!user,
-    staleTime: Infinity, // Prevent unnecessary refetches
+    staleTime: Infinity,
     meta: {
       onError: () => {
         toast({
@@ -76,20 +69,19 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     }
   });
 
-  // Move the initial shop selection to useEffect
   useEffect(() => {
     if (!selectedShop && shops.length > 0 && !isLoading) {
       setSelectedShop(shops[0]);
     }
-  }, [shops, isLoading, selectedShop]);
+  }, [shops, isLoading]);
 
-  const value = {
+  const value = useMemo(() => ({
     selectedShop,
     setSelectedShop,
     isLoading,
     error: error ? 'Failed to load shops' : null,
     shops
-  };
+  }), [selectedShop, isLoading, error, shops]);
 
   return (
     <ShopContext.Provider value={value}>

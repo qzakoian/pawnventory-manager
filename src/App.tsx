@@ -18,14 +18,18 @@ import CustomerProfile from "@/pages/CustomerProfile";
 import ProductDetails from "@/pages/ProductDetails";
 import NotFound from "@/pages/NotFound";
 
+// Create QueryClient instance outside of component to prevent recreation
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+      staleTime: Infinity,
+      gcTime: 1000 * 60 * 60 * 24, // 24 hours
       refetchOnWindowFocus: false,
       refetchOnMount: false,
       refetchOnReconnect: false,
+      retry: false,
+      // This will help prevent unnecessary background updates
+      networkMode: 'offlineFirst'
     },
   },
 });
