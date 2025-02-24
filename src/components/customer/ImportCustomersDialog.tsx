@@ -31,6 +31,19 @@ interface CSVCustomer {
   county?: string;
 }
 
+const REQUIRED_COLUMNS = ['last_name'];
+const OPTIONAL_COLUMNS = [
+  'first_name',
+  'email',
+  'phone_number',
+  'address_line1',
+  'address_line2',
+  'city',
+  'postal_code',
+  'county'
+];
+const ALL_COLUMNS = [...REQUIRED_COLUMNS, ...OPTIONAL_COLUMNS];
+
 export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -48,12 +61,29 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
       
       Papa.parse(text, {
         header: true,
-        skipEmptyLines: true, // Skip empty lines
+        skipEmptyLines: true,
         complete: async (results) => {
           const parsedData = results.data as CSVCustomer[];
           
           if (parsedData.length === 0) {
             throw new Error("No customers found in CSV file");
+          }
+
+          // Validate column headers
+          const headers = results.meta.fields || [];
+          const missingRequired = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
+          const unknownColumns = headers.filter(col => !ALL_COLUMNS.includes(col));
+
+          if (missingRequired.length > 0) {
+            throw new Error(`Missing required columns: ${missingRequired.join(', ')}`);
+          }
+
+          if (unknownColumns.length > 0) {
+            toast({
+              title: "Warning",
+              description: `Unknown columns will be ignored: ${unknownColumns.join(', ')}`,
+              variant: "default",
+            });
           }
 
           // Filter out empty rows and validate last_name
