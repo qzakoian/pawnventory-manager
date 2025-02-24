@@ -48,26 +48,49 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
       
       Papa.parse(text, {
         header: true,
+        skipEmptyLines: true, // Skip empty lines
         complete: async (results) => {
-          const customers = results.data as CSVCustomer[];
+          const parsedData = results.data as CSVCustomer[];
           
-          if (customers.length === 0) {
+          if (parsedData.length === 0) {
             throw new Error("No customers found in CSV file");
           }
 
-          // Validate required fields
-          const invalidCustomers = customers.filter(
-            customer => !customer.last_name
+          // Filter out empty rows and validate last_name
+          const validCustomers = parsedData.filter(customer => 
+            customer && 
+            typeof customer === 'object' && 
+            'last_name' in customer && 
+            customer.last_name && 
+            customer.last_name.trim() !== ''
           );
 
-          if (invalidCustomers.length > 0) {
-            throw new Error("All customers must have a last name");
+          if (validCustomers.length === 0) {
+            throw new Error("No valid customers found. Each customer must have a last name");
+          }
+
+          if (validCustomers.length < parsedData.length) {
+            toast({
+              title: "Warning",
+              description: `${parsedData.length - validCustomers.length} invalid rows were skipped`,
+              variant: "default",
+            });
           }
 
           // Prepare customers data with shop_id
-          const customersWithShopId = customers.map(customer => ({
+          const customersWithShopId = validCustomers.map(customer => ({
             ...customer,
-            shop_id: shopId
+            shop_id: shopId,
+            // Ensure all string fields are properly trimmed
+            last_name: customer.last_name.trim(),
+            first_name: customer.first_name?.trim(),
+            email: customer.email?.trim(),
+            phone_number: customer.phone_number?.trim(),
+            address_line1: customer.address_line1?.trim(),
+            address_line2: customer.address_line2?.trim(),
+            city: customer.city?.trim(),
+            postal_code: customer.postal_code?.trim(),
+            county: customer.county?.trim(),
           }));
 
           const { error } = await supabase
@@ -78,7 +101,7 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
 
           toast({
             title: "Success",
-            description: `Successfully imported ${customers.length} customers`,
+            description: `Successfully imported ${validCustomers.length} customers`,
           });
 
           // Refresh customers list
