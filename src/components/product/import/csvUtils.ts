@@ -25,6 +25,7 @@ export async function downloadCustomersList(shopId: number) {
 export function downloadTemplateCSV() {
   const headers = [
     'model',
+    'brand',
     'product_category',
     'scheme',
     'purchase_date',
@@ -39,6 +40,7 @@ export function downloadTemplateCSV() {
     data: [
       {
         model: 'iPhone 13',
+        brand: 'Apple',
         product_category: 'Phones',
         scheme: 'sale',
         purchase_date: '2024-03-20',

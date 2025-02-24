@@ -5,6 +5,7 @@ export interface ImportProductsDialogProps {
 
 export interface CSVProduct {
   model: string;
+  brand?: string;
   product_category?: string;
   scheme?: string;
   purchase_date?: string;
@@ -20,6 +21,7 @@ export interface ColumnMapping {
 
 export const REQUIRED_COLUMNS = ['model'];
 export const OPTIONAL_COLUMNS = [
+  'brand',
   'product_category',
   'scheme',
   'purchase_date',

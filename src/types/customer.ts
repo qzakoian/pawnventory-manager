@@ -16,6 +16,7 @@ export interface Customer {
 export interface Product {
   id: number;
   model: string | null;
+  brand: string | null;
   product_category: string | null;
   scheme: string | null;
   purchase_date: string | null;
@@ -31,11 +32,12 @@ export interface Product {
   "28-day-buy-back_rate"?: number;
   creation_date?: string;
   customer_id?: number;
-  customer?: Customer | null;  // Made customer optional since it's not always included
+  customer?: Customer | null;
 }
 
 export interface NewProduct {
   model: string;
+  brand: string;
   product_category: string;
   scheme: string;
   purchase_price_including_VAT: number;

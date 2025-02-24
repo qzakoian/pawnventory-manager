@@ -9,6 +9,24 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      Brands: {
+        Row: {
+          created_at: string | null
+          id: number
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       CashInputs: {
         Row: {
           created_at: string
@@ -136,6 +154,7 @@ export type Database = {
           "12-week-buy-back_rate": number | null
           "28-day-buy-back_price": number | null
           "28-day-buy-back_rate": number | null
+          brand: string | null
           creation_date: string | null
           customer_id: number | null
           id: number
@@ -159,6 +178,7 @@ export type Database = {
           "12-week-buy-back_rate"?: number | null
           "28-day-buy-back_price"?: number | null
           "28-day-buy-back_rate"?: number | null
+          brand?: string | null
           creation_date?: string | null
           customer_id?: number | null
           id?: number
@@ -182,6 +202,7 @@ export type Database = {
           "12-week-buy-back_rate"?: number | null
           "28-day-buy-back_price"?: number | null
           "28-day-buy-back_rate"?: number | null
+          brand?: string | null
           creation_date?: string | null
           customer_id?: number | null
           id?: number
@@ -201,6 +222,13 @@ export type Database = {
           sku?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "products_brand_fkey"
+            columns: ["brand"]
+            isOneToOne: false
+            referencedRelation: "Brands"
+            referencedColumns: ["name"]
+          },
           {
             foreignKeyName: "Products_customer_id_fkey"
             columns: ["customer_id"]
