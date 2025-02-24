@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
@@ -64,6 +64,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     queryKey: ['shops', user?.id],
     queryFn: fetchShops,
     enabled: !!user,
+    staleTime: Infinity, // Prevent unnecessary refetches
     meta: {
       onError: () => {
         toast({
@@ -75,10 +76,12 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     }
   });
 
-  // Set initial shop if none is selected
-  if (!selectedShop && shops.length > 0 && !isLoading) {
-    setSelectedShop(shops[0]);
-  }
+  // Move the initial shop selection to useEffect
+  useEffect(() => {
+    if (!selectedShop && shops.length > 0 && !isLoading) {
+      setSelectedShop(shops[0]);
+    }
+  }, [shops, isLoading, selectedShop]);
 
   const value = {
     selectedShop,
