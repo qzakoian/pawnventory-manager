@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -82,7 +81,6 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
           setCsvColumns(headers);
           setCsvData(results.data);
           
-          // Create initial mapping suggestion based on matching column names
           const initialMapping: ColumnMapping = {};
           headers.forEach(header => {
             if (ALL_COLUMNS.includes(header)) {
@@ -109,16 +107,20 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
     }
   };
 
-  const handleColumnMap = (csvColumn: string, dbColumn: string) => {
-    setColumnMapping(prev => ({
-      ...prev,
-      [csvColumn]: dbColumn
-    }));
+  const handleColumnMap = (csvColumn: string, dbColumn: string | null) => {
+    setColumnMapping(prev => {
+      const newMapping = { ...prev };
+      if (dbColumn === null) {
+        delete newMapping[csvColumn];
+      } else {
+        newMapping[csvColumn] = dbColumn;
+      }
+      return newMapping;
+    });
   };
 
   const handleImport = async () => {
     try {
-      // Check if required columns are mapped
       const mappedColumns = Object.values(columnMapping);
       const missingRequired = REQUIRED_COLUMNS.filter(col => !mappedColumns.includes(col));
 
@@ -126,7 +128,6 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
         throw new Error(`Please map the required columns: ${missingRequired.join(', ')}`);
       }
 
-      // Transform data using the mapping
       const transformedData = csvData.map(row => {
         const transformed: any = { shop_id: shopId };
         Object.entries(columnMapping).forEach(([csvCol, dbCol]) => {
@@ -138,7 +139,6 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
         return transformed;
       });
 
-      // Filter out rows without required fields
       const validCustomers = transformedData.filter(customer => 
         customer.last_name && customer.last_name.trim() !== ''
       );
@@ -166,7 +166,6 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
         description: `Successfully imported ${validCustomers.length} customers`,
       });
 
-      // Reset state and close dialog
       setShowMapping(false);
       setCsvColumns([]);
       setCsvData([]);
@@ -273,14 +272,14 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
                   <div key={csvColumn} className="flex items-center gap-4">
                     <span className="min-w-[200px] text-sm">{csvColumn}</span>
                     <Select
-                      value={columnMapping[csvColumn] || ""}
-                      onValueChange={(value) => handleColumnMap(csvColumn, value)}
+                      value={columnMapping[csvColumn] || "do_not_import"}
+                      onValueChange={(value) => handleColumnMap(csvColumn, value === "do_not_import" ? null : value)}
                     >
                       <SelectTrigger className="w-[200px]">
                         <SelectValue placeholder="Map to field..." />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">Do not import</SelectItem>
+                        <SelectItem value="do_not_import">Do not import</SelectItem>
                         {ALL_COLUMNS.map((dbColumn) => (
                           <SelectItem key={dbColumn} value={dbColumn}>
                             {dbColumn.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
