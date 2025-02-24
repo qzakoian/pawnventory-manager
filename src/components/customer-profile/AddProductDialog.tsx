@@ -42,8 +42,10 @@ export const AddProductDialog = ({
   schemes,
 }: AddProductDialogProps) => {
   const { selectedShop } = useShop();
+  const [brands, setBrands] = useState<string[]>([]);
   const [newProduct, setNewProduct] = useState<NewProduct>({
     model: "",
+    brand: "",
     product_category: "",
     scheme: "buy-back",
     purchase_price_including_VAT: 0,
@@ -54,6 +56,21 @@ export const AddProductDialog = ({
   const [buybackPrice, setBuybackPrice] = useState<number>(0);
   const [imei, setImei] = useState<string>("");
   const [sku, setSku] = useState<string>("");
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      const { data } = await supabase
+        .from('Brands')
+        .select('name')
+        .order('name');
+      
+      if (data) {
+        setBrands(data.map(brand => brand.name));
+      }
+    };
+
+    fetchBrands();
+  }, []);
 
   useEffect(() => {
     if (newProduct.purchase_price_including_VAT && buybackRate) {
@@ -97,6 +114,7 @@ export const AddProductDialog = ({
     onSubmit(productToSubmit);
     setNewProduct({
       model: "",
+      brand: "",
       product_category: "",
       scheme: "buy-back",
       purchase_price_including_VAT: 0,
@@ -127,6 +145,27 @@ export const AddProductDialog = ({
               value={newProduct.model}
               onChange={(e) => setNewProduct({ ...newProduct, model: e.target.value })}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="brand">Brand</Label>
+            <Select
+              value={newProduct.brand}
+              onValueChange={(value) => setNewProduct({ ...newProduct, brand: value })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select brand" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Brands</SelectLabel>
+                  {brands.map((brand) => (
+                    <SelectItem key={brand} value={brand}>
+                      {brand}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>

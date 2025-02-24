@@ -28,6 +28,9 @@ const formSchema = z.object({
   model: z.string().min(2, {
     message: "Model must be at least 2 characters.",
   }),
+  brand: z.string().min(1, {
+    message: "Brand is required.",
+  }),
   product_category: z.string().min(2, {
     message: "Category must be at least 2 characters.",
   }),
@@ -35,7 +38,7 @@ const formSchema = z.object({
     message: "Scheme must be at least 2 characters.",
   }),
   purchase_price_including_VAT: z.number(),
-  purchase_date: z.string(), // Changed from z.date() to z.string()
+  purchase_date: z.string(),
 })
 
 interface CreateProductFormProps {
@@ -44,6 +47,7 @@ interface CreateProductFormProps {
 
 export function CreateProductForm({ onSubmit }: CreateProductFormProps) {
   const [schemes, setSchemes] = useState<string[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
   
   useEffect(() => {
     const fetchSchemes = async () => {
@@ -57,23 +61,37 @@ export function CreateProductForm({ onSubmit }: CreateProductFormProps) {
       }
     };
 
+    const fetchBrands = async () => {
+      const { data } = await supabase
+        .from('Brands')
+        .select('name')
+        .order('name');
+      
+      if (data) {
+        setBrands(data.map(brand => brand.name));
+      }
+    };
+
     fetchSchemes();
+    fetchBrands();
   }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       model: "",
+      brand: "",
       product_category: "",
       scheme: "",
       purchase_price_including_VAT: 0,
-      purchase_date: new Date().toISOString().split('T')[0], // Initialize with current date in YYYY-MM-DD format
+      purchase_date: new Date().toISOString().split('T')[0],
     },
   })
 
   function onSubmitForm(values: z.infer<typeof formSchema>) {
     onSubmit({
       model: values.model,
+      brand: values.brand,
       product_category: values.product_category,
       scheme: values.scheme,
       purchase_price_including_VAT: values.purchase_price_including_VAT,
@@ -97,6 +115,30 @@ export function CreateProductForm({ onSubmit }: CreateProductFormProps) {
               <FormDescription>
                 This is the product model.
               </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="brand"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Brand</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a brand" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {brands.map((brand) => (
+                    <SelectItem key={brand} value={brand}>
+                      {brand}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           )}
