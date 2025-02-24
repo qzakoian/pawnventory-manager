@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Upload } from "lucide-react";
+import { Download, Upload } from "lucide-react";
 import Papa from 'papaparse';
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -20,7 +20,7 @@ interface ImportCustomersDialogProps {
 }
 
 interface CSVCustomer {
-  first_name: string;
+  first_name?: string;
   last_name: string;
   email?: string;
   phone_number?: string;
@@ -57,11 +57,11 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
 
           // Validate required fields
           const invalidCustomers = customers.filter(
-            customer => !customer.first_name || !customer.last_name
+            customer => !customer.last_name
           );
 
           if (invalidCustomers.length > 0) {
-            throw new Error("All customers must have first and last names");
+            throw new Error("All customers must have a last name");
           }
 
           // Prepare customers data with shop_id
@@ -103,6 +103,44 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
     }
   };
 
+  const downloadTemplate = () => {
+    const headers = [
+      'last_name',
+      'first_name',
+      'email',
+      'phone_number',
+      'address_line1',
+      'address_line2',
+      'city',
+      'postal_code',
+      'county'
+    ];
+
+    const csvContent = Papa.unparse({
+      fields: headers,
+      data: [
+        {
+          last_name: 'Smith',
+          first_name: 'John',
+          email: 'john.smith@example.com',
+          phone_number: '123-456-7890',
+          address_line1: '123 Main St',
+          address_line2: 'Apt 4B',
+          city: 'Springfield',
+          postal_code: '12345',
+          county: 'Hampshire'
+        }
+      ]
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'customer_import_template.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -117,23 +155,34 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Upload a CSV file with the following columns: first_name, last_name, email,
+            Upload a CSV file with the following columns: last_name, first_name, email,
             phone_number, address_line1, address_line2, city, postal_code, county
           </p>
-          <Input
-            type="file"
-            accept=".csv"
-            onChange={handleFileUpload}
-            disabled={isUploading}
-          />
+          <div className="flex justify-between items-center gap-4">
+            <Input
+              type="file"
+              accept=".csv"
+              onChange={handleFileUpload}
+              disabled={isUploading}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={downloadTemplate}
+              className="whitespace-nowrap"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Download Template
+            </Button>
+          </div>
           <div className="text-sm text-muted-foreground">
-            <p>Required columns:</p>
+            <p>Required column:</p>
             <ul className="list-disc list-inside">
-              <li>first_name</li>
               <li>last_name</li>
             </ul>
             <p className="mt-2">Optional columns:</p>
             <ul className="list-disc list-inside">
+              <li>first_name</li>
               <li>email</li>
               <li>phone_number</li>
               <li>address_line1</li>
