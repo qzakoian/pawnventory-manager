@@ -14,6 +14,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Download, Upload } from "lucide-react";
 import Papa from 'papaparse';
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ImportCustomersDialogProps {
   shopId: number;
@@ -29,6 +36,10 @@ interface CSVCustomer {
   city?: string;
   postal_code?: string;
   county?: string;
+}
+
+interface ColumnMapping {
+  [key: string]: string;
 }
 
 const REQUIRED_COLUMNS = ['last_name'];
@@ -47,6 +58,10 @@ const ALL_COLUMNS = [...REQUIRED_COLUMNS, ...OPTIONAL_COLUMNS];
 export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [csvColumns, setCsvColumns] = useState<string[]>([]);
+  const [columnMapping, setColumnMapping] = useState<ColumnMapping>({});
+  const [csvData, setCsvData] = useState<any[]>([]);
+  const [showMapping, setShowMapping] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -55,88 +70,27 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
     if (!file) return;
 
     setIsUploading(true);
-
+    
     try {
       const text = await file.text();
       
       Papa.parse(text, {
         header: true,
         skipEmptyLines: true,
-        complete: async (results) => {
-          const parsedData = results.data as CSVCustomer[];
-          
-          if (parsedData.length === 0) {
-            throw new Error("No customers found in CSV file");
-          }
-
-          // Validate column headers
+        complete: (results) => {
           const headers = results.meta.fields || [];
-          const missingRequired = REQUIRED_COLUMNS.filter(col => !headers.includes(col));
-          const unknownColumns = headers.filter(col => !ALL_COLUMNS.includes(col));
-
-          if (missingRequired.length > 0) {
-            throw new Error(`Missing required columns: ${missingRequired.join(', ')}`);
-          }
-
-          if (unknownColumns.length > 0) {
-            toast({
-              title: "Warning",
-              description: `Unknown columns will be ignored: ${unknownColumns.join(', ')}`,
-              variant: "default",
-            });
-          }
-
-          // Filter out empty rows and validate last_name
-          const validCustomers = parsedData.filter(customer => 
-            customer && 
-            typeof customer === 'object' && 
-            'last_name' in customer && 
-            customer.last_name && 
-            customer.last_name.trim() !== ''
-          );
-
-          if (validCustomers.length === 0) {
-            throw new Error("No valid customers found. Each customer must have a last name");
-          }
-
-          if (validCustomers.length < parsedData.length) {
-            toast({
-              title: "Warning",
-              description: `${parsedData.length - validCustomers.length} invalid rows were skipped`,
-              variant: "default",
-            });
-          }
-
-          // Prepare customers data with shop_id
-          const customersWithShopId = validCustomers.map(customer => ({
-            ...customer,
-            shop_id: shopId,
-            // Ensure all string fields are properly trimmed
-            last_name: customer.last_name.trim(),
-            first_name: customer.first_name?.trim(),
-            email: customer.email?.trim(),
-            phone_number: customer.phone_number?.trim(),
-            address_line1: customer.address_line1?.trim(),
-            address_line2: customer.address_line2?.trim(),
-            city: customer.city?.trim(),
-            postal_code: customer.postal_code?.trim(),
-            county: customer.county?.trim(),
-          }));
-
-          const { error } = await supabase
-            .from('Customers')
-            .insert(customersWithShopId);
-
-          if (error) throw error;
-
-          toast({
-            title: "Success",
-            description: `Successfully imported ${validCustomers.length} customers`,
+          setCsvColumns(headers);
+          setCsvData(results.data);
+          
+          // Create initial mapping suggestion based on matching column names
+          const initialMapping: ColumnMapping = {};
+          headers.forEach(header => {
+            if (ALL_COLUMNS.includes(header)) {
+              initialMapping[header] = header;
+            }
           });
-
-          // Refresh customers list
-          queryClient.invalidateQueries({ queryKey: ['customers', shopId] });
-          setIsOpen(false);
+          setColumnMapping(initialMapping);
+          setShowMapping(true);
         },
         error: (error) => {
           throw new Error(`Error parsing CSV: ${error.message}`);
@@ -147,12 +101,85 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to import customers",
+        description: error instanceof Error ? error.message : "Failed to parse CSV",
       });
     } finally {
       setIsUploading(false);
-      // Reset the input
       event.target.value = '';
+    }
+  };
+
+  const handleColumnMap = (csvColumn: string, dbColumn: string) => {
+    setColumnMapping(prev => ({
+      ...prev,
+      [csvColumn]: dbColumn
+    }));
+  };
+
+  const handleImport = async () => {
+    try {
+      // Check if required columns are mapped
+      const mappedColumns = Object.values(columnMapping);
+      const missingRequired = REQUIRED_COLUMNS.filter(col => !mappedColumns.includes(col));
+
+      if (missingRequired.length > 0) {
+        throw new Error(`Please map the required columns: ${missingRequired.join(', ')}`);
+      }
+
+      // Transform data using the mapping
+      const transformedData = csvData.map(row => {
+        const transformed: any = { shop_id: shopId };
+        Object.entries(columnMapping).forEach(([csvCol, dbCol]) => {
+          const value = row[csvCol]?.trim();
+          if (value) {
+            transformed[dbCol] = value;
+          }
+        });
+        return transformed;
+      });
+
+      // Filter out rows without required fields
+      const validCustomers = transformedData.filter(customer => 
+        customer.last_name && customer.last_name.trim() !== ''
+      );
+
+      if (validCustomers.length === 0) {
+        throw new Error("No valid customers found. Each customer must have a last name");
+      }
+
+      if (validCustomers.length < transformedData.length) {
+        toast({
+          title: "Warning",
+          description: `${transformedData.length - validCustomers.length} invalid rows were skipped`,
+          variant: "default",
+        });
+      }
+
+      const { error } = await supabase
+        .from('Customers')
+        .insert(validCustomers);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `Successfully imported ${validCustomers.length} customers`,
+      });
+
+      // Reset state and close dialog
+      setShowMapping(false);
+      setCsvColumns([]);
+      setCsvData([]);
+      setColumnMapping({});
+      queryClient.invalidateQueries({ queryKey: ['customers', shopId] });
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Import error:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to import customers",
+      });
     }
   };
 
@@ -202,49 +229,75 @@ export function ImportCustomersDialog({ shopId }: ImportCustomersDialogProps) {
           Import Customers
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle>Import Customers from CSV</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Upload a CSV file with the following columns: last_name, first_name, email,
-            phone_number, address_line1, address_line2, city, postal_code, county
-          </p>
-          <div className="flex justify-between items-center gap-4">
-            <Input
-              type="file"
-              accept=".csv"
-              onChange={handleFileUpload}
-              disabled={isUploading}
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={downloadTemplate}
-              className="whitespace-nowrap"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Download Template
-            </Button>
-          </div>
-          <div className="text-sm text-muted-foreground">
-            <p>Required column:</p>
-            <ul className="list-disc list-inside">
-              <li>last_name</li>
-            </ul>
-            <p className="mt-2">Optional columns:</p>
-            <ul className="list-disc list-inside">
-              <li>first_name</li>
-              <li>email</li>
-              <li>phone_number</li>
-              <li>address_line1</li>
-              <li>address_line2</li>
-              <li>city</li>
-              <li>postal_code</li>
-              <li>county</li>
-            </ul>
-          </div>
+          {!showMapping ? (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Upload a CSV file containing your customer data. You'll be able to map your columns to our required fields in the next step.
+              </p>
+              <div className="flex justify-between items-center gap-4">
+                <Input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileUpload}
+                  disabled={isUploading}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={downloadTemplate}
+                  className="whitespace-nowrap"
+                >
+                  <Download className="mr-2 h-4 w-4" />
+                  Download Template
+                </Button>
+              </div>
+              <div className="text-sm text-muted-foreground">
+                <p>Required fields:</p>
+                <ul className="list-disc list-inside">
+                  <li>Last Name</li>
+                </ul>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">
+                Map your CSV columns to our database fields. Last Name is required.
+              </p>
+              <div className="space-y-4">
+                {csvColumns.map((csvColumn) => (
+                  <div key={csvColumn} className="flex items-center gap-4">
+                    <span className="min-w-[200px] text-sm">{csvColumn}</span>
+                    <Select
+                      value={columnMapping[csvColumn] || ""}
+                      onValueChange={(value) => handleColumnMap(csvColumn, value)}
+                    >
+                      <SelectTrigger className="w-[200px]">
+                        <SelectValue placeholder="Map to field..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Do not import</SelectItem>
+                        {ALL_COLUMNS.map((dbColumn) => (
+                          <SelectItem key={dbColumn} value={dbColumn}>
+                            {dbColumn.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+                <div className="pt-4">
+                  <Button onClick={handleImport} className="w-full">
+                    Import Customers
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
