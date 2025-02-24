@@ -64,12 +64,14 @@ export function ShopProvider({ children }: { children: ReactNode }) {
     queryKey: ['shops', user?.id],
     queryFn: fetchShops,
     enabled: !!user,
-    onError: () => {
-      toast({
-        title: "Error",
-        description: "Failed to load shops. Please try again later.",
-        variant: "destructive",
-      });
+    meta: {
+      onError: () => {
+        toast({
+          title: "Error",
+          description: "Failed to load shops. Please try again later.",
+          variant: "destructive",
+        });
+      }
     }
   });
 
