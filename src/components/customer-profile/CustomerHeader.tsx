@@ -15,7 +15,7 @@ export const CustomerHeader = ({ firstName, lastName }: CustomerHeaderProps) => 
     <div className="space-y-4">
       <Button
         variant="ghost"
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/customers')}
         className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
       >
         <ArrowLeft className="h-4 w-4 mr-2" />
