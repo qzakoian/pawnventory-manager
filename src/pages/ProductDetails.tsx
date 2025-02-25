@@ -84,12 +84,14 @@ const ProductDetails = () => {
     <div className="min-h-screen bg-white">
       <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
         <div className="space-y-4">
-          <Link to="/">
-            <Button variant="ghost" className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            onClick={() => navigate('/products')}
+            className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Products
+          </Button>
           
           <div className="space-y-2">
             <p className="text-gray-500 text-sm">Product Details</p>
