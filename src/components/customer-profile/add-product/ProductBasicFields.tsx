@@ -2,13 +2,6 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -41,7 +34,7 @@ interface ProductBasicFieldsProps {
 export const ProductBasicFields = ({
   newProduct,
   onProductChange,
-  brands = [], // Ensure brands has a default value
+  brands = [],
   categories,
   schemes,
 }: ProductBasicFieldsProps) => {
@@ -58,7 +51,6 @@ export const ProductBasicFields = ({
   const handleCreateBrand = async () => {
     if (!searchValue) return;
     
-    // Check if brand already exists (case insensitive)
     if (brands.some(brand => brand.toLowerCase() === searchValue.toLowerCase())) {
       toast({
         title: "Brand already exists",
@@ -115,49 +107,58 @@ export const ProductBasicFields = ({
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="start" className="w-[300px] p-0">
-            <Command>
-              <CommandInput 
-                placeholder="Search brands..." 
+          <PopoverContent className="w-[300px] p-0" align="start">
+            <div className="flex items-center border-b px-3">
+              <Input
+                className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-0"
+                placeholder="Search brands..."
                 value={searchValue}
-                onValueChange={setSearchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
               />
-              <CommandEmpty className="p-2">
-                <p className="text-sm text-muted-foreground mb-2">No brands found.</p>
-                {searchValue && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="w-full"
-                    onClick={handleCreateBrand}
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    Create "{searchValue}"
-                  </Button>
-                )}
-              </CommandEmpty>
-              <CommandGroup>
-                {filteredBrands.map((brand) => (
-                  <CommandItem
-                    key={brand}
-                    value={brand}
-                    onSelect={() => {
-                      onProductChange({ ...newProduct, brand });
-                      setOpen(false);
-                      setSearchValue("");
-                    }}
-                  >
-                    <Check
+            </div>
+            <div className="max-h-[300px] overflow-y-auto">
+              {filteredBrands.length === 0 ? (
+                <div className="p-4 text-sm text-muted-foreground">
+                  <p className="mb-2">No brands found.</p>
+                  {searchValue && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={handleCreateBrand}
+                    >
+                      <Plus className="mr-2 h-4 w-4" />
+                      Create "{searchValue}"
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="p-1">
+                  {filteredBrands.map((brand) => (
+                    <button
+                      key={brand}
                       className={cn(
-                        "mr-2 h-4 w-4",
-                        newProduct.brand === brand ? "opacity-100" : "opacity-0"
+                        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground",
+                        newProduct.brand === brand && "bg-accent text-accent-foreground"
                       )}
-                    />
-                    {brand}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </Command>
+                      onClick={() => {
+                        onProductChange({ ...newProduct, brand });
+                        setOpen(false);
+                        setSearchValue("");
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          newProduct.brand === brand ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {brand}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </PopoverContent>
         </Popover>
       </div>
