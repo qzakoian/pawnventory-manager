@@ -124,13 +124,17 @@ export const ProductBasicFields = ({
                 <div className="p-4 text-sm text-muted-foreground">
                   <p className="mb-2">No brands found.</p>
                   {searchValue && (
-                    <div className="relative">
+                    <div className="relative pointer-events-auto">
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
-                        className="w-full relative z-10"
+                        className="w-full relative z-50 pointer-events-auto cursor-pointer"
                         onClick={handleCreateBrand}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
                       >
                         <Plus className="mr-2 h-4 w-4" />
                         Create "{searchValue}"
