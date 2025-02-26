@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -271,7 +270,6 @@ const CustomerProfile = () => {
           isOpen={isNewProductDialogOpen}
           onOpenChange={setIsNewProductDialogOpen}
           onSubmit={handleCreateProduct}
-          customerName={`${customer.first_name} ${customer.last_name}`}
           categories={categories}
           schemes={schemes}
         />
