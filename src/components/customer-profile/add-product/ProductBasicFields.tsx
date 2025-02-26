@@ -48,7 +48,10 @@ export const ProductBasicFields = ({
       )
     : brands;
 
-  const handleCreateBrand = async () => {
+  const handleCreateBrand = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent event bubbling
+    e.stopPropagation(); // Ensure the event doesn't propagate
+    
     if (!searchValue) return;
     
     if (brands.some(brand => brand.toLowerCase() === searchValue.toLowerCase())) {
@@ -121,21 +124,25 @@ export const ProductBasicFields = ({
                 <div className="p-4 text-sm text-muted-foreground">
                   <p className="mb-2">No brands found.</p>
                   {searchValue && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={handleCreateBrand}
-                    >
-                      <Plus className="mr-2 h-4 w-4" />
-                      Create "{searchValue}"
-                    </Button>
+                    <div className="relative">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full relative z-10"
+                        onClick={handleCreateBrand}
+                      >
+                        <Plus className="mr-2 h-4 w-4" />
+                        Create "{searchValue}"
+                      </Button>
+                    </div>
                   )}
                 </div>
               ) : (
                 <div className="p-1">
                   {filteredBrands.map((brand) => (
                     <button
+                      type="button"
                       key={brand}
                       className={cn(
                         "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground",
