@@ -28,7 +28,6 @@ const queryClient = new QueryClient({
       refetchOnMount: false,
       refetchOnReconnect: false,
       retry: false,
-      // This will help prevent unnecessary background updates
       networkMode: 'offlineFirst'
     },
   },
@@ -65,6 +64,7 @@ function App() {
           >
             <Route index element={<Index />} />
             <Route path="products" element={<Products />} />
+            <Route path="products/new" element={<Products />} />
             <Route path="customers" element={<Customers />} />
             <Route path="account-settings" element={<AccountSettings />} />
             <Route path="customer/:id" element={<CustomerProfile />} />
