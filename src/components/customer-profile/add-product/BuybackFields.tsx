@@ -31,10 +31,15 @@ export const BuybackFields = ({
       const difference = buybackPrice - purchasePrice;
       const calculatedRate = (difference / purchasePrice) * 100;
       if (calculatedRate !== buybackRate) {
-        onBuybackRateChange(calculatedRate);
+        onBuybackRateChange(Number(calculatedRate.toFixed(2)));
       }
     }
   }, [purchasePrice, buybackPrice, buybackRate, onBuybackRateChange]);
+
+  const handleRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value);
+    onBuybackRateChange(Number(value.toFixed(2)));
+  };
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -43,8 +48,9 @@ export const BuybackFields = ({
         <Input
           id="buyback_rate"
           type="number"
+          step="0.01"
           value={buybackRate}
-          onChange={(e) => onBuybackRateChange(parseFloat(e.target.value))}
+          onChange={handleRateChange}
         />
       </div>
       <div className="space-y-2">
