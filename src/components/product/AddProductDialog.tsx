@@ -117,6 +117,7 @@ export const AddProductDialog = ({
               buybackPrice={buybackPrice}
               onBuybackRateChange={setBuybackRate}
               onBuybackPriceChange={setBuybackPrice}
+              purchasePrice={newProduct.purchase_price_including_VAT}
             />
           )}
           <IdentifierFields
