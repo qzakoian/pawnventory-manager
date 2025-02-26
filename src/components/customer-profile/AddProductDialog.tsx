@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Sheet,
   SheetContent,
@@ -9,20 +9,18 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { ProductBasicFields } from "@/components/customer-profile/add-product/ProductBasicFields";
+import { BuybackFields } from "@/components/customer-profile/add-product/BuybackFields";
+import { IdentifierFields } from "@/components/customer-profile/add-product/IdentifierFields";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { NewProduct } from "@/types/customer";
-import { useShop } from "@/contexts/ShopContext";
 import { supabase } from "@/integrations/supabase/client";
-import { ProductBasicFields } from "./add-product/ProductBasicFields";
-import { BuybackFields } from "./add-product/BuybackFields";
-import { IdentifierFields } from "./add-product/IdentifierFields";
 
 interface AddProductDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (product: NewProduct) => void;
-  customerName: string;
   categories: string[];
   schemes: string[];
 }
@@ -31,12 +29,9 @@ export const AddProductDialog = ({
   isOpen,
   onOpenChange,
   onSubmit,
-  customerName,
   categories,
   schemes,
 }: AddProductDialogProps) => {
-  const { selectedShop } = useShop();
-  const [brands, setBrands] = useState<string[]>([]);
   const [newProduct, setNewProduct] = useState<NewProduct>({
     model: "",
     brand: "",
@@ -50,37 +45,6 @@ export const AddProductDialog = ({
   const [buybackPrice, setBuybackPrice] = useState<number>(0);
   const [imei, setImei] = useState<string>("");
   const [sku, setSku] = useState<string>("");
-
-  useEffect(() => {
-    const fetchBrands = async () => {
-      const { data } = await supabase
-        .from('Brands')
-        .select('name')
-        .order('name');
-      
-      if (data) {
-        setBrands(data.map(brand => brand.name));
-      }
-    };
-
-    fetchBrands();
-  }, []);
-
-  useEffect(() => {
-    if (newProduct.purchase_price_including_VAT && buybackRate) {
-      const interest = (newProduct.purchase_price_including_VAT * buybackRate) / 100;
-      const calculatedPrice = newProduct.purchase_price_including_VAT + interest;
-      setBuybackPrice(calculatedPrice);
-    }
-  }, [newProduct.purchase_price_including_VAT, buybackRate]);
-
-  useEffect(() => {
-    if (newProduct.purchase_price_including_VAT && buybackPrice) {
-      const difference = buybackPrice - newProduct.purchase_price_including_VAT;
-      const calculatedRate = (difference / newProduct.purchase_price_including_VAT) * 100;
-      setBuybackRate(calculatedRate);
-    }
-  }, [newProduct.purchase_price_including_VAT, buybackPrice]);
 
   const generateRandomIMEI = async () => {
     const { data, error } = await supabase.rpc('generate_random_imei');
@@ -101,7 +65,6 @@ export const AddProductDialog = ({
       ...newProduct,
       [`${newProduct.scheme}_rate`]: buybackRate,
       [`${newProduct.scheme}_price`]: buybackPrice,
-      shop_id: selectedShop?.id,
       imei,
       sku,
     };
@@ -128,14 +91,14 @@ export const AddProductDialog = ({
         <SheetHeader className="mb-6">
           <SheetTitle>Add New Product</SheetTitle>
           <SheetDescription>
-            Create a new product for {customerName}
+            Create a new product
           </SheetDescription>
         </SheetHeader>
         <div className="space-y-4">
           <ProductBasicFields
             newProduct={newProduct}
             onProductChange={setNewProduct}
-            brands={brands}
+            brands={[]}
             categories={categories}
             schemes={schemes}
           />
@@ -154,6 +117,7 @@ export const AddProductDialog = ({
               buybackPrice={buybackPrice}
               onBuybackRateChange={setBuybackRate}
               onBuybackPriceChange={setBuybackPrice}
+              purchasePrice={newProduct.purchase_price_including_VAT}
             />
           )}
           <IdentifierFields
