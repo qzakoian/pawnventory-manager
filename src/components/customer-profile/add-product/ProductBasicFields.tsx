@@ -116,44 +116,48 @@ export const ProductBasicFields = ({
             </Button>
           </PopoverTrigger>
           <PopoverContent align="start" className="w-[300px] p-0">
-            <Command>
+            <Command shouldFilter={false}>
               <CommandInput 
                 placeholder="Search brands..." 
                 value={searchValue}
                 onValueChange={setSearchValue}
               />
-              <CommandEmpty className="p-2">
-                <p className="text-sm text-muted-foreground mb-2">No brands found.</p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full"
-                  onClick={handleCreateBrand}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create "{searchValue}"
-                </Button>
-              </CommandEmpty>
-              <CommandGroup>
-                {filteredBrands.map((brand) => (
-                  <CommandItem
-                    key={brand}
-                    onSelect={() => {
-                      onProductChange({ ...newProduct, brand });
-                      setOpen(false);
-                      setSearchValue("");
-                    }}
+              {filteredBrands.length === 0 ? (
+                <CommandEmpty className="p-2">
+                  <p className="text-sm text-muted-foreground mb-2">No brands found.</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full"
+                    onClick={handleCreateBrand}
                   >
-                    <Check
-                      className={cn(
-                        "mr-2 h-4 w-4",
-                        newProduct.brand === brand ? "opacity-100" : "opacity-0"
-                      )}
-                    />
-                    {brand}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+                    <Plus className="mr-2 h-4 w-4" />
+                    Create "{searchValue}"
+                  </Button>
+                </CommandEmpty>
+              ) : (
+                <CommandGroup>
+                  {filteredBrands.map((brand) => (
+                    <CommandItem
+                      key={brand}
+                      value={brand}
+                      onSelect={() => {
+                        onProductChange({ ...newProduct, brand });
+                        setOpen(false);
+                        setSearchValue("");
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          newProduct.brand === brand ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      {brand}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              )}
             </Command>
           </PopoverContent>
         </Popover>
