@@ -14,15 +14,19 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import { ProductSearch } from "@/components/product/ProductSearch";
 import { ImportProductsDialog } from "@/components/product/import/ImportProductsDialog";
+import { AddProductDialog } from "@/components/product/AddProductDialog";
+import { toast } from "@/components/ui/use-toast";
+import { NewProduct } from "@/types/customer";
 
 const Products = () => {
   const { selectedShop } = useShop();
   const navigate = useNavigate();
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   
-  const { data: products, isLoading } = useQuery({
+  const { data: products, isLoading, refetch } = useQuery({
     queryKey: ['products', selectedShop?.id],
     queryFn: async () => {
       if (!selectedShop) return [];
@@ -38,6 +42,59 @@ const Products = () => {
     },
     enabled: !!selectedShop,
   });
+
+  const { data: categories } = useQuery({
+    queryKey: ['productCategories'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('Product Categories')
+        .select('name')
+        .order('name');
+      if (error) throw error;
+      return data?.map(category => category.name) || [];
+    },
+  });
+
+  const { data: schemes } = useQuery({
+    queryKey: ['productSchemes'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('Product Schemes')
+        .select('name')
+        .order('name');
+      if (error) throw error;
+      return data?.map(scheme => scheme.name) || [];
+    },
+  });
+
+  const handleAddProduct = async (product: NewProduct) => {
+    try {
+      const { error } = await supabase
+        .from('Products')
+        .insert([{
+          ...product,
+          shop_id: selectedShop?.id,
+          in_stock: true
+        }]);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Product added successfully",
+      });
+      
+      setIsAddProductOpen(false);
+      refetch();
+    } catch (error) {
+      console.error('Error adding product:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to add product",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -121,8 +178,24 @@ const Products = () => {
               </Table>
             </div>
           </Card>
+          
+          <button 
+            onClick={() => setIsAddProductOpen(true)}
+            className="text-[#646ECB] hover:text-[#646ECB]/90 hover:underline inline-flex items-center text-sm mt-4 gap-1.5"
+          >
+            <Plus className="h-4 w-4" />
+            Create Product
+          </button>
         </div>
       </main>
+
+      <AddProductDialog
+        isOpen={isAddProductOpen}
+        onOpenChange={setIsAddProductOpen}
+        onSubmit={handleAddProduct}
+        categories={categories || []}
+        schemes={schemes || []}
+      />
     </div>
   );
 };
