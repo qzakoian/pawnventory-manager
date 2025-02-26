@@ -1,9 +1,8 @@
-
 import { useShop } from "@/contexts/ShopContext";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -20,12 +19,28 @@ import { ImportProductsDialog } from "@/components/product/import/ImportProducts
 import { AddProductDialog } from "@/components/product/AddProductDialog";
 import { toast } from "@/components/ui/use-toast";
 import { NewProduct } from "@/types/customer";
+import { useEffect } from "react";
 
 const Products = () => {
   const { selectedShop } = useShop();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   
+  useEffect(() => {
+    if (location.pathname === '/products/new') {
+      setIsAddProductOpen(true);
+    }
+  }, [location]);
+
+  useEffect(() => {
+    if (isAddProductOpen) {
+      navigate('/products/new', { replace: true });
+    } else if (location.pathname === '/products/new') {
+      navigate('/products', { replace: true });
+    }
+  }, [isAddProductOpen, navigate, location.pathname]);
+
   const { data: products, isLoading, refetch } = useQuery({
     queryKey: ['products', selectedShop?.id],
     queryFn: async () => {
@@ -191,7 +206,9 @@ const Products = () => {
 
       <AddProductDialog
         isOpen={isAddProductOpen}
-        onOpenChange={setIsAddProductOpen}
+        onOpenChange={(open) => {
+          setIsAddProductOpen(open);
+        }}
         onSubmit={handleAddProduct}
         categories={categories || []}
         schemes={schemes || []}
