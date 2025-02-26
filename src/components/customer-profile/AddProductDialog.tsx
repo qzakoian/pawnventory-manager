@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Sheet,
   SheetContent,
@@ -45,6 +45,22 @@ export const AddProductDialog = ({
   const [buybackPrice, setBuybackPrice] = useState<number>(0);
   const [imei, setImei] = useState<string>("");
   const [sku, setSku] = useState<string>("");
+  const [brands, setBrands] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchBrands = async () => {
+      const { data } = await supabase
+        .from('Brands')
+        .select('name')
+        .order('name');
+      
+      if (data) {
+        setBrands(data.map(brand => brand.name || "").filter(Boolean));
+      }
+    };
+
+    fetchBrands();
+  }, []);
 
   const generateRandomIMEI = async () => {
     const { data, error } = await supabase.rpc('generate_random_imei');
@@ -98,7 +114,7 @@ export const AddProductDialog = ({
           <ProductBasicFields
             newProduct={newProduct}
             onProductChange={setNewProduct}
-            brands={[]}
+            brands={brands}
             categories={categories}
             schemes={schemes}
           />
