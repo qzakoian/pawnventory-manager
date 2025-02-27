@@ -110,7 +110,7 @@ export const ProductBasicFields = ({
               <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-[300px] p-0" align="start">
+          <PopoverContent className="w-[300px] p-0 z-50" align="start">
             <div className="flex items-center border-b px-3">
               <Input
                 className="flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-0"
@@ -145,27 +145,37 @@ export const ProductBasicFields = ({
               ) : (
                 <div className="p-1">
                   {filteredBrands.map((brand) => (
-                    <button
-                      type="button"
+                    <div 
                       key={brand}
-                      className={cn(
-                        "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground",
-                        newProduct.brand === brand && "bg-accent text-accent-foreground"
-                      )}
-                      onClick={() => {
-                        onProductChange({ ...newProduct, brand });
-                        setOpen(false);
-                        setSearchValue("");
+                      className="relative pointer-events-auto"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
                       }}
                     >
-                      <Check
+                      <button
+                        type="button"
                         className={cn(
-                          "mr-2 h-4 w-4",
-                          newProduct.brand === brand ? "opacity-100" : "opacity-0"
+                          "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground pointer-events-auto",
+                          newProduct.brand === brand && "bg-accent text-accent-foreground"
                         )}
-                      />
-                      {brand}
-                    </button>
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          onProductChange({ ...newProduct, brand });
+                          setOpen(false);
+                          setSearchValue("");
+                        }}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            newProduct.brand === brand ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        {brand}
+                      </button>
+                    </div>
                   ))}
                 </div>
               )}
