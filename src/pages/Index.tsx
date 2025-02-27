@@ -1,58 +1,19 @@
 
-import { useShop } from "@/contexts/ShopContext";
-import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
-import { QuickAccess } from "@/components/dashboard/QuickAccess";
-import { OverviewCards } from "@/components/dashboard/OverviewCards";
-import { ProfitsChart } from "@/components/dashboard/ProfitsChart";
-import { CashLevels } from "@/components/dashboard/CashLevels";
-import { TransactionsTable } from "@/components/dashboard/TransactionsTable";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Brain, ShieldCheck, BarChart3, DollarSign, ShoppingCart, Scale, Zap, Clock } from "lucide-react";
 
 const Index = () => {
-  const { selectedShop, isLoading, error } = useShop();
+  const { user } = useAuth();
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <main className="p-6 max-w-7xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-gray-500">Loading shop data...</div>
-          </div>
-        </main>
-      </div>
-    );
+  // Redirect to dashboard if logged in
+  if (user) {
+    return <Navigate to="/dashboard" />;
   }
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-white">
-        <main className="p-6 max-w-7xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-red-500">{error}</div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  if (selectedShop) {
-    return (
-      <div className="min-h-screen bg-white">
-        <main className="p-6 max-w-7xl mx-auto space-y-8">
-          <WelcomeHeader />
-          <QuickAccess shopId={selectedShop.id} />
-          <OverviewCards />
-          <ProfitsChart />
-          <CashLevels />
-          <TransactionsTable />
-        </main>
-      </div>
-    );
-  }
-
-  // Landing page if no shop is selected
+  // Landing page for non-logged-in users
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
       {/* Hero Section */}
@@ -71,7 +32,7 @@ const Index = () => {
                 The complete AI-powered solution designed specifically for pawn shops to boost profitability, streamline operations, and make smarter decisions.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                <Button size="lg" className="bg-[#646ECB] hover:bg-[#3F4BBD] text-white">
+                <Button size="lg" className="bg-[#646ECB] hover:bg-[#3F4BBD] text-white" onClick={() => window.location.href = '/auth'}>
                   Get Started Free
                 </Button>
                 <Button size="lg" variant="outline">
@@ -279,7 +240,7 @@ const Index = () => {
             Join hundreds of pawn shop managers who are leveraging AI to increase profits, streamline operations, and stay ahead of the competition.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-[#646ECB] hover:bg-white/90">
+            <Button size="lg" className="bg-white text-[#646ECB] hover:bg-white/90" onClick={() => window.location.href = '/auth'}>
               Start Your Free Trial
             </Button>
             <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">

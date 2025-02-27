@@ -11,6 +11,7 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 // Import your pages
 import Auth from "@/pages/Auth";
 import Index from "@/pages/Index";
+import Dashboard from "@/pages/Dashboard";
 import Products from "@/pages/Products";
 import Customers from "@/pages/Customers";
 import AccountSettings from "@/pages/AccountSettings";
@@ -54,6 +55,7 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/auth" element={<Auth />} />
+          <Route index element={<Index />} />
           <Route
             path="/"
             element={
@@ -62,7 +64,7 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Index />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="products" element={<Products />} />
             <Route path="products/new" element={<Products />} />
             <Route path="customers" element={<Customers />} />
