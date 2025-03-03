@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, SidebarRail, useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -15,7 +16,7 @@ export function AppSidebar() {
   const menuItems = [{
     title: "Home",
     icon: Home,
-    url: "/"
+    url: "/dashboard"
   }, {
     title: "Customers",
     icon: Users,
@@ -35,8 +36,8 @@ export function AppSidebar() {
     url: "/account-settings"
   }];
   const isActiveLink = (path: string) => {
-    if (path === "/") {
-      return location.pathname === "/";
+    if (path === "/dashboard") {
+      return location.pathname === "/dashboard";
     }
     return location.pathname.startsWith(path);
   };
