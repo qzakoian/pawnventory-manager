@@ -2,7 +2,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Brain, ShieldCheck, BarChart3, DollarSign, ShoppingCart, Scale, Zap, Clock } from "lucide-react";
+import { Brain, ShieldCheck, BarChart3, DollarSign, ShoppingCart, Scale, Zap, Clock, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
@@ -11,35 +11,47 @@ const Index = () => {
   // Instead of redirecting, we'll display a dashboard link for logged-in users
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-blue-50">
-      {/* Navigation bar for logged-in users */}
-      {user && (
-        <div className="bg-white shadow-sm py-3 px-4 md:px-8">
-          <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <img 
-                src="/lovable-uploads/6d264df4-586e-42c3-86be-1d1e9ba01ddb.png" 
-                alt="Logo" 
-                className="h-8 w-8"
-              />
-              <span className="font-semibold text-gray-900">PawnventoryAI</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link 
-                to="/dashboard" 
-                className="text-sm font-medium text-blue-600 hover:text-blue-800"
+      {/* Navigation bar */}
+      <div className="bg-white shadow-sm py-3 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <img 
+              src="/lovable-uploads/6d264df4-586e-42c3-86be-1d1e9ba01ddb.png" 
+              alt="Logo" 
+              className="h-8 w-8"
+            />
+            <span className="font-semibold text-gray-900">PawnventoryAI</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <>
+                <Link 
+                  to="/dashboard" 
+                  className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  to="/account-settings"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-800"
+                >
+                  Account Settings
+                </Link>
+              </>
+            ) : (
+              <Button 
+                as={Link} 
+                to="/auth" 
+                variant="outline" 
+                className="flex items-center gap-2"
               >
-                Go to Dashboard
-              </Link>
-              <Link
-                to="/account-settings"
-                className="text-sm font-medium text-gray-600 hover:text-gray-800"
-              >
-                Account Settings
-              </Link>
-            </div>
+                <LogIn className="h-4 w-4" />
+                Connexion / Sign up
+              </Button>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Hero Section */}
       <section className="pt-20 pb-16 px-4 md:px-8">
