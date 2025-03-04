@@ -44,7 +44,8 @@ const Auth = () => {
             description: "Please check your email to verify your account.",
           });
         }
-        navigate("/");
+        // Redirect to dashboard instead of homepage
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error("Authentication error:", error);
