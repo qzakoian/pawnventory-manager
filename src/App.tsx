@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Import your pages
 import Auth from "@/pages/Auth";
@@ -36,8 +37,8 @@ const queryClient = new QueryClient({
 
 function ProtectedLayout() {
   return (
-    <div className="flex w-full">
-      <SidebarProvider>
+    <div className="flex w-full min-h-svh">
+      <SidebarProvider defaultOpen={true}>
         <ShopProvider>
           <AppSidebar />
           <div className="flex-1">

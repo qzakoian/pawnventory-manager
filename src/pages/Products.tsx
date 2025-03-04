@@ -20,6 +20,8 @@ import { AddProductDialog } from "@/components/product/AddProductDialog";
 import { toast } from "@/components/ui/use-toast";
 import { NewProduct } from "@/types/customer";
 import { useEffect } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
 
 const Products = () => {
   const { selectedShop } = useShop();
@@ -111,29 +113,46 @@ const Products = () => {
     }
   };
 
+  const isMobile = useIsMobile();
+
   return (
     <div className="min-h-screen bg-white">
-      <main className="p-6 max-w-7xl mx-auto space-y-8">
+      <main className="p-4 md:p-6 max-w-7xl mx-auto space-y-4 md:space-y-8">
         <div>
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-semibold text-foreground">Products</h1>
-            {selectedShop && <ImportProductsDialog shopId={selectedShop.id} />}
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4 md:mb-6">
+            <h1 className="text-xl md:text-2xl font-semibold text-foreground">Products</h1>
+            {selectedShop && (
+              <div className="flex items-center">
+                {!isMobile && <ImportProductsDialog shopId={selectedShop.id} />}
+                {isMobile && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full" 
+                    onClick={() => setIsAddProductOpen(true)}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Product
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
           
           {selectedShop && <ProductSearch shopId={selectedShop.id} />}
           
-          <Card className="mt-8">
+          <Card className="mt-4 md:mt-8">
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Model</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>IMEI/SKU</TableHead>
-                    <TableHead>Purchase Date</TableHead>
+                    <TableHead className="hidden md:table-cell">Category</TableHead>
+                    <TableHead className="hidden md:table-cell">IMEI/SKU</TableHead>
+                    <TableHead className="hidden md:table-cell">Purchase Date</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Price</TableHead>
-                    <TableHead></TableHead>
+                    <TableHead className="w-10"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -159,8 +178,8 @@ const Products = () => {
                         <TableCell className="font-medium">
                           {product.model}
                         </TableCell>
-                        <TableCell>{product.product_category}</TableCell>
-                        <TableCell>
+                        <TableCell className="hidden md:table-cell">{product.product_category}</TableCell>
+                        <TableCell className="hidden md:table-cell">
                           {product.imei && (
                             <div className="text-gray-500">{product.imei}</div>
                           )}
@@ -168,7 +187,7 @@ const Products = () => {
                             <div className="text-gray-500">{product.sku}</div>
                           )}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="hidden md:table-cell">
                           {product.purchase_date ? format(new Date(product.purchase_date), "MMM d, yyyy") : 'N/A'}
                         </TableCell>
                         <TableCell>
@@ -194,13 +213,15 @@ const Products = () => {
             </div>
           </Card>
           
-          <button 
-            onClick={() => setIsAddProductOpen(true)}
-            className="text-[#646ECB] hover:text-[#646ECB]/90 hover:underline inline-flex items-center text-sm mt-4 gap-1.5"
-          >
-            <Plus className="h-4 w-4" />
-            Create Product
-          </button>
+          {!isMobile && (
+            <button 
+              onClick={() => setIsAddProductOpen(true)}
+              className="text-[#646ECB] hover:text-[#646ECB]/90 hover:underline inline-flex items-center text-sm mt-4 gap-1.5"
+            >
+              <Plus className="h-4 w-4" />
+              Create Product
+            </button>
+          )}
         </div>
       </main>
 
