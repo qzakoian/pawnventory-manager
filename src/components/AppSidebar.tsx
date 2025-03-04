@@ -53,8 +53,8 @@ export function AppSidebar() {
 
   return (
     <>
-      <Sidebar collapsible="icon" className="border-r bg-white text-foreground">
-        <SidebarContent>
+      <Sidebar collapsible="icon" className="border-r bg-white text-foreground shadow-sm">
+        <SidebarContent className="bg-white">
           {/* Collapse button container */}
           <div className="absolute right-0 top-0 z-50 p-2">
             <SidebarTrigger className="flex items-center gap-2 rounded-md px-2 py-1 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700">
@@ -63,7 +63,7 @@ export function AppSidebar() {
           </div>
 
           {/* Main content with proper spacing for the button */}
-          <div className="mt-12">
+          <div className="mt-12 bg-white">
             <div className="flex flex-col">
               <div className="p-2">
                 <div className={cn("relative overflow-hidden transition-all duration-200 w-full", state === "expanded" ? "h-48" : "h-32")}>
@@ -94,7 +94,7 @@ export function AppSidebar() {
           </SidebarGroup>
         </SidebarContent>
 
-        <SidebarFooter className="p-0">
+        <SidebarFooter className="p-0 bg-white">
           <SidebarGroup className="p-0">
             <SidebarGroupContent className="px-[8px] py-[16px]">
               <SidebarMenu>
