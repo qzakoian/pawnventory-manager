@@ -1,11 +1,16 @@
 
 import { Plus } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface AddProductButtonProps {
   onClick: () => void;
 }
 
 export const AddProductButton = ({ onClick }: AddProductButtonProps) => {
+  const isMobile = useIsMobile();
+  
+  if (isMobile) return null;
+  
   return (
     <button 
       onClick={onClick}

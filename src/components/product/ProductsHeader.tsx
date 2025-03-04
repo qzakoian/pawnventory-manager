@@ -16,8 +16,20 @@ export const ProductsHeader = ({ shopId, onAddProduct }: ProductsHeaderProps) =>
     <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-4 md:mb-6">
       <h1 className="text-xl md:text-2xl font-semibold text-foreground">Products</h1>
       {shopId && (
-        <div className="flex items-center">
-          {!isMobile && <ImportProductsDialog shopId={shopId} />}
+        <div className="flex items-center gap-2">
+          {!isMobile && (
+            <>
+              <ImportProductsDialog shopId={shopId} />
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2" 
+                onClick={onAddProduct}
+              >
+                <Plus className="h-4 w-4" />
+                Add Product
+              </Button>
+            </>
+          )}
           {isMobile && (
             <Button 
               variant="outline" 

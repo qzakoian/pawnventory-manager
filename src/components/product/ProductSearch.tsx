@@ -6,6 +6,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { ArrowRight, Plus } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Product {
   id: number;
@@ -24,6 +25,7 @@ export const ProductSearch = ({ shopId }: ProductSearchProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const isMobile = useIsMobile();
 
   // Debounced search effect
   useEffect(() => {
@@ -99,13 +101,15 @@ export const ProductSearch = ({ shopId }: ProductSearchProps) => {
             ))}
           </div>
         )}
-        <button 
-          onClick={() => navigate('/products/new')}
-          className="text-[#646ECB] hover:text-[#646ECB]/90 hover:underline inline-flex items-center text-sm mt-2 gap-1.5"
-        >
-          <Plus className="h-4 w-4" />
-          Create Product
-        </button>
+        {!isMobile && (
+          <button 
+            onClick={() => navigate('/products/new')}
+            className="text-[#646ECB] hover:text-[#646ECB]/90 hover:underline inline-flex items-center text-sm mt-2 gap-1.5"
+          >
+            <Plus className="h-4 w-4" />
+            Create Product
+          </button>
+        )}
       </div>
     </Card>
   );
