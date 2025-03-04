@@ -40,13 +40,14 @@ const Index = () => {
               </>
             ) : (
               <Button 
-                as={Link} 
-                to="/auth" 
                 variant="outline" 
                 className="flex items-center gap-2"
+                asChild
               >
-                <LogIn className="h-4 w-4" />
-                Connexion / Sign up
+                <Link to="/auth">
+                  <LogIn className="h-4 w-4" />
+                  Connexion / Sign up
+                </Link>
               </Button>
             )}
           </div>
@@ -74,8 +75,8 @@ const Index = () => {
                     <Link to="/dashboard">Go to Dashboard</Link>
                   </Button>
                 ) : (
-                  <Button size="lg" className="bg-[#646ECB] hover:bg-[#3F4BBD] text-white" onClick={() => window.location.href = '/auth'}>
-                    Get Started Free
+                  <Button size="lg" className="bg-[#646ECB] hover:bg-[#3F4BBD] text-white" asChild>
+                    <Link to="/auth">Get Started Free</Link>
                   </Button>
                 )}
                 <Button size="lg" variant="outline">
@@ -288,8 +289,8 @@ const Index = () => {
                 <Link to="/dashboard">Go to Dashboard</Link>
               </Button>
             ) : (
-              <Button size="lg" className="bg-white text-[#646ECB] hover:bg-white/90" onClick={() => window.location.href = '/auth'}>
-                Start Your Free Trial
+              <Button size="lg" className="bg-white text-[#646ECB] hover:bg-white/90" asChild>
+                <Link to="/auth">Start Your Free Trial</Link>
               </Button>
             )}
             <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
