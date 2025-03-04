@@ -78,6 +78,10 @@
   @apply bg-white/90 backdrop-blur-sm border-[#646ECB]/20 border;
 }
 
+.animate-fade-in {
+  @apply animate-in fade-in duration-300;
+}
+
 .animate-enter {
   @apply animate-fade-in;
 }

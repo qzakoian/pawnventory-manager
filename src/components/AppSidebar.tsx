@@ -116,7 +116,7 @@ export function AppSidebar() {
       {/* Mobile sidebar toggle button - Updated styling */}
       {isMobile && !openMobile && (
         <Button
-          variant="primary"
+          variant="default"
           size="icon"
           className="fixed bottom-6 right-6 z-50 rounded-full shadow-lg h-14 w-14 animate-fade-in"
           onClick={() => setOpenMobile(true)}
