@@ -51,6 +51,13 @@ export function AppSidebar() {
     return location.pathname.startsWith(path);
   };
 
+  // Handle navigation with mobile closing
+  const handleNavigation = () => {
+    if (isMobile && openMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   return (
     <>
       <Sidebar collapsible="icon" className="border-r bg-white text-foreground shadow-sm">
@@ -83,7 +90,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 {menuItems.map(item => <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild tooltip={state === "collapsed" ? item.title : undefined} className={cn("flex items-center gap-3 px-4 py-2 hover:bg-gray-100", isActiveLink(item.url) && "bg-gray-100 font-medium")}>
-                      <Link to={item.url} className="flex items-center gap-3">
+                      <Link to={item.url} className="flex items-center gap-3" onClick={handleNavigation}>
                         <item.icon className="h-5 w-5 text-gray-600" />
                         <span className="text-[#454545]">{item.title}</span>
                       </Link>
@@ -100,7 +107,7 @@ export function AppSidebar() {
               <SidebarMenu>
                 {bottomMenuItems.map(item => <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild tooltip={state === "collapsed" ? item.title : undefined} className={cn("flex items-center gap-3 px-4 py-2 hover:bg-gray-100", isActiveLink(item.url) && "bg-gray-100 font-medium")}>
-                      <Link to={item.url} className="flex items-center gap-3">
+                      <Link to={item.url} className="flex items-center gap-3" onClick={handleNavigation}>
                         <item.icon className="h-5 w-5 text-gray-600" />
                         <span className="text-[#454545]">{item.title}</span>
                       </Link>
