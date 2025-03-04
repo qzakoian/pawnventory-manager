@@ -113,15 +113,15 @@ export function AppSidebar() {
         <SidebarRail />
       </Sidebar>
 
-      {/* Mobile sidebar toggle button */}
+      {/* Mobile sidebar toggle button - Updated styling */}
       {isMobile && !openMobile && (
         <Button
-          variant="secondary"
+          variant="primary"
           size="icon"
-          className="fixed bottom-4 right-4 z-50 rounded-full shadow-lg border border-gray-200 bg-white text-gray-700 h-12 w-12"
+          className="fixed bottom-6 right-6 z-50 rounded-full shadow-lg h-14 w-14 animate-fade-in"
           onClick={() => setOpenMobile(true)}
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-6 w-6" />
         </Button>
       )}
     </>
