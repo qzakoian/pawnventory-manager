@@ -1,6 +1,5 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,9 +13,9 @@ serve(async (req) => {
   }
 
   try {
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      throw new Error('OPENAI_API_KEY is not set');
+    const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
+    if (!anthropicApiKey) {
+      throw new Error('ANTHROPIC_API_KEY is not set');
     }
 
     // Parse the request body
@@ -28,64 +27,77 @@ serve(async (req) => {
       );
     }
 
-    console.log('Analyzing product image with OpenAI API...');
+    console.log('Analyzing product image with Claude API...');
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'x-api-key': anthropicApiKey,
+        'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o',
+        model: 'claude-3-opus-20240229',
+        max_tokens: 1024,
         messages: [
-          {
-            role: 'system',
-            content: `You are a product specialist AI that analyzes images of electronic devices, 
-            especially phones and tablets. Extract product information in JSON format with the
-            following fields: model, brand, category, and if visible, any identifiers like IMEI or SKU.
-            For category, use one of these values if possible: [Smartphone, Tablet, Laptop, Watch, Other].
-            If you can't determine a field with high confidence, leave it as null.`
-          },
           {
             role: 'user',
             content: [
-              { type: 'text', text: 'Analyze this device and extract product details in JSON format.' },
-              { 
-                type: 'image_url', 
-                image_url: {
-                  url: `data:image/jpeg;base64,${imageBase64}`
+              {
+                type: 'text',
+                text: `You are a product specialist AI that analyzes images of electronic devices, 
+                especially phones and tablets. Extract product information in JSON format with the
+                following fields: model, brand, category, and if visible, any identifiers like IMEI or SKU.
+                For category, use one of these values if possible: [Smartphone, Tablet, Laptop, Watch, Other].
+                If you can't determine a field with high confidence, leave it as null.
+                
+                Analyze this device and extract product details in JSON format.`
+              },
+              {
+                type: 'image',
+                source: {
+                  type: 'base64',
+                  media_type: 'image/jpeg',
+                  data: imageBase64
                 }
               }
             ]
           }
-        ],
-        temperature: 0.1,
-        response_format: { type: "json_object" }
+        ]
       }),
     });
 
     const data = await response.json();
     
     if (data.error) {
-      console.error('OpenAI API error:', data.error);
+      console.error('Claude API error:', data.error);
       return new Response(
         JSON.stringify({ error: 'Error analyzing image', details: data.error }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       );
     }
 
-    const content = data.choices[0]?.message?.content;
+    const content = data.content?.[0]?.text;
     if (!content) {
       throw new Error('No content in the response');
     }
 
+    // Extract JSON from the text response
+    const jsonMatch = content.match(/```json\n([\s\S]*?)\n```/) || 
+                      content.match(/{[\s\S]*?}/);
+                      
+    if (!jsonMatch) {
+      throw new Error('No JSON found in the response');
+    }
+    
     // Parse the JSON content
     let productInfo;
     try {
-      productInfo = JSON.parse(content);
+      // If we matched the code block format, use the first capture group, otherwise use the whole match
+      const jsonString = jsonMatch[1] || jsonMatch[0];
+      productInfo = JSON.parse(jsonString);
     } catch (e) {
-      console.error('Error parsing JSON from OpenAI response:', e);
+      console.error('Error parsing JSON from Claude response:', e, 'Raw content:', content);
       return new Response(
         JSON.stringify({ error: 'Failed to parse product information' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
