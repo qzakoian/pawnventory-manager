@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { CameraCapture } from "./CameraCapture";
 import { ImagePreview } from "./ImagePreview";
