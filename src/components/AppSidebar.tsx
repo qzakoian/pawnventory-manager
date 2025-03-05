@@ -1,4 +1,3 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, SidebarRail, useSidebar } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
@@ -21,7 +20,7 @@ export function AppSidebar() {
   } = useShop();
   
   const menuItems = [{
-    title: "Home",
+    title: "Dashboard",
     icon: Home,
     url: "/dashboard"
   }, {
