@@ -44,6 +44,14 @@ export interface NewProduct {
   purchase_date: string;
 }
 
+export interface ProductInfo {
+  model?: string | null;
+  brand?: string | null;
+  category?: string | null;
+  imei?: string | null;
+  sku?: string | null;
+}
+
 export interface EditCustomer {
   first_name: string;
   last_name: string;

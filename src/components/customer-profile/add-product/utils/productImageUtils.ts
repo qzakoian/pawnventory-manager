@@ -1,14 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-
-export interface ProductInfo {
-  model?: string | null;
-  brand?: string | null;
-  category?: string | null;
-  imei?: string | null;
-  sku?: string | null;
-}
+import { ProductInfo } from "@/types/customer";
 
 export async function analyzeProductImage(imageBase64: string) {
   const { toast } = useToast();
