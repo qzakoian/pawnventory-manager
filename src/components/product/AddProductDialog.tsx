@@ -109,7 +109,7 @@ export const AddProductDialog = ({
           <Button variant="outline" onClick={() => onOpenChange(false)} className="mb-2 sm:mb-0">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} className="my-[6px] mb-2">
+          <Button onClick={handleSubmit} className="mb-2 mb-2">
             Create Product
           </Button>
         </SheetFooter>
