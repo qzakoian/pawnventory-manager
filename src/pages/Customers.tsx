@@ -48,11 +48,11 @@ const Customers = () => {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={() => navigate('/')} 
+            onClick={() => navigate('/dashboard')} 
             className="flex items-center gap-2 mb-4"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            Back to Dashboard
           </Button>
           
           <div className="flex justify-between items-center mb-6">
