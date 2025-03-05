@@ -27,7 +27,8 @@ export const ImagePreview = ({ imageSrc, onReset, onProductInfoDetected }: Image
       });
 
       if (error) {
-        throw error;
+        console.error("Error analyzing image:", error);
+        throw new Error(error.message || "Failed to analyze image");
       }
 
       if (data.productInfo) {
@@ -41,11 +42,22 @@ export const ImagePreview = ({ imageSrc, onReset, onProductInfoDetected }: Image
       }
     } catch (error) {
       console.error("Error analyzing image:", error);
-      toast({
-        title: "Analysis Failed",
-        description: "Could not extract product information from the image.",
-        variant: "destructive",
-      });
+      
+      // Check for specific API credit error
+      const errorMessage = error.message || "";
+      if (errorMessage.includes("credit balance") || errorMessage.includes("Edge Function")) {
+        toast({
+          title: "AI Service Unavailable",
+          description: "The AI service is currently unavailable due to credit limits. Please try the manual entry method instead.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Analysis Failed",
+          description: "Could not extract product information from the image. Please try manual entry.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsAnalyzing(false);
     }
