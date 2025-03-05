@@ -126,7 +126,7 @@ export const ProductFormFields = ({
       </div>
 
       {isBuybackScheme && (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="buyback_rate">Interest Rate [%]</Label>
             <Input
@@ -148,7 +148,7 @@ export const ProductFormFields = ({
         </div>
       )}
       
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="imei">IMEI</Label>
           <div className="flex gap-2">
