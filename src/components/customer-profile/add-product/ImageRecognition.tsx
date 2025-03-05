@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Camera, Upload, Loader2 } from "lucide-react";
@@ -24,7 +24,7 @@ export const ImageRecognition = ({ onProductInfoDetected }: ImageRecognitionProp
   const { toast } = useToast();
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [videoStream, setVideoStream] = useState<MediaStream | null>(null);
-  const [videoRef, setVideoRef] = useState<HTMLVideoElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -52,11 +52,6 @@ export const ImageRecognition = ({ onProductInfoDetected }: ImageRecognitionProp
       
       setVideoStream(stream);
       setIsCameraActive(true);
-      
-      // Make sure videoRef is set before setting srcObject
-      if (videoRef) {
-        videoRef.srcObject = stream;
-      }
     } catch (error) {
       console.error("Error accessing camera:", error);
       toast({
@@ -66,6 +61,13 @@ export const ImageRecognition = ({ onProductInfoDetected }: ImageRecognitionProp
       });
     }
   };
+
+  // Effect to set video stream when videoRef is available
+  useEffect(() => {
+    if (videoRef.current && videoStream) {
+      videoRef.current.srcObject = videoStream;
+    }
+  }, [videoStream, isCameraActive]);
 
   // Function to stop the camera
   const stopCamera = () => {
@@ -78,14 +80,14 @@ export const ImageRecognition = ({ onProductInfoDetected }: ImageRecognitionProp
 
   // Function to take a picture
   const takePicture = () => {
-    if (videoRef) {
+    if (videoRef.current) {
       const canvas = document.createElement("canvas");
-      canvas.width = videoRef.videoWidth;
-      canvas.height = videoRef.videoHeight;
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
       const ctx = canvas.getContext("2d");
       
       if (ctx) {
-        ctx.drawImage(videoRef, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
         const dataUrl = canvas.toDataURL("image/jpeg");
         setSelectedImage(dataUrl);
         stopCamera();
@@ -140,7 +142,7 @@ export const ImageRecognition = ({ onProductInfoDetected }: ImageRecognitionProp
         {isCameraActive ? (
           <div className="relative">
             <video 
-              ref={ref => setVideoRef(ref)}
+              ref={videoRef}
               autoPlay 
               playsInline
               className="w-full h-auto rounded-md border border-gray-300"

@@ -242,7 +242,7 @@ export const AddProductDialog = ({
           </TabsContent>
         </Tabs>
         
-        <SheetFooter className="mt-6">
+        <SheetFooter className="mt-6 space-y-2 sm:space-y-0 sm:space-x-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
