@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import {
   Sheet,
@@ -113,7 +112,6 @@ export const AddProductDialog = ({
     }
     
     if (productInfo.category) {
-      // Map the recognized category to one available in our system
       const mappedCategory = mapToAvailableCategory(productInfo.category, categories);
       if (mappedCategory) {
         setNewProduct(prev => ({ ...prev, product_category: mappedCategory }));
@@ -128,22 +126,18 @@ export const AddProductDialog = ({
       setSku(productInfo.sku);
     }
     
-    // Switch to manual tab after AI has filled in the information
     setActiveTab("manual");
   };
   
   const mapToAvailableCategory = (detectedCategory: string, availableCategories: string[]): string => {
-    // First, try to match directly
     const directMatch = availableCategories.find(
       c => c.toLowerCase() === detectedCategory.toLowerCase()
     );
     
     if (directMatch) return directMatch;
     
-    // If no direct match, try to find partial matches
     const lowerDetected = detectedCategory.toLowerCase();
     
-    // Define some common mappings for detected categories
     const categoryMappings: Record<string, string[]> = {
       'smartphone': ['phone', 'mobile', 'cell'],
       'tablet': ['ipad', 'tab'],
@@ -151,16 +145,13 @@ export const AddProductDialog = ({
       'watch': ['smartwatch', 'wearable'],
     };
     
-    // Check if any of our available categories contains the detected term
     for (const category of availableCategories) {
       const lowerCategory = category.toLowerCase();
       
-      // Direct partial match
       if (lowerCategory.includes(lowerDetected) || lowerDetected.includes(lowerCategory)) {
         return category;
       }
       
-      // Check against mappings
       for (const [key, synonyms] of Object.entries(categoryMappings)) {
         if (synonyms.some(s => lowerDetected.includes(s)) && lowerCategory.includes(key)) {
           return category;
@@ -168,7 +159,6 @@ export const AddProductDialog = ({
       }
     }
     
-    // If all else fails, return the first category if available
     return availableCategories.length > 0 ? availableCategories[0] : "";
   };
 
@@ -242,7 +232,7 @@ export const AddProductDialog = ({
           </TabsContent>
         </Tabs>
         
-        <SheetFooter className="mt-6 space-y-2 sm:space-y-0 sm:space-x-2">
+        <SheetFooter className="mt-6 space-y-2 sm:space-y-0 sm:space-x-2 pb-6 mb-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>

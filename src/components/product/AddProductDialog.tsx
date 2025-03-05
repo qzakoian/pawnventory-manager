@@ -1,4 +1,3 @@
-
 import {
   Sheet,
   SheetContent,
@@ -71,7 +70,6 @@ export const AddProductDialog = ({
     }
     
     if (productInfo.category) {
-      // Map the recognized category to one available in our system
       const mappedCategory = mapToAvailableCategory(productInfo.category, categories);
       if (mappedCategory) {
         setNewProduct(prev => ({ ...prev, product_category: mappedCategory }));
@@ -86,7 +84,6 @@ export const AddProductDialog = ({
       setSku(productInfo.sku);
     }
     
-    // Switch to manual tab after AI has filled in the information
     setActiveTab("manual");
   };
 
@@ -133,7 +130,7 @@ export const AddProductDialog = ({
           </TabsContent>
         </Tabs>
         
-        <SheetFooter className="mt-6 space-y-2 sm:space-y-0 sm:space-x-2">
+        <SheetFooter className="mt-6 space-y-2 sm:space-y-0 sm:space-x-2 pb-6 mb-4">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="mb-2 sm:mb-0">
             Cancel
           </Button>
