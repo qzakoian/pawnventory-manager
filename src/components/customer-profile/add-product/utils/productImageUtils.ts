@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ProductInfo } from "@/types/customer";
 
+export type { ProductInfo };  // Export the ProductInfo type
+
 export async function analyzeProductImage(imageBase64: string) {
   const { toast } = useToast();
   

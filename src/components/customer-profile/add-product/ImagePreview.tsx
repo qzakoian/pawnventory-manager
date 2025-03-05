@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { ProductInfo } from "./utils/productImageUtils";
+import { ProductInfo } from "@/types/customer";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ImagePreviewProps {

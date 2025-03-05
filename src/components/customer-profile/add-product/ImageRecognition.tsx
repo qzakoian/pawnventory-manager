@@ -3,7 +3,7 @@ import { useState } from "react";
 import { CameraCapture } from "./CameraCapture";
 import { ImagePreview } from "./ImagePreview";
 import { ImageUpload } from "./ImageUpload";
-import { ProductInfo } from "./utils/productImageUtils";
+import { ProductInfo } from "@/types/customer";
 
 interface ImageRecognitionProps {
   onProductInfoDetected: (productInfo: ProductInfo) => void;
