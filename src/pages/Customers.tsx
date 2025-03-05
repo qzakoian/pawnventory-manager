@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
-import { ArrowRight, Home } from "lucide-react";
+import { ArrowLeft, ArrowRight, Home } from "lucide-react";
 import { CustomerSearch } from "@/components/customer/CustomerSearch";
 import { ImportCustomersDialog } from "@/components/customer/ImportCustomersDialog";
 import { Button } from "@/components/ui/button";
@@ -45,19 +45,18 @@ const Customers = () => {
     <div className="min-h-screen bg-white">
       <main className="p-6 max-w-7xl mx-auto space-y-8">
         <div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate('/')} 
+            className="flex items-center gap-2 mb-4"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
+          </Button>
+          
           <div className="flex justify-between items-center mb-6">
-            <div className="flex items-center gap-4">
-              <h1 className="text-2xl font-semibold text-foreground">Customers</h1>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => navigate('/')} 
-                className="flex items-center gap-2"
-              >
-                <Home className="h-4 w-4" />
-                Home
-              </Button>
-            </div>
+            <h1 className="text-2xl font-semibold text-foreground">Customers</h1>
             {selectedShop && <ImportCustomersDialog shopId={selectedShop.id} />}
           </div>
           
