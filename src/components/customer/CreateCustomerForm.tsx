@@ -83,12 +83,12 @@ export const CreateCustomerForm = ({ shopId, onSuccess }: CreateCustomerFormProp
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto pr-2 space-y-4 pb-4">
+          <div className="flex-1 overflow-y-auto pr-2 space-y-4 pb-6">
             <PersonalInfoFields form={form} />
             <AddressFields form={form} />
           </div>
           
-          <div className="pt-4 border-t sticky bottom-0 bg-background mt-4">
+          <div className="pt-4 border-t sticky bottom-0 bg-background mt-4 pb-2">
             <Button type="submit" className="w-full">Create Customer</Button>
           </div>
         </form>
