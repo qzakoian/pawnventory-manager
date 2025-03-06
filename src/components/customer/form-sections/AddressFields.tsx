@@ -76,7 +76,7 @@ export const AddressFields = ({ form }: AddressFieldsProps) => {
         control={form.control}
         name="postal_code"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="mb-6">
             <FormLabel>Postal Code</FormLabel>
             <FormControl>
               <Input {...field} />
