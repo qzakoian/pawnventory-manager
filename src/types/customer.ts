@@ -1,4 +1,3 @@
-
 export interface Customer {
   id: number;
   first_name: string | null;
@@ -58,7 +57,7 @@ export interface EditCustomer {
   last_name: string;
   phone_number: string;
   email: string;
-  gender: string;
+  gender: "Male" | "Female" | "Prefer not to say";
   address_line1: string;
   address_line2: string;
   city: string;

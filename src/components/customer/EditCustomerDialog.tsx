@@ -48,12 +48,17 @@ export const EditCustomerDialog = ({
 
   useEffect(() => {
     if (customer) {
+      // Ensure gender is one of the allowed values
+      const validGender = (customer.gender === "Male" || customer.gender === "Female" || customer.gender === "Prefer not to say")
+        ? customer.gender
+        : "Prefer not to say";
+      
       form.reset({
         first_name: customer.first_name || "",
         last_name: customer.last_name || "",
         phone_number: customer.phone_number || "",
         email: customer.email || "",
-        gender: customer.gender || "Prefer not to say",
+        gender: validGender as "Male" | "Female" | "Prefer not to say",
         address_line1: customer.address_line1 || "",
         address_line2: customer.address_line2 || "",
         city: customer.city || "",
