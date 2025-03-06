@@ -1,3 +1,4 @@
+
 export interface Customer {
   id: number;
   first_name: string | null;
@@ -34,6 +35,7 @@ export interface Product {
   "12-week-buy-back_rate"?: number;
   "28-day-buy-back_price"?: number;
   "28-day-buy-back_rate"?: number;
+  "Free-stock"?: boolean;
   creation_date?: string;
   customer_id?: number;
   customer?: Customer | null;

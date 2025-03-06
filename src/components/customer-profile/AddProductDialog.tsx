@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import {
   Sheet,
@@ -79,13 +80,19 @@ export const AddProductDialog = ({
   };
 
   const handleSubmit = () => {
-    const productToSubmit = {
+    // Create a product object with the necessary fields
+    const productToSubmit: any = {
       ...newProduct,
-      [`${newProduct.scheme}_rate`]: buybackRate,
-      [`${newProduct.scheme}_price`]: buybackPrice,
       imei,
       sku,
     };
+    
+    // Only add buyback fields if using a buyback scheme
+    if (newProduct.scheme.includes('buy-back')) {
+      productToSubmit.scheme_rate = buybackRate;
+      productToSubmit.scheme_price = buybackPrice;
+    }
+    
     onSubmit(productToSubmit);
     setNewProduct({
       model: "",

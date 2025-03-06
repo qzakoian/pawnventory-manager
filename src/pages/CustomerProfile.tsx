@@ -105,14 +105,25 @@ const CustomerProfile = () => {
     if (!customer) return;
 
     try {
+      // Prepare product data based on scheme type
+      let productData: any = {
+        ...newProduct,
+        customer_id: customer.id,
+      };
+
+      // For buy-back schemes, add the rate and price fields
+      if (newProduct.scheme.includes('buy-back')) {
+        productData[`${newProduct.scheme}_rate`] = newProduct.scheme_rate || 0;
+        productData[`${newProduct.scheme}_price`] = newProduct.scheme_price || 0;
+      } 
+      // For Free-stock scheme, don't add special fields
+      else if (newProduct.scheme === 'Free-stock') {
+        productData['Free-stock'] = true;
+      }
+
       const { data, error } = await supabase
         .from('Products')
-        .insert([
-          {
-            ...newProduct,
-            customer_id: customer.id,
-          }
-        ])
+        .insert([productData])
         .select()
         .single();
 
