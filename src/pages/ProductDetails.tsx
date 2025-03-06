@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { ProductDetailsCard } from "@/components/product/ProductDetailsCard";
 import { CustomerDetailsCard } from "@/components/product/CustomerDetailsCard";
+import { Customer } from "@/types/customer";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -24,6 +24,14 @@ const ProductDetails = () => {
         .eq('id', productId)
         .single();
       if (error) throw error;
+
+      // Ensure the customer_type is one of the allowed values
+      if (data.customer) {
+        data.customer.customer_type = data.customer.customer_type === "company" 
+          ? "company" 
+          : "individual";
+      }
+      
       return data;
     },
     enabled: !!productId

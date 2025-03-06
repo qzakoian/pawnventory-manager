@@ -4,20 +4,38 @@ import * as z from "zod";
 export const createCustomerSchema = z.object({
   customer_type: z.enum(["individual", "company"]).default("individual"),
   first_name: z.string().min(1, "First name is required").optional().nullable()
-    .refine(
-      (val, ctx) => val !== null && val !== undefined && val.trim() !== "" || ctx.path[0] === "customer_type" && ctx.parent.customer_type === "company", 
-      { message: "First name is required for individuals" }
-    ),
+    .superRefine((val, ctx) => {
+      if ((val === null || val === undefined || val.trim() === "") && 
+          ctx.path[0] === "customer_type" && 
+          ctx.parent.customer_type === "individual") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "First name is required for individuals"
+        });
+      }
+    }),
   last_name: z.string().min(1, "Last name is required").optional().nullable()
-    .refine(
-      (val, ctx) => val !== null && val !== undefined && val.trim() !== "" || ctx.path[0] === "customer_type" && ctx.parent.customer_type === "company",
-      { message: "Last name is required for individuals" }
-    ),
+    .superRefine((val, ctx) => {
+      if ((val === null || val === undefined || val.trim() === "") && 
+          ctx.path[0] === "customer_type" && 
+          ctx.parent.customer_type === "individual") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Last name is required for individuals"
+        });
+      }
+    }),
   company_name: z.string().min(1, "Company name is required").optional().nullable()
-    .refine(
-      (val, ctx) => val !== null && val !== undefined && val.trim() !== "" || ctx.path[0] === "customer_type" && ctx.parent.customer_type === "individual",
-      { message: "Company name is required for companies" }
-    ),
+    .superRefine((val, ctx) => {
+      if ((val === null || val === undefined || val.trim() === "") && 
+          ctx.path[0] === "customer_type" && 
+          ctx.parent.customer_type === "company") {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Company name is required for companies"
+        });
+      }
+    }),
   vat_number: z.string().optional().nullable(),
   email: z.string().email().optional().nullable(),
   phone_number: z.string().optional().nullable(),
