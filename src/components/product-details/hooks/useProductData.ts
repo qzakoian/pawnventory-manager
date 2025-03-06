@@ -25,7 +25,7 @@ export const useProductData = (productId: number | null) => {
       if (data && data.customer) {
         const customerType = data.customer.customer_type;
         
-        // Check if customer_type is one of our valid union types and explicitly cast
+        // Explicitly cast customer_type to the union type or null
         if (customerType === "company" || customerType === "individual") {
           data.customer.customer_type = customerType as "company" | "individual";
         } else {
