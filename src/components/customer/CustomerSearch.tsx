@@ -13,6 +13,8 @@ interface Customer {
   id: number;
   first_name: string | null;
   last_name: string | null;
+  company_name: string | null;
+  customer_type: "individual" | "company" | null;
 }
 
 interface CustomerSearchProps {
@@ -46,9 +48,9 @@ export const CustomerSearch = ({ shopId }: CustomerSearchProps) => {
     try {
       const { data, error } = await supabase
         .from('Customers')
-        .select('id, first_name, last_name')
+        .select('id, first_name, last_name, company_name, customer_type')
         .eq('shop_id', shopId)
-        .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
+        .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,company_name.ilike.%${query}%`)
         .limit(5);
 
       if (error) throw error;
@@ -73,6 +75,14 @@ export const CustomerSearch = ({ shopId }: CustomerSearchProps) => {
     }
   };
 
+  // Function to display the customer name based on type
+  const getCustomerDisplayName = (customer: Customer): string => {
+    if (customer.customer_type === "company" && customer.company_name) {
+      return customer.company_name;
+    }
+    return `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || 'No name';
+  };
+
   return (
     <>
       <Card className="p-4 glass-card">
@@ -80,7 +90,7 @@ export const CustomerSearch = ({ shopId }: CustomerSearchProps) => {
         <div className="space-y-2">
           <div className="flex space-x-2">
             <Input 
-              placeholder="Search by name..." 
+              placeholder="Search by name or company..." 
               className="flex-1"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -96,7 +106,7 @@ export const CustomerSearch = ({ shopId }: CustomerSearchProps) => {
                     navigate(`/customer/${customer.id}`);
                   }}
                 >
-                  <span>{customer.first_name} {customer.last_name}</span>
+                  <span>{getCustomerDisplayName(customer)}</span>
                   <ArrowRight className="h-4 w-4 text-[#646ECB]" />
                 </div>
               ))}

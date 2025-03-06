@@ -41,6 +41,14 @@ const Customers = () => {
     enabled: !!selectedShop,
   });
 
+  // Function to render customer name based on customer type
+  const renderCustomerName = (customer: any) => {
+    if (customer.customer_type === "company" && customer.company_name) {
+      return customer.company_name;
+    }
+    return `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || 'No name';
+  };
+
   return (
     <div className="min-h-screen bg-white">
       <main className="p-6 max-w-7xl mx-auto space-y-8">
@@ -58,7 +66,7 @@ const Customers = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
-                    <TableHead>Gender</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead>Contact</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Created</TableHead>
@@ -86,10 +94,10 @@ const Customers = () => {
                         onClick={() => navigate(`/customer/${customer.id}`)}
                       >
                         <TableCell>
-                          {customer.first_name} {customer.last_name}
+                          {renderCustomerName(customer)}
                         </TableCell>
                         <TableCell>
-                          {customer.gender || "Prefer not to say"}
+                          {customer.customer_type === "company" ? "Company" : "Individual"}
                         </TableCell>
                         <TableCell>
                           {customer.email && (
