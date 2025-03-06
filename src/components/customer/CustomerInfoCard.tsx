@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { User, Pencil, Mail, Phone, MapPin, Users } from "lucide-react";
+import { User, Pencil, Mail, Phone, MapPin, Users, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Customer } from "@/types/customer";
 
@@ -10,6 +10,8 @@ interface CustomerInfoCardProps {
 }
 
 export const CustomerInfoCard = ({ customer, onEditClick }: CustomerInfoCardProps) => {
+  const isCompany = customer.customer_type === "company";
+
   return (
     <div className="glass-card rounded-xl">
       <div className="p-6">
@@ -29,18 +31,35 @@ export const CustomerInfoCard = ({ customer, onEditClick }: CustomerInfoCardProp
         <div className="space-y-6">
           <div className="flex items-center space-x-4">
             <div className="bg-[#646ECB] p-3 rounded-full">
-              <User className="h-5 w-5 text-white" />
+              {isCompany ? (
+                <Building2 className="h-5 w-5 text-white" />
+              ) : (
+                <User className="h-5 w-5 text-white" />
+              )}
             </div>
             <div>
-              <h3 className="font-medium text-[#2A2A2A]">
-                {customer.first_name} {customer.last_name}
-              </h3>
-              <p className="text-sm text-gray-500">ID: {customer.id}</p>
+              {isCompany ? (
+                <>
+                  <h3 className="font-medium text-[#2A2A2A]">
+                    {customer.company_name}
+                  </h3>
+                  {customer.vat_number && (
+                    <p className="text-sm text-gray-500">VAT: {customer.vat_number}</p>
+                  )}
+                </>
+              ) : (
+                <>
+                  <h3 className="font-medium text-[#2A2A2A]">
+                    {customer.first_name} {customer.last_name}
+                  </h3>
+                  <p className="text-sm text-gray-500">ID: {customer.id}</p>
+                </>
+              )}
             </div>
           </div>
 
           <div className="space-y-4">
-            {customer.gender && (
+            {!isCompany && customer.gender && (
               <div className="flex items-center space-x-3 text-sm text-gray-600">
                 <Users className="h-4 w-4 text-gray-400" />
                 <span>{customer.gender}</span>

@@ -1,3 +1,4 @@
+
 export interface Customer {
   id: number;
   first_name: string | null;
@@ -11,6 +12,9 @@ export interface Customer {
   city: string | null;
   postal_code: string | null;
   county: string | null;
+  customer_type: "individual" | "company" | null;
+  company_name: string | null;
+  vat_number: string | null;
 }
 
 export interface Product {
@@ -63,4 +67,7 @@ export interface EditCustomer {
   city: string;
   postal_code: string;
   county: string;
+  customer_type: "individual" | "company";
+  company_name: string;
+  vat_number: string;
 }

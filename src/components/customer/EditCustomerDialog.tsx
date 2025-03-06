@@ -33,11 +33,14 @@ export const EditCustomerDialog = ({
   const form = useForm<CreateCustomerFormData>({
     resolver: zodResolver(createCustomerSchema),
     defaultValues: {
+      customer_type: "individual",
       first_name: "",
       last_name: "",
       email: "",
       phone_number: "",
       gender: "Prefer not to say",
+      company_name: "",
+      vat_number: "",
       address_line1: "",
       address_line2: "",
       city: "",
@@ -54,11 +57,14 @@ export const EditCustomerDialog = ({
         : "Prefer not to say";
       
       form.reset({
+        customer_type: customer.customer_type || "individual",
         first_name: customer.first_name || "",
         last_name: customer.last_name || "",
         phone_number: customer.phone_number || "",
         email: customer.email || "",
         gender: validGender as "Male" | "Female" | "Prefer not to say",
+        company_name: customer.company_name || "",
+        vat_number: customer.vat_number || "",
         address_line1: customer.address_line1 || "",
         address_line2: customer.address_line2 || "",
         city: customer.city || "",
@@ -76,6 +82,9 @@ export const EditCustomerDialog = ({
       email: values.email || "",
       phone_number: values.phone_number || "",
       gender: values.gender || "Prefer not to say",
+      customer_type: values.customer_type || "individual",
+      company_name: values.company_name || "",
+      vat_number: values.vat_number || "",
       address_line1: values.address_line1 || "",
       address_line2: values.address_line2 || "",
       city: values.city || "",

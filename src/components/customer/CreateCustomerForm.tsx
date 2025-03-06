@@ -22,11 +22,14 @@ export const CreateCustomerForm = ({ shopId, onSuccess }: CreateCustomerFormProp
   const form = useForm<CreateCustomerFormData>({
     resolver: zodResolver(createCustomerSchema),
     defaultValues: {
+      customer_type: "individual",
       first_name: "",
       last_name: "",
       email: "",
       phone_number: "",
       gender: "Prefer not to say",
+      company_name: "",
+      vat_number: "",
       address_line1: "",
       address_line2: "",
       city: "",
