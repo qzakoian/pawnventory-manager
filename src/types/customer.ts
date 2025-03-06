@@ -14,6 +14,7 @@ export interface Customer {
   customer_type: "individual" | "company" | null;
   company_name: string | null;
   vat_number: string | null;
+  shop_id: number | null;
 }
 
 export interface Product {
