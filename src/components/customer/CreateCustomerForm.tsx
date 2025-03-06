@@ -26,6 +26,7 @@ export const CreateCustomerForm = ({ shopId, onSuccess }: CreateCustomerFormProp
       last_name: "",
       email: "",
       phone_number: "",
+      gender: "Prefer not to say",
       address_line1: "",
       address_line2: "",
       city: "",

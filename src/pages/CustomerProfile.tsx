@@ -169,6 +169,7 @@ const CustomerProfile = () => {
         last_name: editedCustomer.last_name,
         phone_number: formattedPhoneNumber,
         email: editedCustomer.email,
+        gender: editedCustomer.gender,
         address_line1: editedCustomer.address_line1,
         address_line2: editedCustomer.address_line2,
         city: editedCustomer.city,

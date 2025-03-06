@@ -6,6 +6,7 @@ export const createCustomerSchema = z.object({
   last_name: z.string().min(1, "Last name is required"),
   email: z.string().email().optional().nullable(),
   phone_number: z.string().optional().nullable(),
+  gender: z.enum(["Male", "Female", "Prefer not to say"]).default("Prefer not to say"),
   address_line1: z.string().optional().nullable(),
   address_line2: z.string().optional().nullable(),
   city: z.string().optional().nullable(),

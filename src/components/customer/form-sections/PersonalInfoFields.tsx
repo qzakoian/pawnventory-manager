@@ -9,6 +9,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { CreateCustomerFormData } from "../schemas/customerSchema";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface PersonalInfoFieldsProps {
   form: UseFormReturn<CreateCustomerFormData>;
@@ -74,6 +81,28 @@ export const PersonalInfoFields = ({ form }: PersonalInfoFieldsProps) => {
           )}
         />
       </div>
+      <FormField
+        control={form.control}
+        name="gender"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Gender</FormLabel>
+            <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <FormControl>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                <SelectItem value="Male">Male</SelectItem>
+                <SelectItem value="Female">Female</SelectItem>
+                <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };

@@ -6,6 +6,7 @@ export interface Customer {
   created_at: string;
   phone_number: string | null;
   email: string | null;
+  gender: string | null;
   address_line1: string | null;
   address_line2: string | null;
   city: string | null;
@@ -57,6 +58,7 @@ export interface EditCustomer {
   last_name: string;
   phone_number: string;
   email: string;
+  gender: string;
   address_line1: string;
   address_line2: string;
   city: string;

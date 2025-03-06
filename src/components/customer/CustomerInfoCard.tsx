@@ -1,6 +1,6 @@
 
 import { format } from "date-fns";
-import { User, Pencil, Mail, Phone, MapPin } from "lucide-react";
+import { User, Pencil, Mail, Phone, MapPin, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Customer } from "@/types/customer";
 
@@ -40,6 +40,13 @@ export const CustomerInfoCard = ({ customer, onEditClick }: CustomerInfoCardProp
           </div>
 
           <div className="space-y-4">
+            {customer.gender && (
+              <div className="flex items-center space-x-3 text-sm text-gray-600">
+                <Users className="h-4 w-4 text-gray-400" />
+                <span>{customer.gender}</span>
+              </div>
+            )}
+            
             {customer.email && (
               <div className="flex items-center space-x-3 text-sm text-gray-600">
                 <Mail className="h-4 w-4 text-gray-400" />

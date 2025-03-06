@@ -8,6 +8,7 @@ export interface CSVCustomer {
   last_name: string;
   email?: string;
   phone_number?: string;
+  gender?: string;
   address_line1?: string;
   address_line2?: string;
   city?: string;
@@ -24,6 +25,7 @@ export const OPTIONAL_COLUMNS = [
   'first_name',
   'email',
   'phone_number',
+  'gender',
   'address_line1',
   'address_line2',
   'city',

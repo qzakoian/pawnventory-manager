@@ -1,3 +1,4 @@
+
 import { useShop } from "@/contexts/ShopContext";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -57,6 +58,7 @@ const Customers = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Name</TableHead>
+                    <TableHead>Gender</TableHead>
                     <TableHead>Contact</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Created</TableHead>
@@ -66,13 +68,13 @@ const Customers = () => {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4">
+                      <TableCell colSpan={6} className="text-center py-4">
                         Loading customers...
                       </TableCell>
                     </TableRow>
                   ) : customers?.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-4">
+                      <TableCell colSpan={6} className="text-center py-4">
                         No customers found
                       </TableCell>
                     </TableRow>
@@ -85,6 +87,9 @@ const Customers = () => {
                       >
                         <TableCell>
                           {customer.first_name} {customer.last_name}
+                        </TableCell>
+                        <TableCell>
+                          {customer.gender || "Prefer not to say"}
                         </TableCell>
                         <TableCell>
                           {customer.email && (
