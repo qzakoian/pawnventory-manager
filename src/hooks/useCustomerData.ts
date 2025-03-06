@@ -42,8 +42,9 @@ export const useCustomerData = (customerId: string | undefined) => {
   useEffect(() => {
     const fetchCustomerData = async () => {
       try {
-        const customerId = parseInt(id || '');
-        if (isNaN(customerId)) {
+        // Fix: Use customerId parameter instead of undefined 'id' variable
+        const customerIdNumber = parseInt(customerId || '');
+        if (isNaN(customerIdNumber)) {
           toast({
             variant: "destructive",
             title: "Error",
@@ -55,7 +56,7 @@ export const useCustomerData = (customerId: string | undefined) => {
         const { data: customerData, error: customerError } = await supabase
           .from('Customers')
           .select('*')
-          .eq('id', customerId)
+          .eq('id', customerIdNumber)
           .single();
 
         if (customerError) throw customerError;
@@ -64,7 +65,7 @@ export const useCustomerData = (customerId: string | undefined) => {
         const { data: productsData, error: productsError } = await supabase
           .from('Products')
           .select('*')
-          .eq('customer_id', customerId)
+          .eq('customer_id', customerIdNumber)
           .order('purchase_date', { ascending: false });
 
         if (productsError) throw productsError;
