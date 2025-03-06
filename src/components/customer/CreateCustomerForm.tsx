@@ -36,10 +36,40 @@ export const CreateCustomerForm = ({ shopId, onSuccess }: CreateCustomerFormProp
       postal_code: "",
       county: "",
     },
+    mode: "onSubmit",
   });
 
   const onSubmit = async (values: CreateCustomerFormData) => {
     try {
+      console.log("Form submitted with values:", values);
+
+      // If we're in company mode, make sure we have company_name
+      if (values.customer_type === "company" && !values.company_name) {
+        form.setError("company_name", { 
+          type: "manual", 
+          message: "Company name is required" 
+        });
+        return;
+      }
+      
+      // If we're in individual mode, make sure we have first_name and last_name
+      if (values.customer_type === "individual") {
+        if (!values.first_name) {
+          form.setError("first_name", { 
+            type: "manual", 
+            message: "First name is required" 
+          });
+          return;
+        }
+        if (!values.last_name) {
+          form.setError("last_name", { 
+            type: "manual", 
+            message: "Last name is required" 
+          });
+          return;
+        }
+      }
+
       const { data, error } = await supabase
         .from('Customers')
         .insert([
@@ -51,7 +81,12 @@ export const CreateCustomerForm = ({ shopId, onSuccess }: CreateCustomerFormProp
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+
+      console.log("Customer created:", data);
 
       toast({
         title: "Success",
@@ -69,7 +104,7 @@ export const CreateCustomerForm = ({ shopId, onSuccess }: CreateCustomerFormProp
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to create customer",
+        description: "Failed to create customer. Please try again.",
       });
     }
   };
@@ -89,7 +124,13 @@ export const CreateCustomerForm = ({ shopId, onSuccess }: CreateCustomerFormProp
           </div>
           
           <div className="pt-4 border-t sticky bottom-0 bg-background mt-4 pb-2">
-            <Button type="submit" className="w-full">Create Customer</Button>
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting ? "Creating..." : "Create Customer"}
+            </Button>
           </div>
         </form>
       </Form>
