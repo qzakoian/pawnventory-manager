@@ -83,7 +83,7 @@ export const CreateCustomerForm = ({ shopId, onSuccess }: CreateCustomerFormProp
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
-          <div className="flex-1 overflow-y-auto pr-2 space-y-4 pb-6">
+          <div className="flex-1 overflow-y-auto space-y-4 pb-6 pl-1 pr-3">
             <PersonalInfoFields form={form} />
             <AddressFields form={form} />
           </div>
