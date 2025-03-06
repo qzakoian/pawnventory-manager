@@ -55,7 +55,15 @@ export const CustomerSearch = ({ shopId }: CustomerSearchProps) => {
 
       if (error) throw error;
 
-      setSearchResults(data || []);
+      // Cast the data to ensure customer_type is properly typed
+      const typedData = data?.map(customer => ({
+        ...customer,
+        customer_type: (customer.customer_type === 'company' || customer.customer_type === 'individual') 
+          ? customer.customer_type as "company" | "individual" 
+          : null
+      })) || [];
+      
+      setSearchResults(typedData);
 
       if (data && data.length === 0 && query.trim() !== '') {
         toast({
