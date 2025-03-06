@@ -2,7 +2,23 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
-import { Customer } from "@/types/customer";
+import { Customer, Product } from "@/types/customer";
+
+// Helper function to ensure customer type is properly cast
+const processCustomerData = (customer: any): Customer => {
+  if (!customer) return null;
+  
+  // Create a properly typed customer object
+  const processedCustomer: Customer = {
+    ...customer,
+    // Ensure customer_type is one of the valid union types or null
+    customer_type: (customer.customer_type === "company" || customer.customer_type === "individual") 
+      ? customer.customer_type as "company" | "individual" 
+      : null
+  };
+  
+  return processedCustomer;
+};
 
 export const useProductData = (productId: number | null) => {
   const queryClient = useQueryClient();
@@ -21,19 +37,18 @@ export const useProductData = (productId: number | null) => {
         .single();
       if (error) throw error;
 
-      // Process the returned data to ensure proper typing
-      if (data && data.customer) {
-        const customerType = data.customer.customer_type;
-        
-        // Explicitly cast customer_type to the union type or null
-        if (customerType === "company" || customerType === "individual") {
-          data.customer.customer_type = customerType as "company" | "individual";
-        } else {
-          data.customer.customer_type = null;
+      // Process the customer data to ensure it matches our type
+      if (data) {
+        // Process customer data if it exists
+        if (data.customer) {
+          data.customer = processCustomerData(data.customer);
         }
+        
+        // Return the processed data as a Product
+        return data as Product;
       }
       
-      return data;
+      return null;
     },
     enabled: !!productId
   });
