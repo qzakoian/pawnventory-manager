@@ -15,10 +15,11 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Building2, User } from "lucide-react";
 import { CustomerSearch } from "@/components/customer/CustomerSearch";
 import { ImportCustomersDialog } from "@/components/customer/ImportCustomersDialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const Customers = () => {
   const { selectedShop } = useShop();
@@ -47,6 +48,25 @@ const Customers = () => {
       return customer.company_name;
     }
     return `${customer.first_name || ''} ${customer.last_name || ''}`.trim() || 'No name';
+  };
+
+  // Function to render customer type as a badge
+  const renderCustomerType = (type: string) => {
+    if (type === "company") {
+      return (
+        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1.5">
+          <Building2 className="h-3 w-3" />
+          Company
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 flex items-center gap-1.5">
+          <User className="h-3 w-3" />
+          Individual
+        </Badge>
+      );
+    }
   };
 
   return (
@@ -97,7 +117,7 @@ const Customers = () => {
                           {renderCustomerName(customer)}
                         </TableCell>
                         <TableCell>
-                          {customer.customer_type === "company" ? "Company" : "Individual"}
+                          {renderCustomerType(customer.customer_type)}
                         </TableCell>
                         <TableCell>
                           {customer.email && (
