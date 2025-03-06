@@ -48,6 +48,8 @@ export interface NewProduct {
   scheme: string;
   purchase_price_including_VAT: number;
   purchase_date: string;
+  scheme_rate?: number;
+  scheme_price?: number;
 }
 
 export interface ProductInfo {
