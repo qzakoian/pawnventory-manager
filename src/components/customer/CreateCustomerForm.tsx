@@ -75,16 +75,22 @@ export const CreateCustomerForm = ({ shopId, onSuccess }: CreateCustomerFormProp
   };
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="flex flex-col h-full">
+      <div className="mb-4">
         <h2 className="text-lg font-semibold">Create New Customer</h2>
         <p className="text-sm text-gray-500">Add a new customer to your shop</p>
       </div>
+      
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <PersonalInfoFields form={form} />
-          <AddressFields form={form} />
-          <Button type="submit" className="w-full mt-6">Create Customer</Button>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col h-full">
+          <div className="flex-1 overflow-y-auto pr-2 space-y-4 pb-4">
+            <PersonalInfoFields form={form} />
+            <AddressFields form={form} />
+          </div>
+          
+          <div className="pt-4 border-t sticky bottom-0 bg-background mt-4">
+            <Button type="submit" className="w-full">Create Customer</Button>
+          </div>
         </form>
       </Form>
     </div>
