@@ -1,115 +1,39 @@
 
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
+import { useParams, useNavigate } from "react-router-dom";
+import { ProductDetailsHeader } from "@/components/product-details/ProductDetailsHeader";
+import { LoadingState, ErrorState } from "@/components/product-details/StateComponents";
+import { useProductData } from "@/components/product-details/hooks/useProductData";
 import { ProductDetailsCard } from "@/components/product/ProductDetailsCard";
 import { CustomerDetailsCard } from "@/components/product/CustomerDetailsCard";
-import { Customer } from "@/types/customer";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const productId = id ? parseInt(id) : null;
-
-  const { data: product, isLoading: isLoadingProduct } = useQuery({
-    queryKey: ['product', productId],
-    queryFn: async () => {
-      if (!productId) throw new Error('Product ID is required');
-      const { data, error } = await supabase
-        .from('Products')
-        .select('*, customer:Customers(*)')
-        .eq('id', productId)
-        .single();
-      if (error) throw error;
-
-      // Ensure the customer_type is one of the allowed values
-      if (data.customer) {
-        const customerType = data.customer.customer_type;
-        data.customer.customer_type = (customerType === "company") 
-          ? "company" 
-          : "individual";
-      }
-      
-      return data;
-    },
-    enabled: !!productId
-  });
-
-  const { data: customers, isLoading: isLoadingCustomers } = useQuery({
-    queryKey: ['customers'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('Customers')
-        .select('id, first_name, last_name')
-        .order('first_name');
-      if (error) throw error;
-      return data;
-    }
-  });
-
-  const updateCustomer = async (customerId: number | null) => {
-    if (!productId) return;
-    try {
-      const { error } = await supabase
-        .from('Products')
-        .update({ customer_id: customerId })
-        .eq('id', productId);
-      if (error) throw error;
-      queryClient.invalidateQueries({ queryKey: ['product', productId] });
-      toast({
-        title: "Success",
-        description: "Customer updated successfully"
-      });
-    } catch (error) {
-      console.error('Error updating customer:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update customer"
-      });
-    }
-  };
+  
+  const { 
+    product, 
+    customers, 
+    isLoadingProduct, 
+    isLoadingCustomers, 
+    updateCustomer 
+  } = useProductData(productId);
 
   if (isLoadingProduct) {
-    return (
-      <div className="min-h-screen bg-white p-6">
-        <div className="max-w-7xl mx-auto">Loading...</div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!product) {
-    return (
-      <div className="min-h-screen bg-white p-6">
-        <div className="max-w-7xl mx-auto">Product not found</div>
-      </div>
-    );
+    return <ErrorState />;
   }
 
   return (
     <div className="min-h-screen bg-white">
       <main className="px-6 py-8 max-w-7xl mx-auto space-y-8">
-        <div className="space-y-4">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/products')}
-            className="text-[#646ECB] hover:bg-[#646ECB]/10 hover:text-[#646ECB]"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Products
-          </Button>
-          
-          <div className="space-y-2">
-            <p className="text-gray-500 text-sm">Product Details</p>
-            <h1 className="text-3xl font-semibold text-[#454545]">
-              {product.model}
-            </h1>
-          </div>
-        </div>
+        <ProductDetailsHeader 
+          onBackClick={() => navigate('/products')} 
+          productName={product.model} 
+        />
 
         <div className="space-y-6">
           <CustomerDetailsCard 
