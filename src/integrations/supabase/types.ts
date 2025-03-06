@@ -64,8 +64,10 @@ export type Database = {
           address_line1: string | null
           address_line2: string | null
           city: string | null
+          company_name: string | null
           county: string | null
           created_at: string
+          customer_type: string | null
           email: string | null
           first_name: string | null
           gender: string | null
@@ -74,13 +76,16 @@ export type Database = {
           phone_number: string | null
           postal_code: string | null
           shop_id: number | null
+          vat_number: string | null
         }
         Insert: {
           address_line1?: string | null
           address_line2?: string | null
           city?: string | null
+          company_name?: string | null
           county?: string | null
           created_at?: string
+          customer_type?: string | null
           email?: string | null
           first_name?: string | null
           gender?: string | null
@@ -89,13 +94,16 @@ export type Database = {
           phone_number?: string | null
           postal_code?: string | null
           shop_id?: number | null
+          vat_number?: string | null
         }
         Update: {
           address_line1?: string | null
           address_line2?: string | null
           city?: string | null
+          company_name?: string | null
           county?: string | null
           created_at?: string
+          customer_type?: string | null
           email?: string | null
           first_name?: string | null
           gender?: string | null
@@ -104,6 +112,7 @@ export type Database = {
           phone_number?: string | null
           postal_code?: string | null
           shop_id?: number | null
+          vat_number?: string | null
         }
         Relationships: [
           {

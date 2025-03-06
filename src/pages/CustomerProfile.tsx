@@ -76,7 +76,7 @@ const CustomerProfile = () => {
           .single();
 
         if (customerError) throw customerError;
-        setCustomer(customerData);
+        setCustomer(customerData as Customer);
 
         const { data: productsData, error: productsError } = await supabase
           .from('Products')
@@ -175,6 +175,9 @@ const CustomerProfile = () => {
         city: editedCustomer.city,
         postal_code: formattedPostcode,
         county: editedCustomer.county,
+        customer_type: editedCustomer.customer_type,
+        company_name: editedCustomer.company_name,
+        vat_number: editedCustomer.vat_number,
       };
 
       const { data, error } = await supabase
@@ -186,11 +189,8 @@ const CustomerProfile = () => {
       if (error) throw error;
 
       if (data && data.length > 0) {
-        const updatedCustomer = data[0];
-        setCustomer({
-          ...customer,
-          ...updatedCustomer
-        });
+        const updatedCustomer = data[0] as Customer;
+        setCustomer(updatedCustomer);
         
         setIsEditCustomerDialogOpen(false);
         toast({
