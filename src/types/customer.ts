@@ -50,6 +50,8 @@ export interface NewProduct {
   purchase_date: string;
   scheme_rate?: number;
   scheme_price?: number;
+  imei?: string;
+  sku?: string;
 }
 
 export interface ProductInfo {

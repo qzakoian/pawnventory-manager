@@ -1,233 +1,45 @@
 
 import { useParams } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { CustomerInfoCard } from "@/components/customer/CustomerInfoCard";
 import { CustomerProducts } from "@/components/customer/CustomerProducts";
 import { EditCustomerDialog } from "@/components/customer/EditCustomerDialog";
-import { Customer, Product, NewProduct, EditCustomer } from "@/types/customer";
 import { CustomerHeader } from "@/components/customer-profile/CustomerHeader";
 import { CustomerStats } from "@/components/customer-profile/CustomerStats";
 import { AddProductDialog } from "@/components/customer-profile/AddProductDialog";
-import {
-  formatUKPhoneNumber,
-  isValidUKPhoneNumber,
-  formatPostcode,
-  isValidUKPostcode,
-} from "@/utils/validation";
+import { useCustomerData } from "@/hooks/useCustomerData";
+import { useCreateProduct } from "@/components/customer-profile/handlers/CreateProductHandler";
+import { useUpdateCustomer } from "@/components/customer-profile/handlers/UpdateCustomerHandler";
 
 const CustomerProfile = () => {
   const { id } = useParams();
   const { toast } = useToast();
-  const [customer, setCustomer] = useState<Customer | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isNewProductDialogOpen, setIsNewProductDialogOpen] = useState(false);
   const [isEditCustomerDialogOpen, setIsEditCustomerDialogOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [schemes, setSchemes] = useState<string[]>([]);
+  
+  // Use our custom hook to fetch customer data
+  const {
+    customer,
+    setCustomer,
+    products,
+    setProducts,
+    loading,
+    categories,
+    schemes
+  } = useCustomerData(id);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const { data } = await supabase
-        .from('Product Categories')
-        .select('name')
-        .order('name');
-      
-      if (data) {
-        setCategories(data.map(cat => cat.name || "").filter(Boolean));
-      }
-    };
-
-    const fetchSchemes = async () => {
-      const { data } = await supabase
-        .from('Product Schemes')
-        .select('name')
-        .order('name');
-      
-      if (data) {
-        setSchemes(data.map(scheme => scheme.name || "").filter(Boolean));
-      }
-    };
-
-    fetchCategories();
-    fetchSchemes();
-  }, []);
-
-  useEffect(() => {
-    const fetchCustomerData = async () => {
-      try {
-        const customerId = parseInt(id || '');
-        if (isNaN(customerId)) {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Invalid customer ID",
-          });
-          return;
-        }
-
-        const { data: customerData, error: customerError } = await supabase
-          .from('Customers')
-          .select('*')
-          .eq('id', customerId)
-          .single();
-
-        if (customerError) throw customerError;
-        setCustomer(customerData as Customer);
-
-        const { data: productsData, error: productsError } = await supabase
-          .from('Products')
-          .select('*')
-          .eq('customer_id', customerId)
-          .order('purchase_date', { ascending: false });
-
-        if (productsError) throw productsError;
-        setProducts(productsData || []);
-      } catch (error) {
-        console.error('Error fetching customer data:', error);
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to load customer data",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCustomerData();
-  }, [id, toast]);
-
-  const handleCreateProduct = async (newProduct: NewProduct) => {
-    if (!customer) return;
-
-    try {
-      // Prepare the base product data
-      let productData: any = {
-        model: newProduct.model,
-        brand: newProduct.brand,
-        product_category: newProduct.product_category,
-        scheme: newProduct.scheme,
-        purchase_price_including_VAT: newProduct.purchase_price_including_VAT,
-        purchase_date: newProduct.purchase_date,
-        customer_id: customer.id,
-        imei: newProduct.imei,
-        sku: newProduct.sku
-      };
-
-      // Add scheme-specific data based on the scheme type
-      if (newProduct.scheme.includes('buy-back') && newProduct.scheme_rate && newProduct.scheme_price) {
-        // For buy-back schemes, add the scheme-specific rate and price columns
-        productData[`${newProduct.scheme}_rate`] = newProduct.scheme_rate;
-        productData[`${newProduct.scheme}_price`] = newProduct.scheme_price;
-      }
-      
-      // For Free-stock, we don't need to add any special fields
-      // The scheme column will already be set to 'Free-stock'
-
-      const { data, error } = await supabase
-        .from('Products')
-        .insert([productData])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setProducts([data, ...products]);
-      setIsNewProductDialogOpen(false);
-
-      toast({
-        title: "Success",
-        description: "Product created successfully",
-      });
-    } catch (error) {
-      console.error('Error creating product:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to create product",
-      });
-    }
-  };
-
-  const handleUpdateCustomer = async (editedCustomer: EditCustomer) => {
-    if (!customer) return;
-
-    if (editedCustomer.phone_number && !isValidUKPhoneNumber(editedCustomer.phone_number)) {
-      toast({
-        variant: "destructive",
-        title: "Invalid phone number",
-        description: "Please enter a valid UK mobile number",
-      });
-      return;
-    }
-
-    if (editedCustomer.postal_code && !isValidUKPostcode(editedCustomer.postal_code)) {
-      toast({
-        variant: "destructive",
-        title: "Invalid postcode",
-        description: "Please enter a valid UK postcode",
-      });
-      return;
-    }
-
-    const formattedPhoneNumber = editedCustomer.phone_number 
-      ? formatUKPhoneNumber(editedCustomer.phone_number)
-      : '';
-    const formattedPostcode = editedCustomer.postal_code 
-      ? formatPostcode(editedCustomer.postal_code)
-      : '';
-
-    try {
-      const updatePayload = {
-        first_name: editedCustomer.first_name,
-        last_name: editedCustomer.last_name,
-        phone_number: formattedPhoneNumber,
-        email: editedCustomer.email,
-        gender: editedCustomer.gender,
-        address_line1: editedCustomer.address_line1,
-        address_line2: editedCustomer.address_line2,
-        city: editedCustomer.city,
-        postal_code: formattedPostcode,
-        county: editedCustomer.county,
-        customer_type: editedCustomer.customer_type,
-        company_name: editedCustomer.company_name,
-        vat_number: editedCustomer.vat_number,
-      };
-
-      const { data, error } = await supabase
-        .from('Customers')
-        .update(updatePayload)
-        .eq('id', customer.id)
-        .select();
-
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        const updatedCustomer = data[0] as Customer;
-        setCustomer(updatedCustomer);
-        
-        setIsEditCustomerDialogOpen(false);
-        toast({
-          title: "Success",
-          description: "Customer profile updated successfully",
-        });
-      } else {
-        throw new Error('No data returned from update operation');
-      }
-    } catch (error) {
-      console.error('Error updating customer:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to update customer profile",
-      });
-    }
-  };
+  // Use our custom handlers
+  const { handleCreateProduct } = useCreateProduct(
+    customer, 
+    products, 
+    setProducts, 
+    () => setIsNewProductDialogOpen(false)
+  );
+  
+  const { handleUpdateCustomer } = useUpdateCustomer(customer, setCustomer);
 
   if (loading) {
     return (
