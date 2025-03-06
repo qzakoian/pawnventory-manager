@@ -1,7 +1,6 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { NewProduct } from "@/types/customer";
 
 interface ModelFieldProps {
   model: string;
@@ -16,6 +15,7 @@ export const ModelField = ({ model, onChange }: ModelFieldProps) => {
         id="model"
         value={model}
         onChange={(e) => onChange(e.target.value)}
+        placeholder="Enter model name"
       />
     </div>
   );

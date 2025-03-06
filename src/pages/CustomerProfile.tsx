@@ -1,3 +1,4 @@
+
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -105,21 +106,28 @@ const CustomerProfile = () => {
     if (!customer) return;
 
     try {
-      // Prepare product data based on scheme type
+      // Prepare the base product data
       let productData: any = {
-        ...newProduct,
+        model: newProduct.model,
+        brand: newProduct.brand,
+        product_category: newProduct.product_category,
+        scheme: newProduct.scheme,
+        purchase_price_including_VAT: newProduct.purchase_price_including_VAT,
+        purchase_date: newProduct.purchase_date,
         customer_id: customer.id,
+        imei: newProduct.imei,
+        sku: newProduct.sku
       };
 
-      // For buy-back schemes, add the rate and price fields
-      if (newProduct.scheme.includes('buy-back')) {
-        productData[`${newProduct.scheme}_rate`] = newProduct.scheme_rate || 0;
-        productData[`${newProduct.scheme}_price`] = newProduct.scheme_price || 0;
-      } 
-      // For Free-stock scheme, don't add special fields
-      else if (newProduct.scheme === 'Free-stock') {
-        productData['Free-stock'] = true;
+      // Add scheme-specific data based on the scheme type
+      if (newProduct.scheme.includes('buy-back') && newProduct.scheme_rate && newProduct.scheme_price) {
+        // For buy-back schemes, add the scheme-specific rate and price columns
+        productData[`${newProduct.scheme}_rate`] = newProduct.scheme_rate;
+        productData[`${newProduct.scheme}_price`] = newProduct.scheme_price;
       }
+      
+      // For Free-stock, we don't need to add any special fields
+      // The scheme column will already be set to 'Free-stock'
 
       const { data, error } = await supabase
         .from('Products')

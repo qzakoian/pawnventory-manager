@@ -14,6 +14,7 @@ import { useAddProductForm } from "@/components/customer-profile/hooks/useAddPro
 import { ManualEntryTab } from "@/components/customer-profile/add-product/ManualEntryTab";
 import { AIDetectionTab } from "@/components/customer-profile/add-product/AIDetectionTab";
 import { mapToAvailableCategory } from "@/components/customer-profile/utils/categoryMapping";
+import { toast } from "@/hooks/use-toast";
 
 interface AddProductDialogProps {
   isOpen: boolean;
@@ -50,8 +51,36 @@ export const AddProductDialog = ({
   } = useAddProductForm();
 
   const handleSubmit = () => {
+    // Validate required fields
+    if (!newProduct.model.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Missing information",
+        description: "Please enter a model name",
+      });
+      return;
+    }
+
+    if (!newProduct.brand) {
+      toast({
+        variant: "destructive",
+        title: "Missing information",
+        description: "Please select a brand",
+      });
+      return;
+    }
+
+    if (!newProduct.product_category) {
+      toast({
+        variant: "destructive",
+        title: "Missing information",
+        description: "Please select a product category",
+      });
+      return;
+    }
+
     // Create a product object with the necessary fields
-    const productToSubmit: any = {
+    const productToSubmit: NewProduct = {
       ...newProduct,
       imei,
       sku,

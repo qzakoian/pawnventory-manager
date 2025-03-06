@@ -41,6 +41,7 @@ export const ManualEntryTab = ({
   generateRandomIMEI,
   generateRandomSKU,
 }: ManualEntryTabProps) => {
+  // Only show buyback fields for schemes containing 'buy-back'
   const isBuybackScheme = newProduct.scheme.includes('buy-back');
 
   return (
