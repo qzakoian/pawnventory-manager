@@ -1,3 +1,4 @@
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
@@ -23,10 +24,12 @@ export const useProductData = (productId: number | null) => {
       // Ensure the customer_type is one of the allowed values
       if (data.customer) {
         const customerType = data.customer.customer_type;
-        // Explicitly cast customer_type to the union type
-        data.customer.customer_type = (customerType === "company") 
-          ? "company" 
-          : (customerType === "individual" ? "individual" : null);
+        if (customerType === "company" || customerType === "individual") {
+          // Explicitly cast customer_type to the union type
+          data.customer.customer_type = customerType as "company" | "individual";
+        } else {
+          data.customer.customer_type = null;
+        }
       }
       
       return data;

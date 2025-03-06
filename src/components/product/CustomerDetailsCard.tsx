@@ -3,10 +3,11 @@ import { Card } from "@/components/ui/card";
 import { CustomerSelect } from "./CustomerSelect";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
+import { Customer } from "@/types/customer";
 
 interface CustomerDetailsCardProps {
   customers: Array<{ id: number; first_name: string | null; last_name: string | null; }>;
-  selectedCustomer: { id: number; first_name: string | null; last_name: string | null; } | null;
+  selectedCustomer: Customer | null;
   isLoadingCustomers: boolean;
   onCustomerUpdate: (customerId: number | null) => void;
 }
