@@ -21,11 +21,12 @@ export const useProductData = (productId: number | null) => {
         .single();
       if (error) throw error;
 
-      // Ensure the customer_type is one of the allowed values
-      if (data.customer) {
+      // Process the returned data to ensure proper typing
+      if (data && data.customer) {
         const customerType = data.customer.customer_type;
+        
+        // Check if customer_type is one of our valid union types
         if (customerType === "company" || customerType === "individual") {
-          // Explicitly cast customer_type to the union type
           data.customer.customer_type = customerType as "company" | "individual";
         } else {
           data.customer.customer_type = null;

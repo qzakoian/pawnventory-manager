@@ -5,15 +5,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-interface Customer {
-  id: number;
-  first_name: string | null;
-  last_name: string | null;
-}
+import { Customer } from "@/types/customer";
 
 interface CustomerSelectProps {
-  customers: Customer[];
+  customers: Array<{ id: number; first_name: string | null; last_name: string | null; }>;
   selectedCustomer: Customer | null;
   onCustomerSelect: (customerId: number | null) => void;
   isLoading: boolean;
